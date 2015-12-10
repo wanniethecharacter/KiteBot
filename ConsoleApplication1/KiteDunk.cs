@@ -5,6 +5,7 @@ using System.Net;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace KiteBot
 {
@@ -20,7 +21,8 @@ namespace KiteBot
 			{
 				response = client.DownloadString(kiteDunksApi);
 			}
-
+			dynamic o = JsonConvert.DeserializeObject(response);
+			o.
 		}
 	}
 }
