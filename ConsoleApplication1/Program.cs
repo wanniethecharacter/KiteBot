@@ -13,8 +13,10 @@ namespace ConsoleApplication1
 
 			//Display all log messages in the console
 			Client.LogMessage += (s, e) => Console.WriteLine("[{"+e.Severity+"}] {"+e.Source+"}: {"+e.Message+"}");
-
+			
+			
 			//Echo back any message received, provided it didn't come from the bot itself
+			//ToDO rewrite nested if statements to new class
 			Client.MessageReceived += async (s, e) =>
 			{
 				if (!e.Message.IsAuthor && 0 <= e.Message.Text.IndexOf("GetDunked"))
@@ -47,7 +49,7 @@ namespace ConsoleApplication1
 					}
 					else
 					{
-						await Client.SendMessage(e.Channel, "KiteBot ver. 0.3-PreAlpha");
+						await Client.SendMessage(e.Channel, "KiteBot ver. 0.3-PreAlpha \"Fuck you\"");
 					}
 				}
 			};
@@ -56,7 +58,7 @@ namespace ConsoleApplication1
 			Client.Run(async () =>
 			{
 				//Connect to the Discord server using our email and password
-				await Client.Connect(KiteBot.Properties.auth.Default.email, KiteBot.Properties.auth.Default.password);
+				await Client.Connect("", "");
 			});
         }
     }
