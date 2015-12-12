@@ -1,33 +1,44 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 
 namespace KiteBot
 {
-	internal class KiteDunk
+	public class KiteDunk
 	{
 		public static string[] _kiteDunks;
-		public static Random Rnd;
+		public static Random _randomSeed;
+        public const string FileLocation = @"C:\Users\sindr\Documents\visual studio 2013\Projects\ConsoleApplication1\ConsoleApplication1\KiteDunks3.txt";
+        public const string GoogleSpreadsheetApiUrl = "https://spreadsheets.google.com/feeds/list/11024r_0u5Mu-dLFd-R9lt8VzOYXWgKX1I5JamHJd8S4/od6/public/values?hl=en_US&&alt=json";
 
-		public KiteDunk()
-		{
-			_kiteDunks = System.IO.File.ReadAllLines(@"C:\Users\sindr\Documents\visual studio 2013\Projects\ConsoleApplication1\ConsoleApplication1\KiteDunks3.txt");
-			Rnd = new Random(System.DateTime.Now.Millisecond);
-		}
+        public KiteDunk() : this(File.ReadAllLines(FileLocation), new Random(DateTime.Now.Millisecond))
+        {
+        }
 
+        public KiteDunk(string[] arrayOfDunks, Random randomSeed)
+        {
+            _kiteDunks = arrayOfDunks;
+            _randomSeed = randomSeed;
+        }
+
+        /// <summary>
+        ///     Returns a Message from Random Seed
+        /// </summary>
+        /// <returns>New Message from String</returns>
 		public string GetRandomKiteDunk()
 		{
-			var i = Rnd.Next(_kiteDunks.Length / 2) * 2;
-			return "\"" + _kiteDunks[i + 1] + "\" - " + _kiteDunks[i];
+            //TODO: Maybe make this a retry recursion method
+			var i = _randomSeed.Next(_kiteDunks.Length / 2) * 2;
+			return @"\" + _kiteDunks[i + 1] + @"\ - " + _kiteDunks[i];
 		}
+
 		private void UpdateKiteDunks()
 		{
 			string response;
 			using (var client = new WebClient())
 			{
-				response = client.DownloadString("https://spreadsheets.google.com/feeds/list/11024r_0u5Mu-dLFd-R9lt8VzOYXWgKX1I5JamHJd8S4/od6/public/values?hl=en_US&&alt=json");
+				response = client.DownloadString("");
 			}
 			var regex1 = new Regex("\"gsx\\$name\":{\"\\$t\":\".+?\"}|\"gsx\\$quote\":{\"\\$t\":\".+?\"}}", RegexOptions.Singleline);
 			var matches = regex1.Matches(response);

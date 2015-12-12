@@ -16,7 +16,7 @@ namespace ConsoleApplication1
 			
 			
 			//Echo back any message received, provided it didn't come from the bot itself
-			//ToDO rewrite nested if statements to new class
+			//TODO: Rewrite this as a State Machine
 			Client.MessageReceived += async (s, e) =>
 			{
 				if (!e.Message.IsAuthor && 0 <= e.Message.Text.IndexOf("GetDunked"))
@@ -32,7 +32,7 @@ namespace ConsoleApplication1
 					}
 					else if (0 <= e.Message.Text.ToLower().IndexOf("help", 5))
 					{
-						var nl = System.Environment.NewLine;
+						var nl = Environment.NewLine;
 						await Client.SendMessage(e.Channel, "Current Commands are:" + nl + "#420" + nl + "google" + nl + "youtube" + nl + "kitedunk" + nl + "help");
 					}
 					else if (0 <= e.Message.Text.ToLower().IndexOf("google", 0))
@@ -49,7 +49,7 @@ namespace ConsoleApplication1
 					}
 					else
 					{
-						await Client.SendMessage(e.Channel, "KiteBot ver. 0.3-PreAlpha \"Fuck you\"");
+						await Client.SendMessage(e.Channel, "KiteBot ver. 0.4-PreAlpha \"Fuck you\"");
 					}
 				}
 			};
