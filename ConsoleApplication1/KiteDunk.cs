@@ -30,7 +30,7 @@ namespace KiteBot
 		{
             //TODO: Maybe make this a retry recursion method
 			var i = _randomSeed.Next(_kiteDunks.Length / 2) * 2;
-			return @"\" + _kiteDunks[i + 1] + @"\ - " + _kiteDunks[i];
+			return "\"" + _kiteDunks[i + 1] + "\" - " + _kiteDunks[i];
 		}
 
 		private void UpdateKiteDunks()
