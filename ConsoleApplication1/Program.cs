@@ -23,7 +23,7 @@ namespace KiteBot
 				{
 					await Client.SendMessage(e.Channel, "http://i.imgur.com/QhcNUWo.gifv");
 				}
-				if (!e.Message.IsAuthor && e.Message.Text.StartsWith("@KiteBot"))
+				if (!e.Message.IsAuthor && e.Message.Text.StartsWith("@Kortice"))
 				{
 					if (e.Message.Text.StartsWith("@KiteBot #420") || e.Message.Text.ToLower().StartsWith("@KiteBot #blaze") ||
 					    0 <= e.Message.Text.ToLower().IndexOf("waifu", 0))
@@ -58,7 +58,7 @@ namespace KiteBot
 			Client.Run(async () =>
 			{
 				//Connect to the Discord server using our email and password
-				await Client.Connect("", "");
+				await Client.Connect("spartan117tron@gmail.com", "Spartan117");
 			});
         }
     }
