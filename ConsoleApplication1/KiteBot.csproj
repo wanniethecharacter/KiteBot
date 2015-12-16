@@ -72,7 +72,7 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>ConsoleApplication1.Program</StartupObject>
+    <StartupObject>KiteBot.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Discord.Net, Version=0.8.1.0, Culture=neutral, processorArchitecture=MSIL">
@@ -115,6 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="KiteDunks2.txt" />
+    <Content Include="KiteDunks3.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

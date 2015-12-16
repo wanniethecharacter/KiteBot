@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using Discord.Net;
 
 namespace KiteBot
 {
@@ -9,7 +11,8 @@ namespace KiteBot
 		static void Main(string[] args)
         {
             Client = new Discord.DiscordClient();
-			var kiteDunk = new KiteBot.KiteDunk();
+			var kiteDunk = new KiteDunk();
+			var giantBombRss = new GiantBombRss();
 
 			//Display all log messages in the console
 			Client.LogMessage += (s, e) => Console.WriteLine("[{"+e.Severity+"}] {"+e.Source+"}: {"+e.Message+"}");
@@ -49,7 +52,7 @@ namespace KiteBot
 					}
 					else
 					{
-						await Client.SendMessage(e.Channel, "KiteBot ver. 0.4-PreAlpha \"Fuck you\"");
+						await Client.SendMessage(e.Channel, "KiteBot ver. 0.5-PreAlpha \"This one is for the ladies.\"");
 					}
 				}
 			};
