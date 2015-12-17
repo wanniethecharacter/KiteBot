@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Globalization;
+using System.Threading.Tasks;
+using Discord;
 using Discord.Net;
 
 namespace KiteBot
@@ -18,7 +20,6 @@ namespace KiteBot
 			Client.LogMessage += (s, e) => Console.WriteLine("[{"+e.Severity+"}] {"+e.Source+"}: {"+e.Message+"}");
 			
 			
-			//Echo back any message received, provided it didn't come from the bot itself
 			//TODO: Rewrite this as a State Machine
 			Client.MessageReceived += async (s, e) =>
 			{
@@ -42,7 +43,7 @@ namespace KiteBot
 					{
 						await Client.SendMessage(e.Channel, "http://lmgtfy.com/?q=" + e.Message.Text.ToLower().Substring(16).Replace(' ', '+'));
 					}
-					else if (0 <= e.Message.Text.ToLower().IndexOf("youtube", 0))
+					else if (0 <= e.Message.Text.ToLower().IndexOf("youtube", 0) && e.Message.Text.Length > 16)
 					{
 						await Client.SendMessage(e.Channel, "https://www.youtube.com/results?search_query=" + e.Message.Text.ToLower().Substring(17).Replace(' ', '+'));
 					}
@@ -61,8 +62,19 @@ namespace KiteBot
 			Client.Run(async () =>
 			{
 				//Connect to the Discord server using our email and password
-				await Client.Connect("", "");
+				await Client.Connect("sindre.g.langhus@gmail.com", "H0rt1n007");
 			});
         }
+	    public static void SendMessage(string message)
+	    {
+			//ToDO make this server generic
+		    Client.SendMessage(Client.GetChannel(85842104034541568),message);
+	    }
+
+	    public static void SendMessage(object s, Feed.UpdatedFeedEventArgs e)
+	    {
+		    Client.SendMessage(Client.GetChannel(85842104034541568),
+			    e.Title + " live now at GiantBomb.com\r\n" + e.Link);
+	    }
     }
 }
