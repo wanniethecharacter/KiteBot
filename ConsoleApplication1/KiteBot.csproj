@@ -105,22 +105,25 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GiantBombRSS.cs" />
-    <Compile Include="KiteBot.cs" />
-    <Compile Include="KiteBot.Designer.cs">
-      <DependentUpon>KiteBot.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    <Compile Include="auth.Designer.cs">
       <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>auth.settings</DependentUpon>
     </Compile>
+    <Compile Include="GiantBombRSS.cs" />
     <Compile Include="KiteDunk.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Example_KiteBot.settings" />
-    <None Include="KiteBot.settings">
+    <None Include="app.config" />
+    <None Include="auth.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>KiteBot.Designer.cs</LastGenOutput>
+      <LastGenOutput>auth.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Example_auth.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Example_auth.Designer.cs</LastGenOutput>
     </None>
     <None Include="packages.config" />
   </ItemGroup>

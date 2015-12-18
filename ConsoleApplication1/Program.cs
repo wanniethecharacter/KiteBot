@@ -34,23 +34,38 @@ namespace KiteBot
 					else if (0 <= e.Message.Text.ToLower().IndexOf("help", 5))
 					{
 						var nl = Environment.NewLine;
-						await Client.SendMessage(e.Channel, "Current Commands are:" + nl + "#420" + nl + "google" + nl + "youtube" + nl + "kitedunk" + nl + "help");
+						await Client.SendMessage(e.Channel, "Current Commands are:" + nl + "#420" + nl + "randomql" + nl + "google" + nl + "youtube" + nl + "kitedunk" + nl + "help");
+					}
+					else if (0 <= e.Message.Text.ToLower().IndexOf("randomql", 5))
+					{
+						Client.SendMessage(e.Channel,
+							"http://qlcrew.com/main.php?anyone=anyone&inc%5B0%5D=&p=999&exc%5B0%5D=&per_page=15&random");
 					}
 					else if (0 <= e.Message.Text.ToLower().IndexOf("google", 0))
 					{
-						await Client.SendMessage(e.Channel, "http://lmgtfy.com/?q=" + e.Message.Text.ToLower().Substring(16).Replace(' ', '+'));
+						await
+							Client.SendMessage(e.Channel, "http://lmgtfy.com/?q=" + e.Message.Text.ToLower().Substring(16).Replace(' ', '+'));
 					}
-					else if (0 <= e.Message.Text.ToLower().IndexOf("youtube", 0) && e.Message.Text.Length > 16)
+					else if (0 <= e.Message.Text.ToLower().IndexOf("youtube", 0))
 					{
-						await Client.SendMessage(e.Channel, "https://www.youtube.com/results?search_query=" + e.Message.Text.ToLower().Substring(17).Replace(' ', '+'));
+						if (e.Message.Text.Length > 16)
+						{
+							await Client.SendMessage(e.Channel,
+								"https://www.youtube.com/results?search_query=" + e.Message.Text.ToLower().Substring(17).Replace(' ', '+'));
+						}
+						else
+						{
+							await Client.SendMessage(e.Channel, "Please add a query after youtube, starting with a space.");
+						}
 					}
+
 					else if (0 <= e.Message.Text.ToLower().IndexOf("dunk", 0))
 					{
 						await Client.SendMessage(e.Channel, kiteDunk.GetRandomKiteDunk());
 					}
 					else
 					{
-						await Client.SendMessage(e.Channel, "KiteBot ver. 0.5-PreAlpha \"This one is for the ladies.\"");
+						await Client.SendMessage(e.Channel, "KiteBot ver. 0.5 \"This one is for the ladies.\"");
 					}
 				}
 			};
@@ -59,7 +74,7 @@ namespace KiteBot
 			Client.Run(async () =>
 			{
 				//Connect to the Discord server using our email and password
-				await Client.Connect("", "");
+				await Client.Connect("sindre.g.langhus@gmail.com", "H0rt1n007");
 			});
         }
 	    public static void SendMessage(string message)
