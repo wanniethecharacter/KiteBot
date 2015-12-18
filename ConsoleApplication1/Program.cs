@@ -59,7 +59,7 @@ namespace KiteBot
 			Client.Run(async () =>
 			{
 				//Connect to the Discord server using our email and password
-				await Client.Connect("sindre.g.langhus@gmail.com", "H0rt1n007");
+				await Client.Connect("", "");
 			});
         }
 	    public static void SendMessage(string message)
