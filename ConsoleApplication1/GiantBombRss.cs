@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Timers;
-using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
@@ -26,7 +25,7 @@ namespace KiteBot
 			}
 			Timer GBTimer = new Timer();
 			GBTimer.Elapsed += new ElapsedEventHandler(UpdateFeeds);
-			GBTimer.Interval = 300000;
+			GBTimer.Interval = 300000;//5 minutes 5*60*1000
 			GBTimer.Enabled = true;
 		}
 
@@ -62,7 +61,7 @@ namespace KiteBot
 		{
 			var newXElement = GetXDocumentFromUrl(_url);
 			DateTime newPubDate = getGiantBombFormatDateTime(newXElement.Element("pubDate").Value);
-			if (newPubDate.CompareTo(_pubDate) >= 0)
+			if (newPubDate.CompareTo(_pubDate) > 0)
 			{
 				_latestXElement = newXElement;
 				_pubDate = newPubDate;
@@ -87,14 +86,14 @@ namespace KiteBot
 		private XElement GetXDocumentFromUrl(string url)
 		{
 			XDocument document = XDocument.Load(url);
-			//XmlReader xr = document.Root.Element("rss").CreateReader();//.Element("channel").Element("item");
-			var x = document.XPathSelectElement(@"//rss/channel/item");
-			return x;
+			return document.XPathSelectElement(@"//rss/channel/item");
 		}
 
 		private DateTime getGiantBombFormatDateTime(string dateTimeString)
 		{
-			string timeString = dateTimeString;//this is really ugly, but all the feeds use different ways to encode their timezones AND I JUST DONT CARE anymore.
+			string timeString = dateTimeString;
+			//This is really ugly, but all the feeds use different ways to encode their timezones and I JUST DONT CARE anymore.
+			//Since the feeds are atleast consistent within that particular feed, this shouldn't cause a conflict when comparing
 			timeString = timeString.Replace(" PDT","").Replace(" PST","").Replace(" -0800","");
 			return DateTime.ParseExact(timeString,
 				"ddd, dd MMM yyyy HH:mm:ss",

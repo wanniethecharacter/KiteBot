@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Globalization;
-using System.Threading.Tasks;
 using Discord;
-using Discord.Net;
 
 namespace KiteBot
 {
     class Program
     {
-		public static Discord.DiscordClient Client;
+		public static DiscordClient Client;
 
 		static void Main(string[] args)
         {
-            Client = new Discord.DiscordClient();
+            Client = new DiscordClient();
 			var kiteDunk = new KiteDunk();
 			var giantBombRss = new GiantBombRss();
 

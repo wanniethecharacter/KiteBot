@@ -106,6 +106,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GiantBombRSS.cs" />
+    <Compile Include="KiteBot.cs" />
     <Compile Include="KiteBot.Designer.cs">
       <DependentUpon>KiteBot.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -116,7 +117,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="Example_KiteBot.settings" />
     <None Include="KiteBot.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>KiteBot.Designer.cs</LastGenOutput>
