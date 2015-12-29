@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using Discord;
 
 namespace KiteBot
@@ -12,6 +13,7 @@ namespace KiteBot
             Client = new DiscordClient();
 			var kiteDunk = new KiteDunk();
 			var giantBombRss = new GiantBombRss();
+			bool shutUp = false;
 
 			//Display all log messages in the console
 			Client.LogMessage += (s, e) => Console.WriteLine("[{"+e.Severity+"}] {"+e.Source+"}: {"+e.Message+"}");
@@ -38,8 +40,11 @@ namespace KiteBot
 					}
 					else if (0 <= e.Message.Text.ToLower().IndexOf("randomql", 5))
 					{
-						Client.SendMessage(e.Channel,
-							"http://qlcrew.com/main.php?anyone=anyone&inc%5B0%5D=&p=999&exc%5B0%5D=&per_page=15&random");
+						await Client.SendMessage(e.Channel, getResponseUriFromRandomQLCrew("http://qlcrew.com/main.php?anyone=anyone&inc%5B0%5D=&p=999&exc%5B0%5D=&per_page=15&random"));
+					}
+					else if (0 <= e.Message.Text.ToLower().IndexOf("special sauce", 0))
+					{
+						await Client.SendMessage(e.Channel, "https://www.youtube.com/watch?v=nh8qryMFZb4");
 					}
 					else if (0 <= e.Message.Text.ToLower().IndexOf("google", 0))
 					{
@@ -65,7 +70,7 @@ namespace KiteBot
 					}
 					else
 					{
-						await Client.SendMessage(e.Channel, "KiteBot ver. 0.5 \"This one is for the ladies.\"");
+						await Client.SendMessage(e.Channel, "KiteBot ver. 0.6 \"Ask for the special sauce.\"");
 					}
 				}
 			};
@@ -87,6 +92,14 @@ namespace KiteBot
 	    {
 		    Client.SendMessage(Client.GetChannel(85842104034541568),
 			    e.Title + " live now at GiantBomb.com\r\n" + e.Link);
+	    }
+
+	    private static string getResponseUriFromRandomQLCrew(string s)
+	    {
+		    string url = s;
+			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+			HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+		    return response.ResponseUri.AbsoluteUri;
 	    }
     }
 }

@@ -9,10 +9,9 @@ namespace KiteBot
 {
 	class GiantBombRss
 	{
-		private static readonly string[] GiantBombUrl = { "http://www.giantbomb.com/feeds/podcast/", 
-															"http://www.giantbomb.com/podcast-xml/beastcast/", 
-															"http://www.giantbomb.com/feeds/video/" };
+		private static readonly string[] GiantBombUrl = { "http://www.giantbomb.com/feeds/mashup/" };//,"http://www.giantbomb.com/feeds/podcast/", "http://www.giantbomb.com/podcast-xml/beastcast/", "http://www.giantbomb.com/feeds/video/
 		private static List<Feed> _feeds;
+		private static Timer GBTimer;
 
 		public GiantBombRss()
 		{
@@ -23,13 +22,21 @@ namespace KiteBot
 				feed.FeedUpdated += (s, e) => Program.SendMessage((Feed) s, (Feed.UpdatedFeedEventArgs)e);
 				_feeds.Add(feed);
 			}
-			Timer GBTimer = new Timer();
+			GBTimer = new Timer();
 			GBTimer.Elapsed += new ElapsedEventHandler(UpdateFeeds);
-			GBTimer.Interval = 300000;//5 minutes 5*60*1000
+			GBTimer.Interval = 1800000;//30 minutes 30*60*1000=1 800 000
+			GBTimer.AutoReset = true;
 			GBTimer.Enabled = true;
 		}
 
 		private void UpdateFeeds(object sender, ElapsedEventArgs elapsedEventArgs)
+		{
+			foreach (Feed feed in _feeds)
+			{
+				feed.UpdateFeed();
+			}
+		}
+		private void UpdateFeeds()
 		{
 			foreach (Feed feed in _feeds)
 			{
@@ -93,7 +100,7 @@ namespace KiteBot
 		{
 			string timeString = dateTimeString;
 			//This is really ugly, but all the feeds use different ways to encode their timezones and I JUST DONT CARE anymore.
-			//Since the feeds are atleast consistent within that particular feed, this shouldn't cause a conflict when comparing
+			//Since the feeds are atleast consistent within that particular feed, this shouldn't cause a conflict when comparing timeDates
 			timeString = timeString.Replace(" PDT","").Replace(" PST","").Replace(" -0800","");
 			return DateTime.ParseExact(timeString,
 				"ddd, dd MMM yyyy HH:mm:ss",
