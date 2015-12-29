@@ -32,7 +32,7 @@ namespace KiteBot
             if (0 <= messageText.ToLower().IndexOf("hi", 0) || 0 <= messageText.ToLower().IndexOf("hey", 0) ||
                 0 <= messageText.ToLower().IndexOf("hello", 0))
             {
-                return ParseGreeting(messageText);
+                return ParseGreeting(userName);
             }
 
             else
