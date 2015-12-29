@@ -45,7 +45,7 @@ namespace KiteBot
         {
             List<string> _possibleResponses = new List<string>();
 
-            for (int i = 0; i <= _greetings.Length; i+=2)
+            for (int i = 0; i < _greetings.Length - 2; i+=2)
             {
                 if (userName.ToLower().Contains(_greetings[i]) || _greetings[i] == "generic")
                 {
