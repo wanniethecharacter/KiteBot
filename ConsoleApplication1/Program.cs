@@ -12,6 +12,7 @@ namespace KiteBot
         {
             Client = new DiscordClient();
 			var kiteDunk = new KiteDunk();
+			var kiteChat = new KiteChat();
 			var giantBombRss = new GiantBombRss();
 			bool shutUp = false;
 
