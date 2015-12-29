@@ -105,6 +105,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="KiteChat.cs" />
     <Compile Include="Properties\auth.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -128,6 +129,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Greetings.txt" />
     <Content Include="KiteDunks2.txt" />
     <Content Include="KiteDunks3.txt" />
   </ItemGroup>
