@@ -35,7 +35,7 @@ namespace KiteBot
                 return ParseGreeting(userName);
             }
 
-            if (0 <= messageText.ToLower().IndexOf("fuck you", 0) || 0 <= messageText.ToLower().IndexOf("fuckyou", 0))
+            else if (0 <= messageText.ToLower().IndexOf("fuck you", 0) || 0 <= messageText.ToLower().IndexOf("fuckyou", 0))
             {
                 List<string> _possibleResponses = new List<string>();
                 _possibleResponses.Add("Hey fuck you too USER!");
