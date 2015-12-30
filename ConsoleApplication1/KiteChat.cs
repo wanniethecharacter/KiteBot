@@ -35,6 +35,17 @@ namespace KiteBot
                 return ParseGreeting(userName);
             }
 
+            if (0 <= messageText.ToLower().IndexOf("fuck you", 0) || 0 <= messageText.ToLower().IndexOf("fuckyou", 0))
+            {
+                List<string> _possibleResponses = new List<string>();
+                _possibleResponses.Add("Hey fuck you too USER!");
+                _possibleResponses.Add("I bet you'd like that wouldn't you USER?");
+                _possibleResponses.Add("No, fuck you USER!");
+                _possibleResponses.Add("Fuck you too USER!");
+
+                return (_possibleResponses[_randomSeed.Next(0, _possibleResponses.Count)].Replace("USER", userName));
+            }
+
             else
             {
                 return "KiteBot ver. 0.6 \"Ask for the special sauce.\"";
