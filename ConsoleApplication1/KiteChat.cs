@@ -29,13 +29,8 @@ namespace KiteBot
 
         public string ParseChatResponse(string userName, string messageText)
         {
-            if (0 <= messageText.ToLower().IndexOf("hi", 0) || 0 <= messageText.ToLower().IndexOf("hey", 0) ||
-                0 <= messageText.ToLower().IndexOf("hello", 0))
-            {
-                return ParseGreeting(userName);
-            }
 
-            else if (0 <= messageText.ToLower().IndexOf("fuck you", 0) || 0 <= messageText.ToLower().IndexOf("fuckyou", 0))
+            if (0 <= messageText.ToLower().IndexOf("fuck you", 0) || 0 <= messageText.ToLower().IndexOf("fuckyou", 0))
             {
                 List<string> _possibleResponses = new List<string>();
                 _possibleResponses.Add("Hey fuck you too USER!");
@@ -44,6 +39,12 @@ namespace KiteBot
                 _possibleResponses.Add("Fuck you too USER!");
 
                 return (_possibleResponses[_randomSeed.Next(0, _possibleResponses.Count)].Replace("USER", userName));
+            }
+
+            else if (0 <= messageText.ToLower().IndexOf("hi", 0) || 0 <= messageText.ToLower().IndexOf("hey", 0) ||
+                0 <= messageText.ToLower().IndexOf("hello", 0))
+            {
+                return ParseGreeting(userName);
             }
 
             else
