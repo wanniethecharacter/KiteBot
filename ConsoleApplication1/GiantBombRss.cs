@@ -11,7 +11,7 @@ namespace KiteBot
 	{
 		private static readonly string[] GiantBombUrl = { "http://www.giantbomb.com/feeds/mashup/" };//,"http://www.giantbomb.com/feeds/podcast/", "http://www.giantbomb.com/podcast-xml/beastcast/", "http://www.giantbomb.com/feeds/video/
 		private static List<Feed> _feeds;
-		private static Timer GBTimer;
+		private static Timer GBTimer;//Garbage collection doesnt like local variables
 
 		public GiantBombRss()
 		{

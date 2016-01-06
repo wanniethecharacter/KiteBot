@@ -19,7 +19,6 @@ namespace KiteBot
 			//Display all log messages in the console
 			Client.LogMessage += (s, e) => Console.WriteLine("[{"+e.Severity+"}] {"+e.Source+"}: {"+e.Message+"}");
 			
-			
 			//TODO: Rewrite this as a State Machine
 			Client.MessageReceived += async (s, e) =>
 			{
@@ -67,7 +66,7 @@ namespace KiteBot
 
 					else if (0 <= e.Message.Text.ToLower().IndexOf("dunk", 0))
 					{
-						await Client.SendMessage(e.Channel, kiteDunk.GetRandomKiteDunk());
+						await Client.SendMessage(e.Channel, kiteDunk.GetUpdatedKiteDunk());
 					}
 					else
 					{
