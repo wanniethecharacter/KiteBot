@@ -45,6 +45,11 @@ namespace KiteBot
                 return (_possibleResponses[_randomSeed.Next(0, _possibleResponses.Count)].Replace("USER", userName));
             }
 
+            else if (0 <= messageText.ToLower().IndexOf("/pizza", 7, 8))
+            {
+                return ParsePizza(userName);
+            }
+
             else if (0 <= messageText.ToLower().IndexOf("hi", 0) || 0 <= messageText.ToLower().IndexOf("hey", 0) ||
                 0 <= messageText.ToLower().IndexOf("hello", 0))
             {
@@ -79,6 +84,38 @@ namespace KiteBot
 				return (_possibleResponses[_randomSeed.Next(0, _possibleResponses.Count)].Replace("USER", userName));
 		    }
 		    
+        }
+
+        private string ParsePizza(string userName)
+        {
+            List<string> _pizzaToppings = new List<string>();
+            _pizzaToppings.AddRange (new string[] {"Extra Cheese", "Pepperoni", "Sausage", "Chicken", "Ham", "Canadian Bacon",
+                                                    "Bacon", "Green Peppers", "Black Olives", "White Onion", "Diced Tomatoes", "Mushrooms",
+                                                    "Spinach", "Roasted Red Peppers", "Sun Dried Tomato", "Pineapple", "Italian Sausage",
+                                                    "Red Onion", "Green Chile", "Basil"});
+
+            int _numberOfToppings = _randomSeed.Next(0, _pizzaToppings.Count);
+
+            string _buildThisPizza = "USER you should put these things in the pizza: ";
+
+            for (int i = 0; i <= _numberOfToppings; i++)
+            {
+                int j = _randomSeed.Next(0, _pizzaToppings.Count);
+                _buildThisPizza += _pizzaToppings[j];
+                _pizzaToppings.Remove(_pizzaToppings[j]);
+
+                if (i == _numberOfToppings)
+                {
+                    _buildThisPizza += ".";
+                }
+
+                else
+                {
+                    _buildThisPizza += ", ";
+                }
+            }
+
+            return (_buildThisPizza.Replace("USER", userName));
         }
 
 		private void LoadBekGreetings()
