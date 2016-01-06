@@ -44,19 +44,16 @@ namespace KiteBot
 
                 return (_possibleResponses[_randomSeed.Next(0, _possibleResponses.Count)].Replace("USER", userName));
             }
-
-            else if (0 <= messageText.ToLower().IndexOf("/pizza", 7, 8))
+			else if (0 <= messageText.ToLower().IndexOf("/pizza", 0))
             {
                 return ParsePizza(userName);
             }
-
-            else if (0 <= messageText.ToLower().IndexOf("hi", 0) || 0 <= messageText.ToLower().IndexOf("hey", 0) ||
+			else if (0 <= messageText.ToLower().IndexOf("hi", 0) || 0 <= messageText.ToLower().IndexOf("hey", 0) ||
                 0 <= messageText.ToLower().IndexOf("hello", 0))
             {
                 return ParseGreeting(userName);
             }
-
-            else
+			else
             {
                 return "KiteBot ver. 0.6 \"Ask for the special sauce.\"";
             }
@@ -90,11 +87,11 @@ namespace KiteBot
         {
             List<string> _pizzaToppings = new List<string>();
             _pizzaToppings.AddRange (new string[] {"Extra Cheese", "Pepperoni", "Sausage", "Chicken", "Ham", "Canadian Bacon",
-                                                    "Bacon", "Green Peppers", "Black Olives", "White Onion", "Diced Tomatoes", "Mushrooms",
+                                                    "Bacon", "Green Peppers", "Black Olives", "White Onion", "Red Onions", "Diced Tomatoes", "Mushrooms",
                                                     "Spinach", "Roasted Red Peppers", "Sun Dried Tomato", "Pineapple", "Italian Sausage",
-                                                    "Red Onion", "Green Chile", "Basil"});
+                                                    "Red Onion", "Green Chile", "Basil", "Mayonnaise"});
 
-            int _numberOfToppings = _randomSeed.Next(0, _pizzaToppings.Count);
+            int _numberOfToppings = _randomSeed.Next(2, 7);//2 is 3, 7 is 8
 
             string _buildThisPizza = "USER you should put these things in the pizza: ";
 
