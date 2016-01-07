@@ -42,10 +42,6 @@ namespace KiteBot
 					{
 						await Client.SendMessage(e.Channel, getResponseUriFromRandomQLCrew("http://qlcrew.com/main.php?anyone=anyone&inc%5B0%5D=&p=999&exc%5B0%5D=&per_page=15&random"));
 					}
-					else if (0 <= e.Message.Text.ToLower().IndexOf("special sauce", 0))
-					{
-						await Client.SendMessage(e.Channel, "https://www.youtube.com/watch?v=nh8qryMFZb4");
-					}
 					else if (0 <= e.Message.Text.ToLower().IndexOf("google", 0))
 					{
 						await
