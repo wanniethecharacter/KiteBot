@@ -36,7 +36,7 @@ namespace KiteBot
 					else if (0 <= e.Message.Text.ToLower().IndexOf("help", 5))
 					{
 						var nl = Environment.NewLine;
-						await Client.SendMessage(e.Channel, "Current Commands are:" + nl + "#420" + nl + "randomql" + nl + "google" + nl + "youtube" + nl + "kitedunk" + nl + "/pizza" + nl + "help");
+						await Client.SendMessage(e.Channel, "Current Commands are:" + nl + "#420" + nl + "randomql" + nl + "google" + nl + "youtube" + nl + "kitedunk" + nl + "/pizza" + nl + "Whats for dinner" + nl + "help");
 					}
 					else if (0 <= e.Message.Text.ToLower().IndexOf("randomql", 5))
 					{
