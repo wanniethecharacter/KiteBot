@@ -121,7 +121,7 @@ namespace KiteBot
                                                          "Spinach", "Roasted Red Peppers", "Sun Dried Tomato", "Pineapple", "Italian Sausage",
                                                          "Red Onion", "Green Chile", "Basil", "Mayonnaise", "Mushrooms"});
 
-            int _numberOfToppings = _randomSeed.Next(2, 7);//2 is 3, 7 is 8
+            int _numberOfToppings = _randomSeed.Next(2, 7);//2 is 3, 7 is 8. Fuck you Teya
 
             string _buildThisPizza = "USER you should put these things in the pizza: ";
 
