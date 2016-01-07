@@ -105,44 +105,44 @@ namespace KiteBot
         //Makes up and returns a list of pizza toppings, with special toppings for a specific user
         private string ParsePizza(string userName)
         {
-            List<string> _pizzaToppings = new List<string>();
+            List<string> pizzaToppings = new List<string>();
 
             if (userName.ToLower().Contains("ionic"))
             {
-                _pizzaToppings.AddRange(new string[] {"Mayonnaise", "Squid", "Raw Tuna", "Raw Salmon", "Avocado","Squid Ink",
+                pizzaToppings.AddRange(new string[] {"Mayonnaise", "Squid", "Raw Tuna", "Raw Salmon", "Avocado","Squid Ink",
                                                       "Broccoli", "Shrimp", "Teriyaki Chicken", "Bonito Flakes", "Hot Sake",
                                                       "Soft Tofu", "Sushi Rice", "Nori", "Corn", "Snow Peas", "Bamboo Shoots",
                                                       "Potato", "Onion"});
             }
 
             else
-                 _pizzaToppings.AddRange (new string[] {"Extra Cheese", "Pepperoni", "Sausage", "Chicken", "Ham", "Canadian Bacon",
+                 pizzaToppings.AddRange (new string[] {"Extra Cheese", "Pepperoni", "Sausage", "Chicken", "Ham", "Canadian Bacon",
                                                          "Bacon", "Green Peppers", "Black Olives", "White Onion", "Red Onions", "Diced Tomatoes",
                                                          "Spinach", "Roasted Red Peppers", "Sun Dried Tomato", "Pineapple", "Italian Sausage",
                                                          "Red Onion", "Green Chile", "Basil", "Mayonnaise", "Mushrooms"});
 
-            int _numberOfToppings = _randomSeed.Next(2, 7);//2 is 3, 7 is 8
+            int numberOfToppings = _randomSeed.Next(2, 7);//2 is 3, 7 is 8
 
-            string _buildThisPizza = "USER you should put these things in the pizza: ";
+            string buildThisPizza = "USER you should put these things in the pizza: ";
 
-            for (int i = 0; i <= _numberOfToppings; i++)
+            for (int i = 0; i <= numberOfToppings; i++)
             {
-                int j = _randomSeed.Next(0, _pizzaToppings.Count);
-                _buildThisPizza += _pizzaToppings[j];
-                _pizzaToppings.Remove(_pizzaToppings[j]);
+                int j = _randomSeed.Next(0, pizzaToppings.Count);
+                buildThisPizza += pizzaToppings[j];
+                pizzaToppings.Remove(pizzaToppings[j]);
 
-                if (i == _numberOfToppings)
+                if (i == numberOfToppings)
                 {
-                    _buildThisPizza += ".";
+                    buildThisPizza += ".";
                 }
 
                 else
                 {
-                    _buildThisPizza += ", ";
+                    buildThisPizza += ", ";
                 }
             }
 
-            return (_buildThisPizza.Replace("USER", userName));
+            return (buildThisPizza.Replace("USER", userName));
         }
 
         //grabs random greetings for user bekenel from a reddit profile
