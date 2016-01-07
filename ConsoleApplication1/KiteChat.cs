@@ -34,6 +34,7 @@ namespace KiteBot
             _randomSeed = randomSeed;
         }
 
+        //a method to parse chat responses not dealt with in program.cs
         public string ParseChatResponse(string userName, string messageText)
         {
 			if (0 <= messageText.ToLower().IndexOf("fuck you", 0) || 0 <= messageText.ToLower().IndexOf("fuckyou", 0))
@@ -65,6 +66,7 @@ namespace KiteBot
             }
         }
 
+        //returns a greeting from the greetings.txt list on a per user or generic basis
 	    private string ParseGreeting(string userName)
         {
 		    if (userName.Equals("Bekenel"))
@@ -100,22 +102,24 @@ namespace KiteBot
 		    
         }
 
+        //Makes up and returns a list of pizza toppings, with special toppings for a specific user
         private string ParsePizza(string userName)
         {
             List<string> _pizzaToppings = new List<string>();
-            _pizzaToppings.AddRange (new string[] {"Extra Cheese", "Pepperoni", "Sausage", "Chicken", "Ham", "Canadian Bacon",
-                                                    "Bacon", "Green Peppers", "Black Olives", "White Onion", "Red Onions", "Diced Tomatoes",
-                                                    "Spinach", "Roasted Red Peppers", "Sun Dried Tomato", "Pineapple", "Italian Sausage",
-                                                    "Red Onion", "Green Chile", "Basil", "Mayonnaise", "Mushrooms",});
 
             if (userName.ToLower().Contains("ionic"))
             {
-                _pizzaToppings.Clear();
                 _pizzaToppings.AddRange(new string[] {"Mayonnaise", "Squid", "Raw Tuna", "Raw Salmon", "Avocado","Squid Ink",
                                                       "Broccoli", "Shrimp", "Teriyaki Chicken", "Bonito Flakes", "Hot Sake",
                                                       "Soft Tofu", "Sushi Rice", "Nori", "Corn", "Snow Peas", "Bamboo Shoots",
                                                       "Potato", "Onion"});
             }
+
+            else
+                 _pizzaToppings.AddRange (new string[] {"Extra Cheese", "Pepperoni", "Sausage", "Chicken", "Ham", "Canadian Bacon",
+                                                         "Bacon", "Green Peppers", "Black Olives", "White Onion", "Red Onions", "Diced Tomatoes",
+                                                         "Spinach", "Roasted Red Peppers", "Sun Dried Tomato", "Pineapple", "Italian Sausage",
+                                                         "Red Onion", "Green Chile", "Basil", "Mayonnaise", "Mushrooms"});
 
             int _numberOfToppings = _randomSeed.Next(2, 7);//2 is 3, 7 is 8
 
@@ -141,6 +145,7 @@ namespace KiteBot
             return (_buildThisPizza.Replace("USER", userName));
         }
 
+        //grabs random greetings for user bekenel from a reddit profile
 		private void LoadBekGreetings()
 		{
 			const string url = "https://www.reddit.com/user/UWotM8_SS";
