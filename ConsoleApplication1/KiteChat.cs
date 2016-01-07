@@ -12,22 +12,25 @@ namespace KiteBot
 
         public static string[] _greetings;
         public static string[] _responses;
-	    public static string[] _bekGreetings;
+        public static string[] _mealResponses;
+        public static string[] _bekGreetings;
 
         public static string ChatDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
         public static string GreetingFileLocation = ChatDirectory + "\\Content\\Greetings.txt";
         public static string ResponseFileLocation = ChatDirectory + "\\Content\\Responses.txt";
+        public static string MealFileLocation = ChatDirectory + "\\Content\\Meals.txt";
 
-        public KiteChat() : this(File.ReadAllLines(GreetingFileLocation), File.ReadAllLines(ResponseFileLocation), 
-                                new Random(DateTime.Now.Millisecond))
+        public KiteChat() : this(File.ReadAllLines(GreetingFileLocation), File.ReadAllLines(ResponseFileLocation),
+                                File.ReadAllLines(MealFileLocation), new Random(DateTime.Now.Millisecond))
         {
         }
 
-        public KiteChat(string[] arrayOfGreetings, string[] arrayOfResponses, Random randomSeed)
+        public KiteChat(string[] arrayOfGreetings, string[] arrayOfResponses, string[] arrayOfMeals, Random randomSeed)
         {
 			LoadBekGreetings();
             _greetings = arrayOfGreetings;
             _responses = arrayOfResponses;
+            _mealResponses = arrayOfMeals;
             _randomSeed = randomSeed;
         }
 
@@ -52,7 +55,11 @@ namespace KiteBot
             {
                 return ParseGreeting(userName);
             }
-			else
+            else if (0 <= messageText.ToLower().IndexOf("/meal", 0) || 0 <= messageText.ToLower().IndexOf("dinner", 0))
+            {
+                return (_mealResponses[_randomSeed.Next(0, _mealResponses.Length)].Replace("USER", userName));
+            }
+            else
             {
                 return "KiteBot ver. 0.6 \"Ask for the special sauce.\"";
             }
@@ -89,6 +96,15 @@ namespace KiteBot
                                                     "Bacon", "Green Peppers", "Black Olives", "White Onion", "Red Onions", "Diced Tomatoes",
                                                     "Spinach", "Roasted Red Peppers", "Sun Dried Tomato", "Pineapple", "Italian Sausage",
                                                     "Red Onion", "Green Chile", "Basil", "Mayonnaise", "Mushrooms",});
+
+            if (userName.ToLower().Contains("ionic"))
+            {
+                _pizzaToppings.Clear();
+                _pizzaToppings.AddRange(new string[] {"Mayonnaise", "Squid", "Raw Tuna", "Raw Salmon", "Avocado","Squid Ink",
+                                                      "Broccoli", "Shrimp", "Teriyaki Chicken", "Bonito Flakes", "Hot Sake",
+                                                      "Soft Tofu", "Sushi Rice", "Nori", "Corn", "Snow Peas", "Bamboo Shoots",
+                                                      "Potato", "Onion"});
+            }
 
             int _numberOfToppings = _randomSeed.Next(2, 7);//2 is 3, 7 is 8
 
