@@ -98,14 +98,18 @@ namespace KiteBot
                                                     "Spinach", "Roasted Red Peppers", "Sun Dried Tomato", "Pineapple", "Italian Sausage",
                                                     "Red Onion", "Green Chile", "Basil", "Mayonnaise"});
 
+            if (userName.ToLower().Contains("ionic"))
+            {
+                _pizzaToppings.Clear();
+                _pizzaToppings.AddRange(new string[] {"Mayonnaise", "Squid", "Raw Tuna", "Raw Salmon", "Avocado","Squid Ink",
+                                                      "Broccoli", "Shrimp", "Teriyaki Chicken", "Bonito Flakes", "Hot Sake",
+                                                      "Soft Tofu", "Sushi Rice", "Nori", "Corn", "Snow Peas", "Bamboo Shoots",
+                                                      "Potato", "Onion"});
+            }
+
             int _numberOfToppings = _randomSeed.Next(2, 7);//2 is 3, 7 is 8
 
             string _buildThisPizza = "USER you should put these things in the pizza: ";
-
-            if (userName.ToLower().Contains("ionic"))
-            {
-                _buildThisPizza += "Mayonnaise, ";
-            }
 
             for (int i = 0; i <= _numberOfToppings; i++)
             {
