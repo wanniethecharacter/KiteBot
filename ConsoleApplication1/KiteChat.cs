@@ -102,6 +102,11 @@ namespace KiteBot
 
             string _buildThisPizza = "USER you should put these things in the pizza: ";
 
+            if (userName.ToLower().Contains("ionic"))
+            {
+                _buildThisPizza += "Mayonnaise, ";
+            }
+
             for (int i = 0; i <= _numberOfToppings; i++)
             {
                 int j = _randomSeed.Next(0, _pizzaToppings.Count);
