@@ -13,22 +13,25 @@ namespace KiteBot
 
         public static string[] _greetings;
         public static string[] _responses;
-	    public static string[] _bekGreetings;
+        public static string[] _mealResponses;
+        public static string[] _bekGreetings;
 
         public static string ChatDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
         public static string GreetingFileLocation = ChatDirectory + "\\Content\\Greetings.txt";
         public static string ResponseFileLocation = ChatDirectory + "\\Content\\Responses.txt";
+        public static string MealFileLocation = ChatDirectory + "\\Content\\Meals.txt";
 
-        public KiteChat() : this(File.ReadAllLines(GreetingFileLocation), File.ReadAllLines(ResponseFileLocation), 
-                                new Random(DateTime.Now.Millisecond))
+        public KiteChat() : this(File.ReadAllLines(GreetingFileLocation), File.ReadAllLines(ResponseFileLocation),
+                                File.ReadAllLines(MealFileLocation), new Random(DateTime.Now.Millisecond))
         {
         }
 
-        public KiteChat(string[] arrayOfGreetings, string[] arrayOfResponses, Random randomSeed)
+        public KiteChat(string[] arrayOfGreetings, string[] arrayOfResponses, string[] arrayOfMeals, Random randomSeed)
         {
 			LoadBekGreetings();
             _greetings = arrayOfGreetings;
             _responses = arrayOfResponses;
+            _mealResponses = arrayOfMeals;
             _randomSeed = randomSeed;
         }
 
@@ -53,7 +56,11 @@ namespace KiteBot
             {
                 return ParseGreeting(userName);
             }
-			else
+            else if (0 <= messageText.ToLower().IndexOf("/meal", 0) || 0 <= messageText.ToLower().IndexOf("dinner", 0))
+            {
+                return (_mealResponses[_randomSeed.Next(0, _mealResponses.Length)].Replace("USER", userName));
+            }
+            else
             {
                 return "KiteBot ver. 0.6 \"Ask for the special sauce.\"";
             }
