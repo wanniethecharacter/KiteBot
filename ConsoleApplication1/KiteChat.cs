@@ -3,7 +3,6 @@ using System.IO;
 using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace KiteBot
 {
@@ -87,9 +86,9 @@ namespace KiteBot
         {
             List<string> _pizzaToppings = new List<string>();
             _pizzaToppings.AddRange (new string[] {"Extra Cheese", "Pepperoni", "Sausage", "Chicken", "Ham", "Canadian Bacon",
-                                                    "Bacon", "Green Peppers", "Black Olives", "White Onion", "Red Onions", "Diced Tomatoes", "Mushrooms",
+                                                    "Bacon", "Green Peppers", "Black Olives", "White Onion", "Red Onions", "Diced Tomatoes",
                                                     "Spinach", "Roasted Red Peppers", "Sun Dried Tomato", "Pineapple", "Italian Sausage",
-                                                    "Red Onion", "Green Chile", "Basil", "Mayonnaise"});
+                                                    "Red Onion", "Green Chile", "Basil", "Mayonnaise", "Mushrooms",});
 
             int _numberOfToppings = _randomSeed.Next(2, 7);//2 is 3, 7 is 8
 
@@ -123,13 +122,13 @@ namespace KiteBot
 			{
 				htmlCode = client.DownloadString(url);
 			}
-			var regex1 = new Regex(@"<div class=""md""><p>(.+)</p>");
+			var regex1 = new Regex(@"<div class=""md""><p>(?<quote>.+)</p>");
 			var matches = regex1.Matches(htmlCode);
 			var stringArray = new string[matches.Count];
 			var i = 0;
-			foreach (var match in matches)
+			foreach (Match match in matches)
 			{
-				var s = match.ToString().Replace(@"<div class=""md""><p>", "").Replace(@"</p>", "").Normalize();
+				var s = match.Groups["quote"].Value.Replace("&#39;", "'").Replace("&quot;", "\"");
 				stringArray[i] = s;
 				i++;
 			}
