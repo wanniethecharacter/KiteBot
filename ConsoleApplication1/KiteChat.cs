@@ -77,11 +77,22 @@ namespace KiteBot
 
 				for (int i = 0; i < _greetings.Length - 2; i += 2)
 				{
-					if (userName.ToLower().Contains(_greetings[i]) || _greetings[i] == "generic")
+					if (userName.ToLower().Contains(_greetings[i]))
 					{
 						_possibleResponses.Add(_greetings[i + 1]);
 					}
 				}
+
+                if (_possibleResponses.Count == 0)
+                {
+                    for (int i = 0; i < _greetings.Length - 2; i += 2)
+                    {
+                        if (_greetings[i] == "generic")
+                        {
+                            _possibleResponses.Add(_greetings[i + 1]);
+                        }
+                    }
+                }
 
 				//return a random response from the context provided, replacing the string "USER" with the appropriate username
 				return (_possibleResponses[_randomSeed.Next(0, _possibleResponses.Count)].Replace("USER", userName));
