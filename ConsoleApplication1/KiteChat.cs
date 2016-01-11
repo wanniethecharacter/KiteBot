@@ -8,12 +8,17 @@ namespace KiteBot
 {
     public class KiteChat
     {
+        
+
         public static Random _randomSeed;
 
         public static string[] _greetings;
         public static string[] _responses;
         public static string[] _mealResponses;
         public static string[] _bekGreetings;
+
+        public static KitePizza kitePizza = new KitePizza();
+        public static KiteSandwich kiteSandwich = new KiteSandwich();
 
         public static string ChatDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
         public static string GreetingFileLocation = ChatDirectory + "\\Content\\Greetings.txt";
@@ -49,14 +54,19 @@ namespace KiteBot
             }
 			else if (0 <= messageText.ToLower().IndexOf("/pizza", 0))
             {
-                return ParsePizza(userName);
+                return kitePizza.ParsePizza(userName);
             }
-			else if (0 <= messageText.ToLower().IndexOf("hi", 0) || 0 <= messageText.ToLower().IndexOf("hey", 0) ||
+            else if (0 <= messageText.ToLower().IndexOf("sandwich", 0))
+            {
+                return kiteSandwich.ParseSandwich(userName);
+            }
+            else if (0 <= messageText.ToLower().IndexOf("hi", 0) || 0 <= messageText.ToLower().IndexOf("hey", 0) ||
                 0 <= messageText.ToLower().IndexOf("hello", 0))
             {
                 return ParseGreeting(userName);
             }
-            else if (0 <= messageText.ToLower().IndexOf("/meal", 0) || 0 <= messageText.ToLower().IndexOf("dinner", 0))
+            else if (0 <= messageText.ToLower().IndexOf("/meal", 0) || 0 <= messageText.ToLower().IndexOf("dinner", 0)
+                     || 0 <= messageText.ToLower().IndexOf("lunch", 0))
             {
                 return (_mealResponses[_randomSeed.Next(0, _mealResponses.Length)].Replace("USER", userName));
             }
@@ -100,49 +110,6 @@ namespace KiteBot
 				return (_possibleResponses[_randomSeed.Next(0, _possibleResponses.Count)].Replace("USER", userName));
 		    }
 		    
-        }
-
-        //Makes up and returns a list of pizza toppings, with special toppings for a specific user
-        private string ParsePizza(string userName)
-        {
-            List<string> pizzaToppings = new List<string>();
-
-            if (userName.ToLower().Contains("ionic"))
-            {
-                pizzaToppings.AddRange(new string[] {"Mayonnaise", "Squid", "Raw Tuna", "Raw Salmon", "Avocado","Squid Ink",
-                                                      "Broccoli", "Shrimp", "Teriyaki Chicken", "Bonito Flakes", "Hot Sake",
-                                                      "Soft Tofu", "Sushi Rice", "Nori", "Corn", "Snow Peas", "Bamboo Shoots",
-                                                      "Potato", "Onion"});
-            }
-
-            else
-                 pizzaToppings.AddRange (new string[] {"Extra Cheese", "Pepperoni", "Sausage", "Chicken", "Ham", "Canadian Bacon",
-                                                         "Bacon", "Green Peppers", "Black Olives", "White Onion", "Red Onions", "Diced Tomatoes",
-                                                         "Spinach", "Roasted Red Peppers", "Sun Dried Tomato", "Pineapple", "Italian Sausage",
-                                                         "Red Onion", "Green Chile", "Basil", "Mayonnaise", "Mushrooms"});
-
-            int numberOfToppings = _randomSeed.Next(2, 7);//2 is 3, 7 is 8
-
-            string buildThisPizza = "USER you should put these things in the pizza: ";
-
-            for (int i = 0; i <= numberOfToppings; i++)
-            {
-                int j = _randomSeed.Next(0, pizzaToppings.Count);
-                buildThisPizza += pizzaToppings[j];
-                pizzaToppings.Remove(pizzaToppings[j]);
-
-                if (i == numberOfToppings)
-                {
-                    buildThisPizza += ".";
-                }
-
-                else
-                {
-                    buildThisPizza += ", ";
-                }
-            }
-
-            return (buildThisPizza.Replace("USER", userName));
         }
 
         //grabs random greetings for user bekenel from a reddit profile
