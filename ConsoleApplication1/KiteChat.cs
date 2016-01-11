@@ -62,7 +62,7 @@ namespace KiteBot
             }
             else
             {
-                return "KiteBot ver. 0.7.1 \"Now with more stuff.\"";
+                return "KiteBot ver. 0.7.1 \"Now with more stuff(ing).\"";
             }
         }
 
