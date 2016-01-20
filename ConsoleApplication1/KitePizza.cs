@@ -8,11 +8,11 @@ namespace KiteBot
     {
         Random randomSeed = new Random(DateTime.Now.Millisecond);
 
-        public string ParsePizza(string userName)
+        public string ParsePizza(string userName, string message)
         {
             List<string> pizzaToppings = new List<string>();
 
-            if (userName.ToLower().Contains("ionic"))
+            if (userName.ToLower().Contains("ionic") && !message.ToLower().Contains("opt-out"))
             {
                 pizzaToppings.AddRange(new string[] {"Mayonnaise", "Squid", "Raw Tuna", "Raw Salmon", "Avocado","Squid Ink",
                                                       "Broccoli", "Shrimp", "Teriyaki Chicken", "Bonito Flakes", "Hot Sake",
@@ -24,7 +24,7 @@ namespace KiteBot
                 pizzaToppings.AddRange(new string[] {"Extra Cheese", "Pepperoni", "Sausage", "Chicken", "Ham", "Canadian Bacon",
                                                          "Bacon", "Green Peppers", "Black Olives", "White Onion", "Red Onions", "Diced Tomatoes",
                                                          "Spinach", "Roasted Red Peppers", "Sun Dried Tomato", "Pineapple", "Italian Sausage",
-                                                         "Red Onion", "Green Chile", "Basil", "Mayonnaise", "Mushrooms"});
+                                                         "Red Onion", "Green Chile", "Basil", "Mayonnaise", "Mushrooms", "Beef"});
 
             int numberOfToppings = randomSeed.Next(2, 7);//2 is 3, 7 is 8
 

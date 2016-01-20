@@ -29,7 +29,7 @@ namespace KiteBot
             cheeseTypes.AddRange(new string[] {"Cheddar", "Mozerella", "American", "Swiss", "Havarti", "Muenster", "Gruyere", "Pepper Jack"});
             veggieTypes.AddRange(new string[] {"Lettuce", "Tomato", "Onion", "Bell Pepper", "Black Olive", "Cucumber", "Pickles", "Hot Peppers", "Spinach", "Avocado"});
             dressingTypes.AddRange(new string[] {"Mayo", "Mustard", "Oil and Vinegar", "Olive Oil", "Italian Dressing", "Home-Made Special Sauce", "Dijon", "Pesto"});
-            specialInstructions.AddRange(new string[] {"Grilled",  "Toasted", "Panini Press", "Double Stack", "Triple Stack", "Foot Long"});
+            specialInstructions.AddRange(new string[] {"Grilled",  "Toasted", "Panini Press", "Double Stack", "Triple Stack", "Foot Long", "Open Faced"});
 
             categoryList.AddRange(new string[] {"Bread: ", "Meat: ", "Cheese: ", "Toppings: ", "Dressing: "});
         }
@@ -47,7 +47,7 @@ namespace KiteBot
 
             foreach (List<string> currentList in optionLists)
             {
-                int qty = randomSeed.Next(1, 2);
+                int qty = randomSeed.Next(1, 3);
 
                 //only 1 bread
                 if (categoryTracker == 0)

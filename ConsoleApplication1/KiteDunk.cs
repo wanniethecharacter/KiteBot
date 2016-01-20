@@ -59,7 +59,7 @@ namespace KiteBot
 			{
 				response = client.DownloadString(GoogleSpreadsheetApiUrl);
 			}
-			var regex1 = new Regex(@"""gsx\$name"":{""\$t"":""(?<name>[0-9A-Za-z'""., +\-?!@\[\]]+?)""},""gsx\$quote"":{""\$t"":""(?<quote>[0-9A-Za-z'""., +\-?!@\[\]]+?)""}}", RegexOptions.Singleline);
+			var regex1 = new Regex(@"""gsx\$name"":{""\$t"":""(?<name>[0-9A-Za-z'""., +\-?!\[\]]+?)""},""gsx\$quote"":{""\$t"":""(?<quote>[0-9A-Za-z'""., +\-?!\[\]]+?)""}}", RegexOptions.Singleline);
 			var matches = regex1.Matches(response);
 			string[,] kiteDunks = new string[matches.Count,2];
 			int i = 0;

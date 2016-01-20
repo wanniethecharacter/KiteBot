@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using Discord;
 
 namespace KiteBot
@@ -7,14 +10,16 @@ namespace KiteBot
     class Program
     {
 		public static DiscordClient Client;
+	    public static CryptoRandom Random;
 
 		static void Main(string[] args)
         {
             Client = new DiscordClient();
+			Random = new CryptoRandom();
 			var kiteDunk = new KiteDunk();
 			var kiteChat = new KiteChat();
 			var giantBombRss = new GiantBombRss();
-			bool shutUp = false;
+			//bool shutUp = false;
 
 			//Display all log messages in the console
 			Client.LogMessage += (s, e) => Console.WriteLine("[{"+e.Severity+"}] {"+e.Source+"}: {"+e.Message+"}");
@@ -22,7 +27,12 @@ namespace KiteBot
 			//TODO: Rewrite this as a State Machine
 			Client.MessageReceived += async (s, e) =>
 			{
-				if (!e.Message.IsAuthor && 0 <= e.Message.Text.IndexOf("GetDunked"))
+				Console.WriteLine("(" + e.User.Name + "/"+ e.User.Discriminator + ") -" + e.Message.Text);
+				if (!e.Message.IsAuthor && e.Message.Text.StartsWith("/roll"))
+				{
+					await Client.SendMessage(e.Channel,ParseRoll(e.Message.Text));
+				}
+				else if (!e.Message.IsAuthor && 0 <= e.Message.Text.IndexOf("GetDunked"))
 				{
 					await Client.SendMessage(e.Channel, "http://i.imgur.com/QhcNUWo.gifv");
 				}
@@ -36,7 +46,9 @@ namespace KiteBot
 					else if (0 <= e.Message.Text.ToLower().IndexOf("help", 5))
 					{
 						var nl = Environment.NewLine;
-						await Client.SendMessage(e.Channel, "Current Commands are:" + nl + "#420" + nl + "randomql" + nl + "google" + nl + "youtube" + nl + "kitedunk" + nl + "/pizza" + nl + "Whats for dinner" + nl + "help");
+						await Client.SendMessage(e.Channel, "Current Commands are:" + nl + "#420" 
+							+ nl + "randomql" + nl + "google" + nl + "youtube" + nl + "kitedunk" 
+							+ nl + "/pizza" + nl + "Whats for dinner" + nl + "sandwich" + nl + "help");
 					}
 					else if (0 <= e.Message.Text.ToLower().IndexOf("randomql", 5))
 					{
@@ -78,9 +90,43 @@ namespace KiteBot
 				await Client.Connect(Properties.auth.Default.DiscordEmail,Properties.auth.Default.DiscordPassword);
 			});
         }
+
+	    private static string ParseRoll(string text)
+	    {
+			Regex diceroll = new Regex(@"(?<dice>[0-9]+)d(?<sides>[0-9]+)|d?(?<single>[0-9]+)");
+		    var matches = diceroll.Match(text);
+			int result = 0;
+		    try
+		    {
+				if (matches.Groups["dice"].Success && matches.Groups["sides"].Success)
+				{
+					int numberOfDice = Int32.Parse(matches.Groups["dice"].Value);
+					int numberOfSides = Int32.Parse(matches.Groups["sides"].Value);
+					for (int i = 0; i < numberOfDice; i++)
+					{
+						result += Random.Next(1, numberOfSides);
+					}
+					return result.ToString();
+				}
+			    else if (matches.Groups["single"].Success)
+				{
+					return Random.Next(1, Int32.Parse(matches.Groups["single"].Value)).ToString();
+				}
+				else
+				{
+					return "use the format 5d6, d6 or simply spesify a positive integer";
+				}
+
+		    }
+		    catch (OverflowException)
+		    {
+			    return "Why do you do this? You're on my shitlist now.";
+		    }
+		}
+
 	    public static void SendMessage(string message)
 	    {
-			//ToDO make this server generic
+			//TODO: make this server generic
 		    Client.SendMessage(Client.GetChannel(85842104034541568),message);
 	    }
 

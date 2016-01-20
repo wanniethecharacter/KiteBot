@@ -105,6 +105,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CryptoRandom.cs" />
     <Compile Include="KiteChat.cs" />
     <Compile Include="KitePizza.cs" />
     <Compile Include="KiteSandwich.cs" />
@@ -128,7 +129,9 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Example_auth.Designer.cs</LastGenOutput>
     </None>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Greetings.txt" />

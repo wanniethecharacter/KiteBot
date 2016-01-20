@@ -54,7 +54,7 @@ namespace KiteBot
             }
 			else if (0 <= messageText.ToLower().IndexOf("/pizza", 0))
             {
-                return kitePizza.ParsePizza(userName);
+                return kitePizza.ParsePizza(userName, messageText);
             }
             else if (0 <= messageText.ToLower().IndexOf("sandwich", 0))
             {
