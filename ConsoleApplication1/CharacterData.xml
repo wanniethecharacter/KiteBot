@@ -4,10 +4,14 @@
     <userid>0</userid>
     <name>test</name>
     <level>53</level>
+    <x>2</x>
+    <y>0</y>
   </character>
   <character>
     <userid>86966000083300352</userid>
     <name>Teya Ihara</name>
     <level>0</level>
+    <x>2</x>
+    <y>0</y>
   </character>
 </chardata>

@@ -29,14 +29,22 @@ namespace KiteBot
                 {
                     if (e.Element("userid").Value == userIdString)
                     {
-                        return "Welcome Back User: " + e.Element("userid").Value;
+                        if (0 <= message.Text.ToLower().IndexOf("look"))
+                        {
+                            return "looking";
+                        }
+
+                        else
+                            return "Welcome Back User: " + e.Element("userid").Value;
                     }
                 }
 
                 XElement newCharacter = new XElement("character",
                                                        new XElement("userid", message.User.Id),
                                                        new XElement("name", message.User.Name),
-                                                       new XElement("level", 0));
+                                                       new XElement("level", 0),
+                                                       new XElement("x", 2),
+                                                       new XElement("y", 0));
                 characterData.Element("chardata").Add(newCharacter);
                 characterData.Save(CharacterData);
 
