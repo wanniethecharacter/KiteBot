@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
-using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using Discord;
 
@@ -13,14 +11,14 @@ namespace KiteBot
 	    public static CryptoRandom Random;
 
 	    private static void Main(string[] args)
-        {
-            Client = new DiscordClient();
-			Random = new CryptoRandom();
-			var kiteDunk = new KiteDunk();
-			var kiteChat = new KiteChat();
-			var giantBombRss = new GiantBombRss();
-			//bool shutUp = false;
-
+	    {
+		    Client = new DiscordClient();
+		    Random = new CryptoRandom();
+		    var kiteDunk = new KiteDunk();
+		    var kiteChat = new KiteChat();
+		    var giantBombRss = new GiantBombRss();
+		    //bool shutUp = false;
+		    
 			//Display all log messages in the console
 			Client.LogMessage += (s, e) => Console.WriteLine("[{"+e.Severity+"}] {"+e.Source+"}: {"+e.Message+"}");
 			
@@ -142,6 +140,22 @@ namespace KiteBot
 			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
 			HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 		    return response.ResponseUri.AbsoluteUri;
+	    }
+
+	    private static void RandomTester()
+	    {
+			var testarray = new int[100];
+			for (int i = 0; i < 100; i++)
+			{
+				testarray[i] = Random.Next(0, 10);
+			}
+			Array.Sort(testarray);
+			var ta = new int[11];
+			foreach (int i in testarray)
+			{
+				ta[i] += i;
+			}
+			Console.WriteLine(ta[0] + " " + ta[1] + " " + ta[2] + " " + ta[3] + " " + ta[4] + " " + ta[5] + " " + ta[6] + " " + ta[7] + " " + ta[8] + " " + ta[9] + " " + ta[10] + " ");
 	    }
     }
 }
