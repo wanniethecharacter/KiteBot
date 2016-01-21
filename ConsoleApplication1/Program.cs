@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Net;
-using System.Text.RegularExpressions;
 using Discord;
-using System.Collections.Generic;
 
 namespace KiteBot
 {
@@ -19,6 +17,7 @@ namespace KiteBot
 		    var kiteChat = new KiteChat();
 		    var giantBombRss = new GiantBombRss();
             var diceRoller = new DiceRoller();
+            var kiteGame = new KitCoGame();
 		    //bool shutUp = false;
 		    
 			//Display all log messages in the console
@@ -28,7 +27,15 @@ namespace KiteBot
 			Client.MessageReceived += async (s, e) =>
 			{
 				Console.WriteLine("(" + e.User.Name + "/"+ e.User.Discriminator + ") -" + e.Message.Text);
-				if (!e.Message.IsAuthor && e.Message.Text.StartsWith("/roll"))
+
+                if (e.Channel.Name.ToLower().Contains("vinncorobocorps"))
+                {
+                    string response = kiteGame.GetGameResponse(e.Message);
+                    if (response != null)
+                        await Client.SendMessage(e.Channel, response);
+                }
+
+				else if (!e.Message.IsAuthor && e.Message.Text.StartsWith("/roll"))
 				{
 					await Client.SendMessage(e.Channel , diceRoller.ParseRoll(e.Message.Text));
 				}
@@ -39,7 +46,7 @@ namespace KiteBot
 				}
 
 
-				if (!e.Message.IsAuthor && e.Message.Text.StartsWith("@KiteBot"))
+				else if (!e.Message.IsAuthor && e.Message.Text.StartsWith("@KiteBot"))
 				{
 					if (e.Message.Text.StartsWith("@KiteBot #420") || e.Message.Text.ToLower().StartsWith("@KiteBot #blaze") ||
 					    0 <= e.Message.Text.ToLower().IndexOf("waifu", 0))
