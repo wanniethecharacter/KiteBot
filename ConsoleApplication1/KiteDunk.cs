@@ -8,29 +8,32 @@ namespace KiteBot
 {
 	public class KiteDunk
 	{
-		public static string[] _kiteDunks;
-		public static string[,] UpdatedKiteDunks;
-		public static Random _randomSeed;
-        public static string DunkDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
-        public static string FileLocation = DunkDirectory + "\\Content\\KiteDunks2.txt";
-        public const string GoogleSpreadsheetApiUrl = "https://spreadsheets.google.com/feeds/list/11024r_0u5Mu-dLFd-R9lt8VzOYXWgKX1I5JamHJd8S4/od6/public/values?hl=en_US&&alt=json";
-		private static Timer KiteDunkTimer;
+		private static string[] _kiteDunks;
+		private static string[,] _updatedKiteDunks;
+		private static Random _randomSeed;
+		private static CryptoRandom _cryptoRandom;
+        private static readonly string DunkDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
+        private static readonly string FileLocation = DunkDirectory + "\\Content\\KiteDunks2.txt";
+        private const string GoogleSpreadsheetApiUrl = "https://spreadsheets.google.com/feeds/list/11024r_0u5Mu-dLFd-R9lt8VzOYXWgKX1I5JamHJd8S4/od6/public/values?hl=en_US&&alt=json";
+		// ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
+		private static Timer _kiteDunkTimer;
 
-        public KiteDunk() : this(File.ReadAllLines(FileLocation), new Random(DateTime.Now.Millisecond))
+        public KiteDunk() : this(File.ReadAllLines(FileLocation), new Random(DateTime.Now.Millisecond), new CryptoRandom())
         {
         }
 
-        public KiteDunk(string[] arrayOfDunks, Random randomSeed)
+        public KiteDunk(string[] arrayOfDunks, Random randomSeed, CryptoRandom cryptoRandom)
         {
             _kiteDunks = arrayOfDunks;
             _randomSeed = randomSeed;
+	        _cryptoRandom = cryptoRandom;
 	        UpdateKiteDunks();
-
-			KiteDunkTimer = new Timer();
-			KiteDunkTimer.Elapsed += new ElapsedEventHandler(UpdateKiteDunks);
-			KiteDunkTimer.Interval = 86400000;//24 hours
-			KiteDunkTimer.AutoReset = true;
-			KiteDunkTimer.Enabled = true;
+			 
+			_kiteDunkTimer = new Timer();
+			_kiteDunkTimer.Elapsed += new ElapsedEventHandler(UpdateKiteDunks);
+			_kiteDunkTimer.Interval = 86400000;//24 hours
+			_kiteDunkTimer.AutoReset = true;
+			_kiteDunkTimer.Enabled = true;
         }
 
 		[Obsolete]
@@ -43,8 +46,8 @@ namespace KiteBot
 
 		public string GetUpdatedKiteDunk()
 		{
-			var i = _randomSeed.Next(UpdatedKiteDunks.GetLength(0));
-			return "\"" + UpdatedKiteDunks[i, 1] + "\" - " + UpdatedKiteDunks[i,0];
+			var i = _cryptoRandom.Next(_updatedKiteDunks.GetLength(0));
+			return "\"" + _updatedKiteDunks[i, 1] + "\" - " + _updatedKiteDunks[i,0];
 		}
 
 		private void UpdateKiteDunks(object sender, ElapsedEventArgs elapsedEventArgs)
@@ -68,7 +71,7 @@ namespace KiteBot
 				kiteDunks[i, 0] = match.Groups["name"].Value;
 				kiteDunks[i++, 1] = match.Groups["quote"].Value;
 			}
-			UpdatedKiteDunks = kiteDunks;
+			_updatedKiteDunks = kiteDunks;
 
 			/* var i = 0;
 			var kiteDunks = new string[matches.Count];

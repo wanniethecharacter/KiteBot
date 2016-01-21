@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 ///<summary>
 /// Represents a pseudo-random number generator, a device that produces random data.
 ///</summary>
-class CryptoRandom : RandomNumberGenerator
+public class CryptoRandom : RandomNumberGenerator
 {
 private static RandomNumberGenerator r;
 ///<summary>

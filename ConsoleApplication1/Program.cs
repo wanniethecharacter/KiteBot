@@ -12,7 +12,7 @@ namespace KiteBot
 		public static DiscordClient Client;
 	    public static CryptoRandom Random;
 
-		static void Main(string[] args)
+	    private static void Main(string[] args)
         {
             Client = new DiscordClient();
 			Random = new CryptoRandom();
