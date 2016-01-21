@@ -2,21 +2,23 @@
 using System.Net;
 using System.Text.RegularExpressions;
 using Discord;
+using System.Collections.Generic;
 
 namespace KiteBot
 {
     class Program
     {
 		public static DiscordClient Client;
-	    public static CryptoRandom Random;
+        public static CryptoRandom Random;
 
-	    private static void Main(string[] args)
+        private static void Main(string[] args)
 	    {
 		    Client = new DiscordClient();
 		    Random = new CryptoRandom();
 		    var kiteDunk = new KiteDunk();
 		    var kiteChat = new KiteChat();
 		    var giantBombRss = new GiantBombRss();
+            var diceRoller = new DiceRoller();
 		    //bool shutUp = false;
 		    
 			//Display all log messages in the console
@@ -28,12 +30,15 @@ namespace KiteBot
 				Console.WriteLine("(" + e.User.Name + "/"+ e.User.Discriminator + ") -" + e.Message.Text);
 				if (!e.Message.IsAuthor && e.Message.Text.StartsWith("/roll"))
 				{
-					await Client.SendMessage(e.Channel,ParseRoll(e.Message.Text));
+					await Client.SendMessage(e.Channel , diceRoller.ParseRoll(e.Message.Text));
 				}
-				else if (!e.Message.IsAuthor && 0 <= e.Message.Text.IndexOf("GetDunked"))
+
+                else if (!e.Message.IsAuthor && 0 <= e.Message.Text.IndexOf("GetDunked"))
 				{
 					await Client.SendMessage(e.Channel, "http://i.imgur.com/QhcNUWo.gifv");
 				}
+
+
 				if (!e.Message.IsAuthor && e.Message.Text.StartsWith("@KiteBot"))
 				{
 					if (e.Message.Text.StartsWith("@KiteBot #420") || e.Message.Text.ToLower().StartsWith("@KiteBot #blaze") ||
@@ -88,39 +93,6 @@ namespace KiteBot
 				await Client.Connect(Properties.auth.Default.DiscordEmail,Properties.auth.Default.DiscordPassword);
 			});
         }
-
-	    private static string ParseRoll(string text)
-	    {
-			Regex diceroll = new Regex(@"(?<dice>[0-9]+)d(?<sides>[0-9]+)|d?(?<single>[0-9]+)");
-		    var matches = diceroll.Match(text);
-			int result = 0;
-		    try
-		    {
-				if (matches.Groups["dice"].Success && matches.Groups["sides"].Success)
-				{
-					int numberOfDice = Int32.Parse(matches.Groups["dice"].Value);
-					int numberOfSides = Int32.Parse(matches.Groups["sides"].Value);
-					for (int i = 0; i < numberOfDice; i++)
-					{
-						result += Random.Next(1, numberOfSides);
-					}
-					return result.ToString();
-				}
-			    else if (matches.Groups["single"].Success)
-				{
-					return Random.Next(1, Int32.Parse(matches.Groups["single"].Value)).ToString();
-				}
-				else
-				{
-					return "use the format 5d6, d6 or simply spesify a positive integer";
-				}
-
-		    }
-		    catch (OverflowException)
-		    {
-			    return "Why do you do this? You're on my shitlist now.";
-		    }
-		}
 
 	    public static void SendMessage(string message)
 	    {
