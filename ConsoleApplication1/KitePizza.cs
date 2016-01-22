@@ -6,7 +6,7 @@ namespace KiteBot
     //Class returns string for users, making a random pizza from a toppings list
     public class KitePizza
     {
-        Random randomSeed = new Random(DateTime.Now.Millisecond);
+	    Random randomSeed = new Random(DateTime.Now.Millisecond);
 
         public string ParsePizza(string userName, string message)
         {

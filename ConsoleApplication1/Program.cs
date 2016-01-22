@@ -25,7 +25,7 @@ namespace KiteBot
 			//TODO: Rewrite this as a State Machine
 			Client.MessageReceived += async (s, e) =>
 			{
-				Console.WriteLine("(" + e.User.Name + "/"+ e.User.Discriminator + ") -" + e.Message.Text);
+				Console.WriteLine("(" + e.User.Name + "/"+ e.User.Id + ") -" + e.Message.Text);
 				if (!e.Message.IsAuthor && e.Message.Text.StartsWith("/roll"))
 				{
 					await Client.SendMessage(e.Channel,ParseRoll(e.Message.Text));
@@ -50,7 +50,7 @@ namespace KiteBot
 					}
 					else if (0 <= e.Message.Text.ToLower().IndexOf("randomql", 5))
 					{
-						await Client.SendMessage(e.Channel, getResponseUriFromRandomQLCrew("http://qlcrew.com/main.php?anyone=anyone&inc%5B0%5D=&p=999&exc%5B0%5D=&per_page=15&random"));
+						await Client.SendMessage(e.Channel, GetResponseUriFromRandomQlCrew("http://qlcrew.com/main.php?anyone=anyone&inc%5B0%5D=&p=999&exc%5B0%5D=&per_page=15&random"));
 					}
 					else if (0 <= e.Message.Text.ToLower().IndexOf("google", 0))
 					{
@@ -134,7 +134,7 @@ namespace KiteBot
 			    e.Title + " live now at GiantBomb.com\r\n" + e.Link);
 	    }
 
-	    private static string getResponseUriFromRandomQLCrew(string s)
+	    private static string GetResponseUriFromRandomQlCrew(string s)
 	    {
 		    string url = s;
 			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Security.Cryptography;
-using RestSharp.Extensions;
 
 ///<summary>
 /// Represents a pseudo-random number generator, a device that produces random data.
