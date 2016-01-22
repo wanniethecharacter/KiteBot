@@ -26,7 +26,7 @@ namespace KiteBot
 			//TODO: Rewrite this as a State Machine
 			Client.MessageReceived += async (s, e) =>
 			{
-				Console.WriteLine("(" + e.User.Name + "/"+ e.User.Discriminator + ") -" + e.Message.Text);
+				Console.WriteLine("(" + e.User.Name + "/"+ e.User.Id + ") -" + e.Message.Text);
 
                 if (e.Channel.Name.ToLower().Contains("vinncorobocorps"))
                 {
