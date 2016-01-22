@@ -7,7 +7,7 @@ using Discord;
 
 namespace KiteBot
 {
-    class KitCoGame
+	public class KitCoGame
     {
         private XDocument characterData;
         private XDocument mapData;

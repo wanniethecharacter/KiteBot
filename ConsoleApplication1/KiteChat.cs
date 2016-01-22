@@ -3,13 +3,13 @@ using System.IO;
 using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Discord;
 
 namespace KiteBot
 {
     public class KiteChat
     {
-        
-
         public static Random _randomSeed;
 
         public static string[] _greetings;
@@ -19,6 +19,10 @@ namespace KiteBot
 
         public static KitePizza kitePizza = new KitePizza();
         public static KiteSandwich kiteSandwich = new KiteSandwich();
+		public static KiteDunk kiteDunk = new KiteDunk();
+		public static GiantBombRss giantBombRss = new GiantBombRss();
+		public static DiceRoller diceRoller = new DiceRoller();
+		public static KitCoGame kiteGame = new KitCoGame();
 
         public static string ChatDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
         public static string GreetingFileLocation = ChatDirectory + "\\Content\\Greetings.txt";
@@ -39,7 +43,105 @@ namespace KiteBot
             _randomSeed = randomSeed;
         }
 
-        //a method to parse chat responses not dealt with in program.cs
+	    public async Task AsyncParseChat(object s, MessageEventArgs e, DiscordClient client)
+	    {
+			Console.WriteLine("(" + e.User.Name + "/" + e.User.Id + ") -" + e.Message.Text);
+
+			if (e.Channel.Name.ToLower().Contains("vinncorobocorps"))
+			{
+				string response = kiteGame.GetGameResponse(e.Message);
+				if (response != null)
+					await client.SendMessage(e.Channel, response);
+			}
+
+			else if (!e.Message.IsAuthor && e.Message.Text.StartsWith("/roll"))
+			{
+				await client.SendMessage(e.Channel, diceRoller.ParseRoll(e.Message.Text));
+			}
+
+			else if (!e.Message.IsAuthor && 0 <= e.Message.Text.IndexOf("GetDunked"))
+			{
+				await client.SendMessage(e.Channel, "http://i.imgur.com/QhcNUWo.gifv");
+			}
+
+
+			else if (!e.Message.IsAuthor && e.Message.Text.StartsWith("@KiteBot"))
+			{
+				if (e.Message.Text.StartsWith("@KiteBot #420") || e.Message.Text.ToLower().StartsWith("@KiteBot #blaze") ||
+					0 <= e.Message.Text.ToLower().IndexOf("waifu", 0))
+				{
+					await client.SendMessage(e.Channel, "http://420.moe/");
+				}
+				else if (0 <= e.Message.Text.ToLower().IndexOf("help", 5))
+				{
+					var nl = Environment.NewLine;
+					await client.SendMessage(e.Channel, "Current Commands are:" + nl + "#420"
+						+ nl + "randomql" + nl + "google" + nl + "youtube" + nl + "kitedunk"
+						+ nl + "/pizza" + nl + "Whats for dinner" + nl + "sandwich" + nl + "help");
+				}
+				else if (0 <= e.Message.Text.ToLower().IndexOf("randomql", 5))
+				{
+					await client.SendMessage(e.Channel, GetResponseUriFromRandomQlCrew("http://qlcrew.com/main.php?anyone=anyone&inc%5B0%5D=&p=999&exc%5B0%5D=&per_page=15&random"));
+				}
+				else if (0 <= e.Message.Text.ToLower().IndexOf("google", 0))
+				{
+					await
+						client.SendMessage(e.Channel, "http://lmgtfy.com/?q=" + e.Message.Text.ToLower().Substring(16).Replace(' ', '+'));
+				}
+				else if (0 <= e.Message.Text.ToLower().IndexOf("youtube", 0))
+				{
+					if (e.Message.Text.Length > 16)
+					{
+						await client.SendMessage(e.Channel,
+							"https://www.youtube.com/results?search_query=" + e.Message.Text.ToLower().Substring(17).Replace(' ', '+'));
+					}
+					else
+					{
+						await client.SendMessage(e.Channel, "Please add a query after youtube, starting with a space.");
+					}
+				}
+
+				else if (0 <= e.Message.Text.ToLower().IndexOf("dunk", 0))
+				{
+					await client.SendMessage(e.Channel, kiteDunk.GetUpdatedKiteDunk());
+				}
+				else if (0 <= e.Message.Text.ToLower().IndexOf("fuck you", 0) || 0 <= e.Message.Text.ToLower().IndexOf("fuckyou", 0))
+				{
+					List<string> _possibleResponses = new List<string>();
+					_possibleResponses.Add("Hey fuck you too USER!");
+					_possibleResponses.Add("I bet you'd like that wouldn't you USER?");
+					_possibleResponses.Add("No, fuck you USER!");
+					_possibleResponses.Add("Fuck you too USER!");
+
+					await client.SendMessage(e.Channel, _possibleResponses[_randomSeed.Next(0, _possibleResponses.Count)].Replace("USER", e.User.Name));
+				}
+				else if (0 <= e.Message.Text.ToLower().IndexOf("/pizza", 0))
+				{
+					await client.SendMessage(e.Channel, kitePizza.ParsePizza(e.User.Name, e.Message.Text));
+				}
+				else if (0 <= e.Message.Text.ToLower().IndexOf("sandwich", 0))
+				{
+					await client.SendMessage(e.Channel, kiteSandwich.ParseSandwich(e.User.Name));
+				}
+				else if (0 <= e.Message.Text.ToLower().IndexOf("hi", 0) || 0 <= e.Message.Text.ToLower().IndexOf("hey", 0) ||
+					0 <= e.Message.Text.ToLower().IndexOf("hello", 0))
+				{
+					await client.SendMessage(e.Channel, ParseGreeting(e.User.Name));
+				}
+				else if (0 <= e.Message.Text.ToLower().IndexOf("/meal", 0) || 0 <= e.Message.Text.ToLower().IndexOf("dinner", 0)
+						 || 0 <= e.Message.Text.ToLower().IndexOf("lunch", 0))
+				{
+					await client.SendMessage(e.Channel, _mealResponses[_randomSeed.Next(0, _mealResponses.Length)].Replace("USER", e.User.Name));
+				}
+				else
+				{
+					await client.SendMessage(e.Channel, "KiteBot ver. 0.8.1 \"Finishes infinite while loops in less than 2 minutes.\"");
+				}
+			}
+	    }
+
+	    //a synchronous method to parse chat responses not dealt with in program.cs
+		[Obsolete]
         public string ParseChatResponse(string userName, string messageText)
         {
 			if (0 <= messageText.ToLower().IndexOf("fuck you", 0) || 0 <= messageText.ToLower().IndexOf("fuckyou", 0))
@@ -72,7 +174,7 @@ namespace KiteBot
             }
             else
             {
-                return "KiteBot ver. 0.7.1 \"Now with more stuff(ing).\"";
+                return "KiteBot ver. 0.8.1 \"Finishes infinite while loops in less than 2 minutes.\"";
             }
         }
 
@@ -132,6 +234,14 @@ namespace KiteBot
 				i++;
 			}
 			_bekGreetings = stringArray;
+		}
+
+		private static string GetResponseUriFromRandomQlCrew(string s)
+		{
+			string url = s;
+			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+			HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+			return response.ResponseUri.AbsoluteUri;
 		}
     }
 }

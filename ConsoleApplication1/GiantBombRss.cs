@@ -7,7 +7,7 @@ using System.Xml.XPath;
 
 namespace KiteBot
 {
-	class GiantBombRss
+	public class GiantBombRss
 	{
 		private static readonly string[] GiantBombUrl = { "http://www.giantbomb.com/feeds/mashup/" };//,"http://www.giantbomb.com/feeds/podcast/", "http://www.giantbomb.com/podcast-xml/beastcast/", "http://www.giantbomb.com/feeds/video/
 		private static List<Feed> _feeds;
@@ -19,7 +19,7 @@ namespace KiteBot
 			foreach (string url in GiantBombUrl)
 			{
 				Feed feed = new Feed(url);
-				feed.FeedUpdated += (s, e) => Program.SendMessage((Feed) s, (Feed.UpdatedFeedEventArgs)e);
+				feed.FeedUpdated += (s, e) => Program.SendMessage(s, (Feed.UpdatedFeedEventArgs)e);
 				_feeds.Add(feed);
 			}
 			GBTimer = new Timer();

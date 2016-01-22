@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace KiteBot
 {
-    class DiceRoller
+	public class DiceRoller
     {
         public static CryptoRandom Random;
 
