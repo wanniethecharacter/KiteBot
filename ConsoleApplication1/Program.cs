@@ -26,5 +26,11 @@ namespace KiteBot
 				await Client.Connect(Properties.auth.Default.DiscordEmail,Properties.auth.Default.DiscordPassword);
 			});
         }
+
+	    public static void SendMessage(object s, Feed.UpdatedFeedEventArgs e)
+	    {
+		    Client.SendMessage(Client.GetChannel(85842104034541568),
+			    e.Title + " live now at GiantBomb.com\r\n" + e.Link);
+	    }
     }
 }
