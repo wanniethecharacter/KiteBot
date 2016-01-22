@@ -159,7 +159,7 @@ namespace KiteBot
                 characterData.Element("chardata").Add(newCharacter);
                 characterData.Save(CharacterData);
 
-                return "Added new user: " + newCharacter.Element("userid").ToString();
+                return "Added new user: " + newCharacter.Element("name").Value.ToString();
             }
 
             else return null;
