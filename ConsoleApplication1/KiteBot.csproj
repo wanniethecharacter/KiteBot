@@ -139,8 +139,6 @@
   <ItemGroup>
     <Content Include="CharacterData.xml" />
     <Content Include="Greetings.txt" />
-    <Content Include="KiteDunks2.txt" />
-    <Content Include="KiteDunks3.txt" />
     <Content Include="RoomData.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -10,23 +10,14 @@ namespace KiteBot
 	{
 		private static string[] _kiteDunks;
 		private static string[,] _updatedKiteDunks;
-		private static Random _randomSeed;
 		private static CryptoRandom _cryptoRandom;
-        private static readonly string DunkDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
-        private static readonly string FileLocation = DunkDirectory + "\\Content\\KiteDunks2.txt";
         private const string GoogleSpreadsheetApiUrl = "https://spreadsheets.google.com/feeds/list/11024r_0u5Mu-dLFd-R9lt8VzOYXWgKX1I5JamHJd8S4/od6/public/values?hl=en_US&&alt=json";
 		// ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
 		private static Timer _kiteDunkTimer;
 
-        public KiteDunk() : this(File.ReadAllLines(FileLocation), new Random(DateTime.Now.Millisecond), new CryptoRandom())
+        public KiteDunk()
         {
-        }
-
-        public KiteDunk(string[] arrayOfDunks, Random randomSeed, CryptoRandom cryptoRandom)
-        {
-            _kiteDunks = arrayOfDunks;
-            _randomSeed = randomSeed;
-	        _cryptoRandom = cryptoRandom;
+	        _cryptoRandom = new CryptoRandom();
 	        UpdateKiteDunks();
 			 
 			_kiteDunkTimer = new Timer();
@@ -35,14 +26,6 @@ namespace KiteBot
 			_kiteDunkTimer.AutoReset = true;
 			_kiteDunkTimer.Enabled = true;
         }
-
-		[Obsolete]
-		public string GetRandomKiteDunk()
-		{
-            //TODO: Maybe make this a retry recursion method
-			var i = _randomSeed.Next(_kiteDunks.Length / 2) * 2;
-			return "\"" + _kiteDunks[i + 1] + "\" - " + _kiteDunks[i];
-		}
 
 		public string GetUpdatedKiteDunk()
 		{
@@ -72,16 +55,6 @@ namespace KiteBot
 				kiteDunks[i++, 1] = match.Groups["quote"].Value;
 			}
 			_updatedKiteDunks = kiteDunks;
-
-			/* var i = 0;
-			var kiteDunks = new string[matches.Count];
-			foreach(var match in matches)
-			{
-				var s = match.ToString().Replace("\"gsx$name\":{\"$t\":","").Replace("gsx$quote\":{\"$t\":","").Replace("}","").Replace("\"","");
-				kiteDunks[i] = s;
-				i++;
-			}
-			File.WriteAllLines(path: DunkDirectory + "\\Content\\KiteDunks3.txt", contents: kiteDunks); */
 		}
 	}
 }

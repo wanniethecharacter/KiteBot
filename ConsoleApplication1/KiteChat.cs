@@ -140,44 +140,6 @@ namespace KiteBot
 			}
 	    }
 
-	    //a synchronous method to parse chat responses not dealt with in program.cs
-		[Obsolete]
-        public string ParseChatResponse(string userName, string messageText)
-        {
-			if (0 <= messageText.ToLower().IndexOf("fuck you", 0) || 0 <= messageText.ToLower().IndexOf("fuckyou", 0))
-            {
-                List<string> _possibleResponses = new List<string>();
-                _possibleResponses.Add("Hey fuck you too USER!");
-                _possibleResponses.Add("I bet you'd like that wouldn't you USER?");
-                _possibleResponses.Add("No, fuck you USER!");
-                _possibleResponses.Add("Fuck you too USER!");
-
-                return (_possibleResponses[_randomSeed.Next(0, _possibleResponses.Count)].Replace("USER", userName));
-            }
-			else if (0 <= messageText.ToLower().IndexOf("/pizza", 0))
-            {
-                return kitePizza.ParsePizza(userName, messageText);
-            }
-            else if (0 <= messageText.ToLower().IndexOf("sandwich", 0))
-            {
-                return kiteSandwich.ParseSandwich(userName);
-            }
-            else if (0 <= messageText.ToLower().IndexOf("hi", 0) || 0 <= messageText.ToLower().IndexOf("hey", 0) ||
-                0 <= messageText.ToLower().IndexOf("hello", 0))
-            {
-                return ParseGreeting(userName);
-            }
-            else if (0 <= messageText.ToLower().IndexOf("/meal", 0) || 0 <= messageText.ToLower().IndexOf("dinner", 0)
-                     || 0 <= messageText.ToLower().IndexOf("lunch", 0))
-            {
-                return (_mealResponses[_randomSeed.Next(0, _mealResponses.Length)].Replace("USER", userName));
-            }
-            else
-            {
-                return "KiteBot ver. 0.8.1 \"Finishes infinite while loops in less than 2 minutes.\"";
-            }
-        }
-
         //returns a greeting from the greetings.txt list on a per user or generic basis
 	    private string ParseGreeting(string userName)
         {
