@@ -106,14 +106,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CryptoRandom.cs" />
-    <Compile Include="KiteChat.cs" />
-    <Compile Include="KitePizza.cs" />
-    <Compile Include="KiteSandwich.cs" />
+    <Compile Include="DiceRoller.cs" />
     <Compile Include="Properties\auth.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>auth.settings</DependentUpon>
     </Compile>
+    <Compile Include="KitCoGame.cs" />
+    <Compile Include="KiteChat.cs" />
+    <Compile Include="KitePizza.cs" />
+    <Compile Include="KiteSandwich.cs" />
+    <Compile Include="MapCell.cs" />
     <Compile Include="GiantBombRSS.cs" />
     <Compile Include="KiteDunk.cs" />
     <Compile Include="Program.cs" />
@@ -134,6 +137,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="CharacterData.xml" />
     <Content Include="Greetings.txt" />
     <Content Include="KiteDunks2.txt" />
     <Content Include="KiteDunks3.txt" />
