@@ -45,7 +45,7 @@ namespace KiteBot
 
 	    public async Task AsyncParseChat(object s, MessageEventArgs e, DiscordClient client)
 	    {
-			Console.WriteLine("(" + e.User.Name + "/" + e.User.Id + ") -" + e.Message.Text);
+			Console.WriteLine("(" + e.User.Name + "/" + e.User.Id + ") - " + e.Message.Text);
 
 			if (e.Channel.Name.ToLower().Contains("vinncorobocorps"))
 			{

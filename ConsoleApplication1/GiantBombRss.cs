@@ -19,7 +19,7 @@ namespace KiteBot
 			foreach (string url in GiantBombUrl)
 			{
 				Feed feed = new Feed(url);
-				feed.FeedUpdated += (s, e) => Program.SendMessage(s, (Feed.UpdatedFeedEventArgs)e);
+				feed.FeedUpdated += (s, e) => Program.RssFeedSendMessage(s, (Feed.UpdatedFeedEventArgs)e);
 				_feeds.Add(feed);
 			}
 			GBTimer = new Timer();
