@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<rooms>
+  <room>
+    <xcoord>2</xcoord>
+    <ycoord>0</ycoord>
+    <name>Reception Room</name>
+    <roomdesc>As you stand near the elevator, a large well appointed reception area stands before you. To the east is a reception desk with a plant off to one side. The northwest corner has a large comfy couch.</roomdesc>
+    <objects>
+      <object>
+        <objname>Desk</objname>
+        <objdesc>A wide reception desk dominates the eastern wall of the room. As expected a phone sits on one corner of the desk, along with a stack of mail.</objdesc>
+      </object>
+      <object>
+        <objname>Plant</objname>
+        <objdesc>A very green, very plastic plant sits in the northeast corner.</objdesc>
+      </object>
+      <object>
+        <objname>Phone</objname>
+        <objdesc>A typical office telephone. You're not sure what you were expecting.</objdesc>
+      </object>
+      <object>
+        <objname>Mail</objname>
+        <objdesc>All of these are addressed to "Giant Bomb". You really shouldn't go through other people's mail.</objdesc>
+      </object>
+      <object>
+        <objname>Couch</objname>
+        <objdesc>This couch looks well used, as if a large number of butts have graced its plush cushions.</objdesc>
+      </object>
+    </objects>
+    <directions>
+      <direction>
+        <directionname>North</directionname>
+        <direciondesc>A hallway leads to the north, connecting several other office areas beyond.</direciondesc>
+      </direction>
+      <direction>
+        <directionname>South</directionname>
+        <direciondesc>To the south is the elevator which you rode up to this floor. It appears locked. Forever.</direciondesc>
+      </direction>
+      <direction>
+        <directionname>East</directionname>
+        <direciondesc>Behind the desk is a small door that appears to lead into an office.(WIP)</direciondesc>
+      </direction>
+      <direction>
+        <directionname>West</directionname>
+        <direciondesc>To the west is a large open room with a few chairs and a number of monitors along the wall.(WIP)</direciondesc>
+      </direction>
+    </directions>
+  </room>
+
+  <room>
+    <xcoord>2</xcoord>
+    <ycoord>1</ycoord>
+    <name>Office Hallway</name>
+    <roomdesc>This wide hallway connects several large rooms on either side. A massive room to the west contains a dozen or more workstations. Along the hallway are several posters.</roomdesc>
+    <objects>
+      <object>
+        <objname>Poster</objname>
+        <objdesc>Video Game posters and artwork line the walls.</objdesc>
+      </object>
+    </objects>
+    <directions>
+      <direction>
+        <directionname>North</directionname>
+        <direciondesc>A hallway leads to the north, connecting several other office areas beyond.(WIP)</direciondesc>
+      </direction>
+      <direction>
+        <directionname>South</directionname>
+        <direciondesc>To the south you can see a reception area.</direciondesc>
+      </direction>
+      <direction>
+        <directionname>East</directionname>
+        <direciondesc>To the east sits a small room with a large TV and a couch.(WIP)</direciondesc>
+      </direction>
+      <direction>
+        <directionname>West</directionname>
+        <direciondesc>Off to the west you see a very large open room filled with PC workstations.(WIP)</direciondesc>
+      </direction>
+    </directions>
+  </room>
+</rooms>
