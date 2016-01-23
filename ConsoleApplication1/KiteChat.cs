@@ -12,6 +12,8 @@ namespace KiteBot
     {
         public static Random _randomSeed;
 
+		public static int RaeCounter;
+
         public static string[] _greetings;
         public static string[] _responses;
         public static string[] _mealResponses;
@@ -41,11 +43,13 @@ namespace KiteBot
             _responses = arrayOfResponses;
             _mealResponses = arrayOfMeals;
             _randomSeed = randomSeed;
+	        RaeCounter = 0;
         }
 
 	    public async Task AsyncParseChat(object s, MessageEventArgs e, DiscordClient client)
 	    {
 			Console.WriteLine("(" + e.User.Name + "/" + e.User.Id + ") - " + e.Message.Text);
+		    IsRaeTyping(e);
 
 			if (e.Channel.Name.ToLower().Contains("vinncorobocorps"))
 			{
@@ -64,7 +68,6 @@ namespace KiteBot
 				await client.SendMessage(e.Channel, "http://i.imgur.com/QhcNUWo.gifv");
 			}
 
-
 			else if (!e.Message.IsAuthor && e.Message.Text.StartsWith("@KiteBot"))
 			{
 				if (e.Message.Text.StartsWith("@KiteBot #420") || e.Message.Text.ToLower().StartsWith("@KiteBot #blaze") ||
@@ -77,16 +80,20 @@ namespace KiteBot
 					var nl = Environment.NewLine;
 					await client.SendMessage(e.Channel, "Current Commands are:" + nl + "#420"
 						+ nl + "randomql" + nl + "google" + nl + "youtube" + nl + "kitedunk"
-						+ nl + "/pizza" + nl + "Whats for dinner" + nl + "sandwich" + nl + "help");
+						+ nl + "/pizza" + nl + "Whats for dinner" + nl + "sandwich" + nl + "RaeCounter"
+						+ nl + "help");
 				}
 				else if (0 <= e.Message.Text.ToLower().IndexOf("randomql", 5))
 				{
 					await client.SendMessage(e.Channel, GetResponseUriFromRandomQlCrew("http://qlcrew.com/main.php?anyone=anyone&inc%5B0%5D=&p=999&exc%5B0%5D=&per_page=15&random"));
 				}
+				else if (0 <= e.Message.Text.ToLower().IndexOf("raecounter", 0))
+				{
+					await client.SendMessage(e.Channel, @"Rae has ghost-typed " + RaeCounter);
+				}
 				else if (0 <= e.Message.Text.ToLower().IndexOf("google", 0))
 				{
-					await
-						client.SendMessage(e.Channel, "http://lmgtfy.com/?q=" + e.Message.Text.ToLower().Substring(16).Replace(' ', '+'));
+					await client.SendMessage(e.Channel, "http://lmgtfy.com/?q=" + e.Message.Text.ToLower().Substring(16).Replace(' ', '+'));
 				}
 				else if (0 <= e.Message.Text.ToLower().IndexOf("youtube", 0))
 				{
@@ -139,8 +146,8 @@ namespace KiteBot
 				}
 			}
 	    }
-
-        //returns a greeting from the greetings.txt list on a per user or generic basis
+		
+	    //returns a greeting from the greetings.txt list on a per user or generic basis
 	    private string ParseGreeting(string userName)
         {
 		    if (userName.Equals("Bekenel"))
@@ -205,5 +212,19 @@ namespace KiteBot
 			HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 			return response.ResponseUri.AbsoluteUri;
 		}
+		public void IsRaeTyping(MessageEventArgs e)
+		{
+			if (e.User.Name.Equals("Rae Kusoni"))
+			{
+				RaeCounter += -1;
+			}
+		}
+	    public void IsRaeTyping(UserChannelEventArgs e)
+	    {
+			if (e.User.Name.Equals("Rae Kusoni"))
+			{
+				RaeCounter += 1;
+			}
+	    }
     }
 }

@@ -15,9 +15,10 @@ namespace KiteBot
 		    
 			//Display all log messages in the console
 			Client.LogMessage += (s, e) => Console.WriteLine("[{"+e.Severity+"}] {"+e.Source+"}: {"+e.Message+"}");
-			
-			//TODO: Rewrite this as a State Machine
-	        Client.MessageReceived += async (s, e) => await kiteChat.AsyncParseChat(s, e, Client);
+
+	        Client.UserIsTypingUpdated += async (s, e) => kiteChat.IsRaeTyping(e);
+
+			Client.MessageReceived += async (s, e) => await kiteChat.AsyncParseChat(s, e, Client);
 
 			//Convert our sync method to an async one and block the Main function until the bot disconnects
 			Client.Run(async () =>
