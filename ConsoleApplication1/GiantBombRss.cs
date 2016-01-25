@@ -36,8 +36,10 @@ namespace KiteBot
 				feed.UpdateFeed();
 			}
 		}
-		private void UpdateFeeds()
+		public void UpdateFeeds()
 		{
+			GBTimer.Stop();
+			GBTimer.Start();
 			foreach (Feed feed in _feeds)
 			{
 				feed.UpdateFeed();

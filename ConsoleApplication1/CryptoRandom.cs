@@ -40,7 +40,7 @@ namespace KiteBot
 		///<param name=”maxValue”>The exclusive upper bound of the random number returned. maxValue must be greater than or equal to minValue.</param>
 		public int Next(int minValue, int maxValue)
 		{
-			var v = Math.Round(NextDouble() * (maxValue - minValue));
+			var v = Math.Round(NextDouble() * (maxValue - minValue + 1));
 			return minValue + (int)v;
 		}
 		///<summary>

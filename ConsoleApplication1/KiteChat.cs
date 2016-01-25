@@ -68,10 +68,15 @@ namespace KiteBot
 				await client.SendMessage(e.Channel, "http://i.imgur.com/QhcNUWo.gifv");
 			}
 
+			else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /forceUpdate"))
+			{
+				giantBombRss.UpdateFeeds();
+			}
+
 			else if (!e.Message.IsAuthor && e.Message.Text.StartsWith("@KiteBot"))
 			{
 				if (e.Message.Text.StartsWith("@KiteBot #420") || e.Message.Text.ToLower().StartsWith("@KiteBot #blaze") ||
-					0 <= e.Message.Text.ToLower().IndexOf("waifu", 0))
+				    0 <= e.Message.Text.ToLower().IndexOf("waifu", 0))
 				{
 					await client.SendMessage(e.Channel, "http://420.moe/");
 				}
@@ -79,13 +84,16 @@ namespace KiteBot
 				{
 					var nl = Environment.NewLine;
 					await client.SendMessage(e.Channel, "Current Commands are:" + nl + "#420"
-						+ nl + "randomql" + nl + "google" + nl + "youtube" + nl + "kitedunk"
-						+ nl + "/pizza" + nl + "Whats for dinner" + nl + "sandwich" + nl + "RaeCounter"
-						+ nl + "help");
+					                                    + nl + "randomql" + nl + "google" + nl + "youtube" + nl + "kitedunk"
+					                                    + nl + "/pizza" + nl + "Whats for dinner" + nl + "sandwich" + nl + "RaeCounter"
+					                                    + nl + "help");
 				}
 				else if (0 <= e.Message.Text.ToLower().IndexOf("randomql", 5))
 				{
-					await client.SendMessage(e.Channel, GetResponseUriFromRandomQlCrew("http://qlcrew.com/main.php?anyone=anyone&inc%5B0%5D=&p=999&exc%5B0%5D=&per_page=15&random"));
+					await
+						client.SendMessage(e.Channel,
+							GetResponseUriFromRandomQlCrew(
+								"http://qlcrew.com/main.php?anyone=anyone&inc%5B0%5D=&p=999&exc%5B0%5D=&per_page=15&random"));
 				}
 				else if (0 <= e.Message.Text.ToLower().IndexOf("raecounter", 0))
 				{
@@ -93,7 +101,8 @@ namespace KiteBot
 				}
 				else if (0 <= e.Message.Text.ToLower().IndexOf("google", 0))
 				{
-					await client.SendMessage(e.Channel, "http://lmgtfy.com/?q=" + e.Message.Text.ToLower().Substring(16).Replace(' ', '+'));
+					await
+						client.SendMessage(e.Channel, "http://lmgtfy.com/?q=" + e.Message.Text.ToLower().Substring(16).Replace(' ', '+'));
 				}
 				else if (0 <= e.Message.Text.ToLower().IndexOf("youtube", 0))
 				{
@@ -120,7 +129,9 @@ namespace KiteBot
 					_possibleResponses.Add("No, fuck you USER!");
 					_possibleResponses.Add("Fuck you too USER!");
 
-					await client.SendMessage(e.Channel, _possibleResponses[_randomSeed.Next(0, _possibleResponses.Count)].Replace("USER", e.User.Name));
+					await
+						client.SendMessage(e.Channel,
+							_possibleResponses[_randomSeed.Next(0, _possibleResponses.Count)].Replace("USER", e.User.Name));
 				}
 				else if (0 <= e.Message.Text.ToLower().IndexOf("/pizza", 0))
 				{
@@ -131,18 +142,21 @@ namespace KiteBot
 					await client.SendMessage(e.Channel, kiteSandwich.ParseSandwich(e.User.Name));
 				}
 				else if (0 <= e.Message.Text.ToLower().IndexOf("hi", 0) || 0 <= e.Message.Text.ToLower().IndexOf("hey", 0) ||
-					0 <= e.Message.Text.ToLower().IndexOf("hello", 0))
+				         0 <= e.Message.Text.ToLower().IndexOf("hello", 0))
 				{
 					await client.SendMessage(e.Channel, ParseGreeting(e.User.Name));
 				}
 				else if (0 <= e.Message.Text.ToLower().IndexOf("/meal", 0) || 0 <= e.Message.Text.ToLower().IndexOf("dinner", 0)
-						 || 0 <= e.Message.Text.ToLower().IndexOf("lunch", 0))
+				         || 0 <= e.Message.Text.ToLower().IndexOf("lunch", 0))
 				{
-					await client.SendMessage(e.Channel, _mealResponses[_randomSeed.Next(0, _mealResponses.Length)].Replace("USER", e.User.Name));
+					await
+						client.SendMessage(e.Channel,
+							_mealResponses[_randomSeed.Next(0, _mealResponses.Length)].Replace("USER", e.User.Name));
 				}
 				else
 				{
-					await client.SendMessage(e.Channel, "KiteBot ver. 0.8.1 \"Finishes infinite while loops in less than 2 minutes.\"");
+					await
+						client.SendMessage(e.Channel, "KiteBot ver. 0.8.1 \"Finishes infinite while loops in less than 2 minutes.\"");
 				}
 			}
 	    }

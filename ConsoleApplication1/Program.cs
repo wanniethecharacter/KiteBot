@@ -16,7 +16,7 @@ namespace KiteBot
 			//Display all log messages in the console
 			Client.LogMessage += (s, e) => Console.WriteLine("[{"+e.Severity+"}] {"+e.Source+"}: {"+e.Message+"}");
 
-	        Client.UserIsTypingUpdated += async (s, e) => kiteChat.IsRaeTyping(e);
+	        Client.UserIsTypingUpdated += (s, e) => kiteChat.IsRaeTyping(e);
 
 			Client.MessageReceived += async (s, e) => await kiteChat.AsyncParseChat(s, e, Client);
 
