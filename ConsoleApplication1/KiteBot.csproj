@@ -105,6 +105,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Character.cs" />
     <Compile Include="CryptoRandom.cs" />
     <Compile Include="DiceRoller.cs" />
     <Compile Include="Properties\auth.Designer.cs">
@@ -139,7 +140,9 @@
   <ItemGroup>
     <Content Include="CharacterData.xml" />
     <Content Include="Greetings.txt" />
-    <Content Include="RoomData.xml" />
+    <Content Include="RoomData.xml">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
