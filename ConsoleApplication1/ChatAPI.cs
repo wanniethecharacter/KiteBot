@@ -1,18 +1,20 @@
 ﻿using System.Timers;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using KiteBot.Properties;
 
 namespace KiteBot
 {
 	class LivestreamChecker
 	{
-		public static string ApiCallUrl { get; } = "http://www.giantbomb.com/api/chats/?api_key=";
+		public static string ApiCallUrl;
 		private static Timer _chatTimer;//Garbage collection doesnt like local variables that only fire a couple times per hour
 		private XElement _latestXElement;
 		private bool isStreamRunning = false;
 
 		public void LivetreamChecker()
 		{
+			ApiCallUrl = "http://www.giantbomb.com/api/chats/?api_key=" + auth.Default.GiantBombAPI;
 			_chatTimer = new Timer();
 			_chatTimer.Elapsed += RefreshChatsApi;
 			_chatTimer.Interval = 120000;//2 minutes 2*60*1000=120 000
