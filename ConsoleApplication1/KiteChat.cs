@@ -25,6 +25,7 @@ namespace KiteBot
 		public static GiantBombRss giantBombRss = new GiantBombRss();
 		public static DiceRoller diceRoller = new DiceRoller();
 		public static KitCoGame kiteGame = new KitCoGame();
+		public static LivestreamChecker streamChecker = new LivestreamChecker();
 
         public static string ChatDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
         public static string GreetingFileLocation = ChatDirectory + "\\Content\\Greetings.txt";

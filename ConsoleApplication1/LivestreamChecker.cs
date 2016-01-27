@@ -5,14 +5,14 @@ using KiteBot.Properties;
 
 namespace KiteBot
 {
-	class LivestreamChecker
+	public class LivestreamChecker
 	{
 		public static string ApiCallUrl;
 		private static Timer _chatTimer;//Garbage collection doesnt like local variables that only fire a couple times per hour
 		private XElement _latestXElement;
-		private bool isStreamRunning = false;
+		private bool isStreamRunning;
 
-		public void LivetreamChecker()
+		public LivestreamChecker()
 		{
 			ApiCallUrl = "http://www.giantbomb.com/api/chats/?api_key=" + auth.Default.GiantBombAPI;
 			_chatTimer = new Timer();
@@ -32,13 +32,13 @@ namespace KiteBot
 		{
 			_latestXElement = GetXDocumentFromUrl(ApiCallUrl);
 
-			if (isStreamRunning == false && !_latestXElement.Element("pubDate").Value.Equals("0"))
+			if (isStreamRunning == false && !_latestXElement.Value.Equals("0"))
 			{
 				isStreamRunning = true;
 				Program.Client.SendMessage(Program.Client.GetChannel(85842104034541568),
 			    "Chat is LIVE at http://www.giantbomb.com/chat/ you should maybe check it out");
 			}
-			else if (isStreamRunning && _latestXElement.Element("pubDate").Value.Equals("0"))
+			else if (isStreamRunning && _latestXElement.Value.Equals("0"))
 			{
 				isStreamRunning = false;
 				Program.Client.SendMessage(Program.Client.GetChannel(85842104034541568),
