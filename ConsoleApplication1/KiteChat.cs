@@ -92,8 +92,7 @@ namespace KiteBot
 				{
 					await
 						client.SendMessage(e.Channel,
-							GetResponseUriFromRandomQlCrew(
-								"http://qlcrew.com/main.php?anyone=anyone&inc%5B0%5D=&p=999&exc%5B0%5D=&per_page=15&random"));
+							GetResponseUriFromRandomQlCrew());
 				}
 				else if (0 <= e.Message.Text.ToLower().IndexOf("raecounter", 0))
 				{
@@ -156,10 +155,17 @@ namespace KiteBot
 				else
 				{
 					await
-						client.SendMessage(e.Channel, "KiteBot ver. 0.8.1 \"Finishes infinite while loops in less than 2 minutes.\"");
+						client.SendMessage(e.Channel, "KiteBot ver. 0.8.3 \"Less Pizza, More Meat.\"");
 				}
 			}
 	    }
+		public static string GetResponseUriFromRandomQlCrew()
+		{
+			string url = "http://qlcrew.com/main.php?anyone=anyone&inc%5B0%5D=&p=999&exc%5B0%5D=&per_page=15&random";
+			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+			HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+			return response.ResponseUri.AbsoluteUri;
+		}
 		
 	    //returns a greeting from the greetings.txt list on a per user or generic basis
 	    private string ParseGreeting(string userName)
@@ -219,13 +225,6 @@ namespace KiteBot
 			_bekGreetings = stringArray;
 		}
 
-		private static string GetResponseUriFromRandomQlCrew(string s)
-		{
-			string url = s;
-			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-			HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-			return response.ResponseUri.AbsoluteUri;
-		}
 		public void IsRaeTyping(MessageEventArgs e)
 		{
 			if (e.User.Name.Equals("Rae Kusoni"))
