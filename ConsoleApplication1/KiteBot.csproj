@@ -105,7 +105,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Character.cs" />
+    <Compile Include="KiteCoGame\Character.cs" />
     <Compile Include="CryptoRandom.cs" />
     <Compile Include="DiceRoller.cs" />
     <Compile Include="Properties\auth.Designer.cs">
@@ -113,11 +113,11 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>auth.settings</DependentUpon>
     </Compile>
-    <Compile Include="KitCoGame.cs" />
+    <Compile Include="KiteCoGame\KitCoGame.cs" />
     <Compile Include="KiteChat.cs" />
     <Compile Include="KitePizza.cs" />
     <Compile Include="KiteSandwich.cs" />
-    <Compile Include="MapCell.cs" />
+    <Compile Include="KiteCoGame\MapCell.cs" />
     <Compile Include="GiantBombRSS.cs" />
     <Compile Include="KiteDunk.cs" />
     <Compile Include="Program.cs" />
@@ -138,12 +138,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="CharacterData.xml" />
+    <Content Include="KiteCoGame\CharacterData.xml" />
     <Content Include="Greetings.txt" />
-    <Content Include="RoomData.xml">
+    <Content Include="KiteCoGame\RoomData.xml">
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
