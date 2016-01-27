@@ -92,31 +92,31 @@ namespace KiteBot
                     //look commands
                     if (0 <= message.Text.ToLower().IndexOf("look"))
                     {
-                        foreach (string s in map[currentCharacter.PosX(), currentCharacter.PosY()].objectDictionary.Keys)
+                        foreach (string s in map[currentCharacter.PosX, currentCharacter.PosY].objectDictionary.Keys)
                         {
                             if (0 <= message.Text.ToLower().IndexOf(s.ToLower()))
                             {
-                                return currentCharacter.Name + " " + map[currentCharacter.PosX(), currentCharacter.PosY()].objectDictionary[s];
+                                return currentCharacter.Name + " " + map[currentCharacter.PosX, currentCharacter.PosY].objectDictionary[s];
                             }
                         }
 
-                        foreach (string s in map[currentCharacter.PosX(), currentCharacter.PosY()].directions.Keys)
+                        foreach (string s in map[currentCharacter.PosX, currentCharacter.PosY].directions.Keys)
                         {
                             if (0 <= message.Text.ToLower().IndexOf(s.ToLower()))
                             {
-                                return currentCharacter.Name + " " + map[currentCharacter.PosX(), currentCharacter.PosY()].directions[s];
+                                return currentCharacter.Name + " " + map[currentCharacter.PosX, currentCharacter.PosY].directions[s];
                             }
                         }
 
-                        return currentCharacter.Name + " " + map[currentCharacter.PosX(), currentCharacter.PosY()].roomDesc;
+                        return currentCharacter.Name + " " + map[currentCharacter.PosX, currentCharacter.PosY].roomDesc;
                     }
 
 
                     //move commands
                     else if (0 <= message.Text.ToLower().IndexOf("move"))
                     {
-                        int x = currentCharacter.PosX();
-                        int y = currentCharacter.PosY();
+                        int x = currentCharacter.PosX;
+                        int y = currentCharacter.PosY;
 
                         if (0 <= message.Text.ToLower().IndexOf("north"))
                         {
@@ -126,7 +126,7 @@ namespace KiteBot
                             {
                                 currentCharacter.Move(0,1, tmpXElement);
                                 characterData.Save(CharacterData);
-                                return currentCharacter.Name + " You move to the north. " + map[currentCharacter.PosX(), currentCharacter.PosY()].roomDesc;
+                                return currentCharacter.Name + " You move to the north. " + map[currentCharacter.PosX, currentCharacter.PosY].roomDesc;
                             }
                         }
 
@@ -138,7 +138,7 @@ namespace KiteBot
                             {
                                 currentCharacter.Move(0, -1, tmpXElement);
                                 characterData.Save(CharacterData);
-                                return currentCharacter.Name + " You move to the south. " + map[currentCharacter.PosX(), currentCharacter.PosY()].roomDesc;
+                                return currentCharacter.Name + " You move to the south. " + map[currentCharacter.PosX, currentCharacter.PosY].roomDesc;
                             }
                         }
 
@@ -150,7 +150,7 @@ namespace KiteBot
                             {
                                 currentCharacter.Move(1, 0, tmpXElement);
                                 characterData.Save(CharacterData);
-                                return currentCharacter.Name + " You move to the east. " + map[currentCharacter.PosX(), currentCharacter.PosY()].roomDesc;
+                                return currentCharacter.Name + " You move to the east. " + map[currentCharacter.PosX, currentCharacter.PosY].roomDesc;
                             }
                         }
 
@@ -162,7 +162,7 @@ namespace KiteBot
                             {
                                 currentCharacter.Move(-1, 0, tmpXElement);
                                 characterData.Save(CharacterData);
-                                return currentCharacter.Name + " You move to the west. " + map[currentCharacter.PosX(), currentCharacter.PosY()].roomDesc;
+                                return currentCharacter.Name + " You move to the west. " + map[currentCharacter.PosX, currentCharacter.PosY].roomDesc;
                             }
                         }
                     }

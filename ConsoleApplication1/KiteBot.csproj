@@ -105,15 +105,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LivestreamChecker.cs" />
-    <Compile Include="KiteCoGame\Character.cs" />
-    <Compile Include="CryptoRandom.cs" />
-    <Compile Include="DiceRoller.cs" />
     <Compile Include="Properties\auth.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>auth.settings</DependentUpon>
     </Compile>
+    <Compile Include="LivestreamChecker.cs" />
+    <Compile Include="KiteCoGame\Character.cs" />
+    <Compile Include="CryptoRandom.cs" />
+    <Compile Include="DiceRoller.cs" />
     <Compile Include="KiteCoGame\KitCoGame.cs" />
     <Compile Include="KiteChat.cs" />
     <Compile Include="KitePizza.cs" />
