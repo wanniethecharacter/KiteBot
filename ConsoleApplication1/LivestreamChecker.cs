@@ -20,7 +20,6 @@ namespace KiteBot
 			_chatTimer.Interval = 120000;//2 minutes 2*60*1000=120 000
 			_chatTimer.AutoReset = true;
 			_chatTimer.Enabled = true;
-			RefreshChatsApi();
 		}
 
 		private void RefreshChatsApi(object sender, ElapsedEventArgs elapsedEventArgs)
