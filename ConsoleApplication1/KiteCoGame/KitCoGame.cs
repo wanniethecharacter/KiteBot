@@ -12,8 +12,8 @@ namespace KiteBot
         private XDocument characterData;
         private XDocument mapData;
         private static string DataDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
-        private static string CharacterData = DataDirectory + "\\CharacterData.xml";
-        private static string MapData = DataDirectory + "\\RoomData.xml";
+		private static string CharacterData = DataDirectory + "\\KiteCoGame\\CharacterData.xml";
+        private static string MapData = DataDirectory + "\\KiteCoGame\\RoomData.xml";
 
         static int maxWidth = 5;
         static int maxHeight = 5;
