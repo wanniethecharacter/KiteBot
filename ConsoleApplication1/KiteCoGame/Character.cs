@@ -2,38 +2,22 @@
 
 namespace KiteBot   
 {
-    public struct MapCoords
-    {
-        public int x { get; set; }
-        public int y { get; set; }
-    }
-
     class Character
     {
         public string Name { get; private set; }
         public long UserId { get; private set; }
         public int Level { get; private set; }
-
-        private MapCoords mapCoords = new MapCoords();
+        public int PosX { get; private set; }
+        public int PosY { get; private set; }
 
         public Character (int xCoord, int yCoord, string name, long userId, int level)
         {
-            mapCoords.x = xCoord;
-            mapCoords.y = yCoord;
+            PosX = xCoord;
+            PosY = yCoord;
 
             Name = name;
             UserId = userId;
             Level = level;
-        }
-
-        public int PosX()
-        {
-            return mapCoords.x;
-        }
-
-        public int PosY()
-        {
-            return mapCoords.y;
         }
 
         /// <summary>
@@ -44,11 +28,11 @@ namespace KiteBot
 
         public void Move(int xChange, int yChange, XElement tmpElement)
         {
-            mapCoords.x += xChange;
-            mapCoords.y += yChange;
+            PosX += xChange;
+            PosY += yChange;
 
-            tmpElement.Element("x").Value = mapCoords.x.ToString();
-            tmpElement.Element("y").Value = mapCoords.y.ToString();
+            tmpElement.Element("x").Value = PosX.ToString();
+            tmpElement.Element("y").Value = PosY.ToString();
         }
 
     }
