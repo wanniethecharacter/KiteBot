@@ -31,23 +31,34 @@ namespace KiteBot
 		{
 			_latestXElement = GetXDocumentFromUrl(ApiCallUrl);
 
-			if (isStreamRunning == false && !_latestXElement.Value.Equals("0"))
+			if (isStreamRunning == false && !_latestXElement.Element("number_of_page_results").Value.Equals("0"))
 			{
 				isStreamRunning = true;
+
+				var stream = _latestXElement.Element("results").Element("stream");
+				var title = deGiantBombifyer(stream.Element("title").Value);
+				var deck = deGiantBombifyer(stream.Element("deck").Value);
+
 				Program.Client.SendMessage(Program.Client.GetChannel(85842104034541568),
-			    "Chat is LIVE at http://www.giantbomb.com/chat/ you should maybe check it out");
+			    title +": "+ deck + " is LIVE at http://www.giantbomb.com/chat/ you should maybe check it out");
 			}
-			else if (isStreamRunning && _latestXElement.Value.Equals("0"))
+			else if (isStreamRunning && _latestXElement.Element("number_of_page_results").Value.Equals("0"))
 			{
 				isStreamRunning = false;
 				Program.Client.SendMessage(Program.Client.GetChannel(85842104034541568),
 			    "Show is over folks, if you need more Giant Bomb videos, maybe check this out: " + KiteChat.GetResponseUriFromRandomQlCrew());
 			}
 		}
+
+		private string deGiantBombifyer(string s)
+		{
+			return s.Replace("<![CDATA[ ", "").Replace(" ]]>", "");
+		}
+
 		private XElement GetXDocumentFromUrl(string url)
 		{
 			XDocument document = XDocument.Load(url);
-			return document.XPathSelectElement(@"//response/number_of_page_results");
+			return document.XPathSelectElement(@"//response");
 		}
 	}
 }

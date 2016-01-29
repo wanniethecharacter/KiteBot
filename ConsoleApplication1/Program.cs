@@ -21,7 +21,7 @@ namespace KiteBot
 			Client.MessageReceived += async (s, e) => await kiteChat.AsyncParseChat(s, e, Client);
 
 			//Convert our sync method to an async one and block the Main function until the bot disconnects
-			Client.Run(async () =>
+		Client.Run(async () =>
 			{
 				//Connect to the Discord server using our email and password
 				await Client.Connect(Properties.auth.Default.DiscordEmail,Properties.auth.Default.DiscordPassword);
