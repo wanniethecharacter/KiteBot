@@ -26,6 +26,7 @@ namespace KiteBot
 		public static DiceRoller diceRoller = new DiceRoller();
 		public static KitCoGame kiteGame = new KitCoGame();
 		public static LivestreamChecker streamChecker = new LivestreamChecker();
+        //private static TextMarkovChain textMarkovChain = new TextMarkovChain();
 
         public static string ChatDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
         public static string GreetingFileLocation = ChatDirectory + "\\Content\\Greetings.txt";
@@ -74,7 +75,12 @@ namespace KiteBot
 				giantBombRss.UpdateFeeds();
 			}
 
-			else if (!e.Message.IsAuthor && e.Message.Text.StartsWith("@KiteBot"))
+            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /testMarkov"))
+            {
+                await client.SendMessage(e.Channel, await GetMarkovChain(e));
+            }
+
+            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith("@KiteBot"))
 			{
 				if (e.Message.Text.StartsWith("@KiteBot #420") || e.Message.Text.ToLower().StartsWith("@KiteBot #blaze") ||
 				    0 <= e.Message.Text.ToLower().IndexOf("waifu", 0))
@@ -167,8 +173,34 @@ namespace KiteBot
 			HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 			return response.ResponseUri.AbsoluteUri;
 		}
-		
-	    //returns a greeting from the greetings.txt list on a per user or generic basis
+
+        private async Task<string> GetMarkovChain(MessageEventArgs e)
+        {
+            var channelMessageLog = await Program.Client.DownloadMessages(e.Channel,250);
+            TextMarkovChain textMarkovChain = new TextMarkovChain();
+            foreach (var v in channelMessageLog)
+            {
+                if (v.Text.ToLower().Contains("@KiteBot") || v.User.Name.Equals("KiteBot"))
+                {
+                    
+                }
+                else
+                {
+                    textMarkovChain.feed(v.Text);
+                }
+            }
+
+            if (textMarkovChain.readyToGenerate())
+            {
+                return textMarkovChain.generateSentence().Replace("  ", " ").Replace(" .", ".");
+            }
+            else
+            {
+                return "poop";
+            }
+        }
+
+        //returns a greeting from the greetings.txt list on a per user or generic basis
 	    private string ParseGreeting(string userName)
         {
 		    if (userName.Equals("Bekenel"))
