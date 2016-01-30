@@ -55,7 +55,10 @@ namespace KiteBot
 			Console.WriteLine("(" + e.User.Name + "/" + e.User.Id + ") - " + e.Message.Text);
 		    IsRaeTyping(e);
 
-			if (e.Channel.Name.ToLower().Contains("vinncorobocorps"))
+            //add all messages to the Markov Chain list
+            AddToMarkovChain(e);
+
+            if (e.Channel.Name.ToLower().Contains("vinncorobocorps"))
 			{
 				string response = kiteGame.GetGameResponse(e.Message);
 				if (response != null)
@@ -72,19 +75,19 @@ namespace KiteBot
 				await client.SendMessage(e.Channel, "http://i.imgur.com/QhcNUWo.gifv");
 			}
 
-			else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /forceUpdate"))
+			else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBotBeta /forceUpdate"))
 			{
 				giantBombRss.UpdateFeeds();
 			}
 
-            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /testMarkov"))
+            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBotBeta /testMarkov"))
             {
                 await client.SendMessage(e.Channel, await GetMarkovChain(e));
             }
 
-            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith("@KiteBot"))
+            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith("@KiteBotBeta"))
 			{
-				if (e.Message.Text.StartsWith("@KiteBot #420") || e.Message.Text.ToLower().StartsWith("@KiteBot #blaze") ||
+				if (e.Message.Text.StartsWith("@KiteBotBeta #420") || e.Message.Text.ToLower().StartsWith("@KiteBotBeta #blaze") ||
 				    0 <= e.Message.Text.ToLower().IndexOf("waifu", 0))
 				{
 					await client.SendMessage(e.Channel, "http://420.moe/");
@@ -163,7 +166,7 @@ namespace KiteBot
 				}
 				else
 				{
-					await
+                    await
 						client.SendMessage(e.Channel, "KiteBot ver. 0.8.3 \"Less Pizza, More Meat.\"");
 				}
 			}
@@ -178,6 +181,7 @@ namespace KiteBot
 
         private async Task<string> GetMarkovChain(MessageEventArgs e)
         {
+            //Check if the dictionary entry for the channel exists, populate the new list if it does not.
             if(!chatLogDictionary.ContainsKey(e.Channel.Id))
             {
                 chatLogDictionary.Add(e.Channel.Id, new List<Message>());
@@ -191,16 +195,10 @@ namespace KiteBot
                 }
             }
 
-            else
-            {
-                chatLogDictionary[e.Channel.Id].Add(e.Message);
-                chatLogDictionary[e.Channel.Id].RemoveRange(0,1);
-            }
-
             TextMarkovChain textMarkovChain = new TextMarkovChain();
             foreach (var v in chatLogDictionary[e.Channel.Id])
             {
-                if (v.Text.ToLower().Contains("@kitebot") || v.User.Name.Equals("KiteBot"))
+                if (v.Text.ToLower().Contains("@kitebot") || v.User.Name.Equals("KiteBotBeta"))
                 {
                     
                 }
@@ -227,6 +225,15 @@ namespace KiteBot
             else
             {
                 return "poop";
+            }
+        }
+
+        private void AddToMarkovChain(MessageEventArgs e)
+        {
+            if (chatLogDictionary.ContainsKey(e.Channel.Id) && !e.User.Name.ToLower().Contains("kitebot"))
+            {
+                chatLogDictionary[e.Channel.Id].Add(e.Message);
+                chatLogDictionary[e.Channel.Id].RemoveRange(0, 1);
             }
         }
 
