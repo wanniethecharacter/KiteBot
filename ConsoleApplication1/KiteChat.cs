@@ -33,6 +33,8 @@ namespace KiteBot
         public static string ResponseFileLocation = ChatDirectory + "\\Content\\Responses.txt";
         public static string MealFileLocation = ChatDirectory + "\\Content\\Meals.txt";
 
+        private Dictionary<long, List<Message>> chatLogDictionary = new Dictionary<long, List<Message>>();
+
         public KiteChat() : this(File.ReadAllLines(GreetingFileLocation), File.ReadAllLines(ResponseFileLocation),
                                 File.ReadAllLines(MealFileLocation), new Random(DateTime.Now.Millisecond))
         {
@@ -176,16 +178,40 @@ namespace KiteBot
 
         private async Task<string> GetMarkovChain(MessageEventArgs e)
         {
-            var channelMessageLog = await Program.Client.DownloadMessages(e.Channel,250);
-            TextMarkovChain textMarkovChain = new TextMarkovChain();
-            foreach (var v in channelMessageLog)
+            if(!chatLogDictionary.ContainsKey(e.Channel.Id))
             {
-                if (v.Text.ToLower().Contains("@KiteBot") || v.User.Name.Equals("KiteBot"))
+                chatLogDictionary.Add(e.Channel.Id, new List<Message>());
+                for (int i = 0; i <= 500; i += 100)
+                {
+                    chatLogDictionary[e.Channel.Id].AddRange(await Program.Client.DownloadMessages(e.Channel, 100, i, RelativeDirection.After));
+                }
+            }
+
+            else
+            {
+                chatLogDictionary[e.Channel.Id].Add(e.Message);
+                chatLogDictionary[e.Channel.Id].RemoveRange(0,1);
+            }
+
+            TextMarkovChain textMarkovChain = new TextMarkovChain();
+            foreach (var v in chatLogDictionary[e.Channel.Id])
+            {
+                if (v.Text.ToLower().Contains("@kitebot") || v.User.Name.Equals("KiteBot"))
                 {
                     
                 }
                 else
                 {
+                    if (v.Text.Contains("testMarkov"))
+                    {
+                        v.Text.Replace("testMarkov", "");
+                    }
+
+                    if (v.Text.Contains("testmarkov"))
+                    {
+                        v.Text.Replace("testmarkov", "");
+                    }
+
                     textMarkovChain.feed(v.Text);
                 }
             }
