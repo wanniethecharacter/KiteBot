@@ -20,8 +20,6 @@ namespace KiteBot
 
 			Client.MessageReceived += async (s, e) => await kiteChat.AsyncParseChat(s, e, Client);
 
-            Client.Connected += async (s, e) => tmch = new TextMarkovChainHelper();
-
 			//Convert our sync method to an async one and block the Main function until the bot disconnects
 		    Client.Run(async () =>
 			{
