@@ -181,9 +181,13 @@ namespace KiteBot
             if(!chatLogDictionary.ContainsKey(e.Channel.Id))
             {
                 chatLogDictionary.Add(e.Channel.Id, new List<Message>());
-                for (int i = 0; i <= 500; i += 100)
+
+                long tmpMessageTracker = e.Message.Id;
+
+                while (chatLogDictionary[e.Channel.Id].Count <= 500)
                 {
-                    chatLogDictionary[e.Channel.Id].AddRange(await Program.Client.DownloadMessages(e.Channel, 100, i, RelativeDirection.After));
+                    chatLogDictionary[e.Channel.Id].AddRange(await Program.Client.DownloadMessages(e.Channel, 100, tmpMessageTracker, RelativeDirection.Before));
+                    tmpMessageTracker = chatLogDictionary[e.Channel.Id][chatLogDictionary[e.Channel.Id].Count-1].Id;//grabs the last message in the savd list
                 }
             }
 
