@@ -26,7 +26,6 @@ namespace KiteBot
 		public static DiceRoller diceRoller = new DiceRoller();
 		public static KitCoGame kiteGame = new KitCoGame();
 		public static LivestreamChecker streamChecker = new LivestreamChecker();
-        //private static TextMarkovChain textMarkovChain = new TextMarkovChain();
 
         public static string ChatDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
         public static string GreetingFileLocation = ChatDirectory + "\\Content\\Greetings.txt";
@@ -180,7 +179,7 @@ namespace KiteBot
             TextMarkovChain textMarkovChain = new TextMarkovChain();
             foreach (var v in channelMessageLog)
             {
-                if (v.Text.ToLower().Contains("@KiteBot") || v.User.Name.Equals("KiteBot"))
+                if (v.Text.ToLower().Contains("@kitebot") || v.User.Name.Equals("KiteBot")||v.User.Name.Equals("KiteBotBeta"))
                 {
                     
                 }
