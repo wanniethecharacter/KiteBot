@@ -75,19 +75,19 @@ namespace KiteBot
 				await client.SendMessage(e.Channel, "http://i.imgur.com/QhcNUWo.gifv");
 			}
 
-			else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBotBeta /forceUpdate"))
+			else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /forceUpdate"))
 			{
 				giantBombRss.UpdateFeeds();
 			}
 
-            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBotBeta /testMarkov"))
+            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /testMarkov"))
             {
                 await client.SendMessage(e.Channel, await GetMarkovChain(e));
             }
 
-            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith("@KiteBotBeta"))
+            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith("@KiteBot"))
 			{
-				if (e.Message.Text.StartsWith("@KiteBotBeta #420") || e.Message.Text.ToLower().StartsWith("@KiteBotBeta #blaze") ||
+				if (e.Message.Text.StartsWith("@KiteBot #420") || e.Message.Text.ToLower().StartsWith("@KiteBot #blaze") ||
 				    0 <= e.Message.Text.ToLower().IndexOf("waifu", 0))
 				{
 					await client.SendMessage(e.Channel, "http://420.moe/");
@@ -198,7 +198,7 @@ namespace KiteBot
             TextMarkovChain textMarkovChain = new TextMarkovChain();
             foreach (var v in chatLogDictionary[e.Channel.Id])
             {
-                if (v.Text.ToLower().Contains("@kitebot") || v.User.Name.Equals("KiteBotBeta"))
+                if (v.Text.ToLower().Contains("@kitebot") || v.User.Name.Equals("KiteBot"))
                 {
                     
                 }
