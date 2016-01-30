@@ -74,7 +74,7 @@ namespace KiteBot
 
             XElement tmpXElement = null;
 
-            if (!message.IsAuthor && message.Text.StartsWith("@KiteBot"))
+            if (!message.IsAuthor && message.Text.StartsWith("@KiteBotBeta"))
             {
                 if (characters.ContainsKey(message.User.Id))
                 {

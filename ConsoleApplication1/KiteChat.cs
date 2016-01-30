@@ -26,11 +26,14 @@ namespace KiteBot
 		public static DiceRoller diceRoller = new DiceRoller();
 		public static KitCoGame kiteGame = new KitCoGame();
 		public static LivestreamChecker streamChecker = new LivestreamChecker();
+        //private static TextMarkovChain textMarkovChain = new TextMarkovChain();
 
         public static string ChatDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
         public static string GreetingFileLocation = ChatDirectory + "\\Content\\Greetings.txt";
         public static string ResponseFileLocation = ChatDirectory + "\\Content\\Responses.txt";
         public static string MealFileLocation = ChatDirectory + "\\Content\\Meals.txt";
+
+        private Dictionary<long, List<Message>> chatLogDictionary = new Dictionary<long, List<Message>>();
 
         public KiteChat() : this(File.ReadAllLines(GreetingFileLocation), File.ReadAllLines(ResponseFileLocation),
                                 File.ReadAllLines(MealFileLocation), new Random(DateTime.Now.Millisecond))
@@ -52,7 +55,10 @@ namespace KiteBot
 			Console.WriteLine("(" + e.User.Name + "/" + e.User.Id + ") - " + e.Message.Text);
 		    IsRaeTyping(e);
 
-			if (e.Channel.Name.ToLower().Contains("vinncorobocorps"))
+            //add all messages to the Markov Chain list
+            AddToMarkovChain(e);
+
+            if (e.Channel.Name.ToLower().Contains("vinncorobocorps"))
 			{
 				string response = kiteGame.GetGameResponse(e.Message);
 				if (response != null)
@@ -160,7 +166,7 @@ namespace KiteBot
 				}
 				else
 				{
-					await
+                    await
 						client.SendMessage(e.Channel, "KiteBot ver. 0.8.3 \"Less Pizza, More Meat.\"");
 				}
 			}
@@ -175,16 +181,39 @@ namespace KiteBot
 
         private async Task<string> GetMarkovChain(MessageEventArgs e)
         {
-            var channelMessageLog = await Program.Client.DownloadMessages(e.Channel,250);
-            TextMarkovChain textMarkovChain = new TextMarkovChain();
-            foreach (var v in channelMessageLog)
+            //Check if the dictionary entry for the channel exists, populate the new list if it does not.
+            if(!chatLogDictionary.ContainsKey(e.Channel.Id))
             {
-                if (v.Text.ToLower().Contains("@kitebot") || v.User.Name.Equals("KiteBot")||v.User.Name.Equals("KiteBotBeta"))
+                chatLogDictionary.Add(e.Channel.Id, new List<Message>());
+
+                long tmpMessageTracker = e.Message.Id;
+
+                while (chatLogDictionary[e.Channel.Id].Count <= 500)
+                {
+                    chatLogDictionary[e.Channel.Id].AddRange(await Program.Client.DownloadMessages(e.Channel, 100, tmpMessageTracker, RelativeDirection.Before));
+                    tmpMessageTracker = chatLogDictionary[e.Channel.Id][chatLogDictionary[e.Channel.Id].Count-1].Id;//grabs the last message in the savd list
+                }
+            }
+
+            TextMarkovChain textMarkovChain = new TextMarkovChain();
+            foreach (var v in chatLogDictionary[e.Channel.Id])
+            {
+                if (v.Text.ToLower().Contains("@kitebot") || v.User.Name.Equals("KiteBot"))
                 {
                     
                 }
                 else
                 {
+                    if (v.Text.Contains("testMarkov"))
+                    {
+                        v.Text.Replace("testMarkov", "");
+                    }
+
+                    if (v.Text.Contains("testmarkov"))
+                    {
+                        v.Text.Replace("testmarkov", "");
+                    }
+
                     textMarkovChain.feed(v.Text);
                 }
             }
@@ -196,6 +225,15 @@ namespace KiteBot
             else
             {
                 return "poop";
+            }
+        }
+
+        private void AddToMarkovChain(MessageEventArgs e)
+        {
+            if (chatLogDictionary.ContainsKey(e.Channel.Id) && !e.User.Name.ToLower().Contains("kitebot"))
+            {
+                chatLogDictionary[e.Channel.Id].Add(e.Message);
+                chatLogDictionary[e.Channel.Id].RemoveRange(0, 1);
             }
         }
 
