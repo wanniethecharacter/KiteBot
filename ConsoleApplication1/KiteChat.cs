@@ -11,7 +11,7 @@ namespace KiteBot
 {
     public class KiteChat
     {
-        private static Timer _chatTimer;
+        //private static Timer _chatTimer;
         public static Random _randomSeed;
 
 		public static int RaeCounter;
@@ -52,11 +52,11 @@ namespace KiteBot
 	        RaeCounter = 0;
 
             //Timer for generating randomly timed MarkovChain strings.
-            _chatTimer = new Timer();
+            /*_chatTimer = new Timer();
             _chatTimer.Elapsed += IntervalMarkov;
             _chatTimer.Interval = 30000;
             _chatTimer.AutoReset = true;
-            _chatTimer.Enabled = true;
+            _chatTimer.Enabled = true;*/
         }
 
         public async Task AsyncParseChat(object s, MessageEventArgs e, DiscordClient client)
@@ -84,19 +84,19 @@ namespace KiteBot
 				await client.SendMessage(e.Channel, "http://i.imgur.com/QhcNUWo.gifv");
 			}
 
-			else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBotBeta /forceUpdate"))
+			else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /forceUpdate"))
 			{
 				giantBombRss.UpdateFeeds();
 			}
 
-            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBotBeta /testMarkov"))
+            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /testMarkov"))
             {
                 await client.SendMessage(e.Channel, await GetMarkovChain(e.Message));
             }
 
-            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith("@KiteBotBeta"))
+            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith("@KiteBot"))
 			{
-				if (e.Message.Text.StartsWith("@KiteBotBeta #420") || e.Message.Text.ToLower().StartsWith("@KiteBotBeta #blaze") ||
+				if (e.Message.Text.StartsWith("@KiteBot #420") || e.Message.Text.ToLower().StartsWith("@KiteBot #blaze") ||
 				    0 <= e.Message.Text.ToLower().IndexOf("waifu", 0))
 				{
 					await client.SendMessage(e.Channel, "http://420.moe/");
@@ -208,7 +208,7 @@ namespace KiteBot
             TextMarkovChain textMarkovChain = new TextMarkovChain();
             foreach (var v in chatLogDictionary[e.Channel.Id])
             {
-                if (v.Text.ToLower().Contains("@kitebot") || v.User.Name.Equals("KiteBotBeta"))
+                if (v.Text.ToLower().Contains("@kitebot") || v.User.Name.Equals("KiteBot"))
                 {
                     
                 }
@@ -249,7 +249,7 @@ namespace KiteBot
 
         //Calls from timer to activate random markov string saying.  Currently sends the most recent chat message into the
         //GetMarkovChain method, which menas it doubles up that message in the database...
-        async private void IntervalMarkov(object sender, ElapsedEventArgs elapsedEventArgs)
+        /*async private void IntervalMarkov(object sender, ElapsedEventArgs elapsedEventArgs)
         {
             if (chatLogDictionary.ContainsKey(85842104034541568))
             {
@@ -257,7 +257,7 @@ namespace KiteBot
                 await Program.Client.SendMessage(Program.Client.GetChannel(85842104034541568), await GetMarkovChain(tmpMessageArray[0]));
                 _chatTimer.Interval = _randomSeed.Next(900000, 1500000);
             }
-        }
+        }*/
 
         //returns a greeting from the greetings.txt list on a per user or generic basis
 	    private string ParseGreeting(string userName)
