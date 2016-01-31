@@ -28,7 +28,7 @@ namespace KiteBot
 		public static DiceRoller diceRoller = new DiceRoller();
 		public static KitCoGame kiteGame = new KitCoGame();
 		public static LivestreamChecker streamChecker = new LivestreamChecker();
-        //private static TextMarkovChain textMarkovChain = new TextMarkovChain();
+        public static TextMarkovChain textMarkovChain = new TextMarkovChain();
 
         public static string ChatDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
         public static string GreetingFileLocation = ChatDirectory + "\\Content\\Greetings.txt";
@@ -249,7 +249,7 @@ namespace KiteBot
 
         //Calls from timer to activate random markov string saying.  Currently sends the most recent chat message into the
         //GetMarkovChain method, which menas it doubles up that message in the database...
-        /*async private void IntervalMarkov(object sender, ElapsedEventArgs elapsedEventArgs)
+        /*private async void IntervalMarkov(object sender, ElapsedEventArgs elapsedEventArgs)
         {
             if (chatLogDictionary.ContainsKey(85842104034541568))
             {

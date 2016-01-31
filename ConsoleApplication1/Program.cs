@@ -11,7 +11,6 @@ namespace KiteBot
 	    {
 		    Client = new DiscordClient();
 		    var kiteChat = new KiteChat();
-            TextMarkovChainHelper tmch;
             //bool shutUp = false;
             //Display all log messages in the console
             Client.LogMessage += (s, e) => Console.WriteLine("[{"+e.Severity+"}] {"+e.Source+"}: {"+e.Message+"}");
@@ -19,6 +18,11 @@ namespace KiteBot
 	        Client.UserIsTypingUpdated += (s, e) => kiteChat.IsRaeTyping(e);
 
 			Client.MessageReceived += async (s, e) => await kiteChat.AsyncParseChat(s, e, Client);
+
+            Client.Connected += (s, e) =>
+            {
+                
+            };
 
 			//Convert our sync method to an async one and block the Main function until the bot disconnects
 		    Client.Run(async () =>

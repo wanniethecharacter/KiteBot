@@ -132,7 +132,7 @@ namespace KiteBot
 
             public Chain(XmlNode node)
             {
-                word = node.Attributes["Word"].Value.ToString();
+                word = node.Attributes["Word"].Value;
                 fullCount = 0;  //Full Count is stored, but this will be loaded when adding new words to the chain.  Default to 0 when loading XML
                 chains = new Dictionary<string, ChainProbability>();
             }
