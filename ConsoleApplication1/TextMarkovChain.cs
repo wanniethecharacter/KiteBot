@@ -20,6 +20,9 @@ namespace KiteBot
 
         public void feed(string s)
         {
+            if (!s.EndsWith(".") && !s.EndsWith("!") && !s.EndsWith("?"))
+                s += ".";
+
             s = s.ToLower();
             s = s.Replace('/',' ').Replace(',',' ').Replace("[]", "");
             s = s.Replace(".", " .").Replace("!", " !").Replace("?", " ?");
