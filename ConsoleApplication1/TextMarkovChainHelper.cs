@@ -87,7 +87,7 @@ namespace KiteBot
         {
             if (!message.User.Name.ToLower().Contains("kitebot"))
             {
-                if(!message.Text.Equals("") || !message.Text.Contains("http") || !message.Text.ToLower().Contains("testmarkov"))
+                if(!message.Text.Equals("") && !message.Text.Contains("http") && !message.Text.ToLower().Contains("testmarkov"))
                 {
                     textMarkovChain.feed(message.Text);
                 }
