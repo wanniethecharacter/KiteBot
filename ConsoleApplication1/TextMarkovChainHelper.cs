@@ -7,7 +7,7 @@ namespace KiteBot
 {
     public class TextMarkovChainHelper
     {
-        private const int MaxMessages = 500;
+        private const int MaxMessages = 1500;
         private static readonly Dictionary<long,List<Message>> ChannelMessages = 
             new Dictionary<long,List<Message>>();
         private static readonly Dictionary<long, TextMarkovChain> ChannelMarkovChains =
@@ -42,41 +42,58 @@ namespace KiteBot
 
         public void Feed(Message message)
         {
-            if (ChannelMessages.ContainsKey(message.Channel.Id))
+            if (!_isInitialized)
             {
-                ChannelMessages[message.Channel.Id].Add(message);
-
-                if (ChannelMarkovChains.ContainsKey(message.Channel.Id))
+                if (ChannelMessages.ContainsKey(message.Channel.Id))
                 {
-                    ChannelMarkovChains[message.Channel.Id].feed(message.Text);
+                    ChannelMessages[message.Channel.Id].Add(message);
+
+                    if (ChannelMarkovChains.ContainsKey(message.Channel.Id))
+                    {
+                        FeedMarkovChain(ChannelMarkovChains[message.Channel.Id],message);
+                    }
                 }
-            }
-            else
-            {
-                ChannelMessages.Add(message.Channel.Id, GetMessagesFromChannel(_client,message.Channel, MaxMessages).Result);
+                else
+                {
+                    ChannelMessages.Add(message.Channel.Id, GetMessagesFromChannel(_client, message.Channel, MaxMessages).Result);
+                }
             }
         }
 
         public string GetSequenceForChannel(Channel channel)
         {
-            TextMarkovChain textMarkovChain;
-            if (ChannelMarkovChains.TryGetValue(channel.Id, out textMarkovChain))
+            if (_isInitialized)
             {
-                return textMarkovChain.generateSentence();
+                TextMarkovChain textMarkovChain;
+                if (ChannelMarkovChains.TryGetValue(channel.Id, out textMarkovChain))
+                {
+                    return textMarkovChain.generateSentence();
+                }
+                else
+                {
+                    textMarkovChain = new TextMarkovChain();
+                    foreach (Message message in ChannelMessages[channel.Id])
+                    {
+                        FeedMarkovChain(textMarkovChain, message);
+                    }
+                    ChannelMarkovChains.Add(channel.Id, textMarkovChain);
+                    return textMarkovChain.generateSentence();
+                }
             }
-            else
+            return "I'm not ready yet Senpai!";
+        }
+
+        private void FeedMarkovChain(TextMarkovChain textMarkovChain, Message message)
+        {
+            if (!message.User.Name.ToLower().Contains("kitebot"))
             {
-                textMarkovChain = new TextMarkovChain();
-                foreach (Message message in ChannelMessages[channel.Id])
+                if(!message.Text.Equals("") || !message.Text.Contains("http") || !message.Text.ToLower().Contains("testmarkov"))
                 {
                     textMarkovChain.feed(message.Text);
                 }
-                ChannelMarkovChains.Add(channel.Id, textMarkovChain);
-                return textMarkovChain.generateSentence();
             }
         }
 
-        //
         private async Task<List<Message>> GetMessagesFromChannel(DiscordClient client, Channel channel, int i)
         {
             List<Message> messages = new List<Message>();

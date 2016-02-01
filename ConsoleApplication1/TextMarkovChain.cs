@@ -25,7 +25,6 @@ namespace KiteBot
                 s += ".";
 
             s = s.ToLower();
-            if (!s.Contains('.')) s += '.';
             s = s.Replace('/',' ').Replace(',',' ').Replace("[]", "");
             s = s.Replace(".", " .").Replace("!", " !").Replace("?", " ?");
             string[] splitValues = s.Split(' ');
@@ -118,7 +117,7 @@ namespace KiteBot
 
             s[0] = char.ToUpper(s[0]);
 
-            return s.ToString();
+            return s.ToString().Replace("  "," ").Replace(" .",".");
         }
 
         private class Chain
