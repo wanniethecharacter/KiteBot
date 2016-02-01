@@ -5,7 +5,7 @@ using Discord;
 
 namespace KiteBot
 {
-    class TextMarkovChainHelper
+    public class TextMarkovChainHelper
     {
         private const int MaxMessages = 500;
         private static readonly Dictionary<long,List<Message>> ChannelMessages = 
@@ -24,30 +24,40 @@ namespace KiteBot
             _client = client;
         }
 
-        public async Task Initialize()
+        public async Task<bool> Initialize()
         {
             if (!_isInitialized)
             {
-                foreach (Channel channel in _client.AllServers.SelectMany(server => server.Channels))
+                foreach (Channel channel in _client.AllServers.SelectMany(server => server.Channels).Where(channel => ChannelType.Text == channel.Type))
                 {
-                    ChannelMessages.Add(channel.Id, await GetMessagesFromChannel(_client,channel, MaxMessages));
+                    if (channel.Members.Contains(_client.GetUser(channel.Server,_client.CurrentUser.Id)))
+                    {
+                        ChannelMessages.Add(channel.Id, await GetMessagesFromChannel(_client, channel, MaxMessages));
+                    }
                 }
+                _isInitialized = true;
             }
+            return true;
         }
 
-        public async Task Feed(Message message)
+        public void Feed(Message message)
         {
             if (ChannelMessages.ContainsKey(message.Channel.Id))
             {
                 ChannelMessages[message.Channel.Id].Add(message);
+
+                if (ChannelMarkovChains.ContainsKey(message.Channel.Id))
+                {
+                    ChannelMarkovChains[message.Channel.Id].feed(message.Text);
+                }
             }
             else
             {
-                ChannelMessages.Add(message.Channel.Id, await GetMessagesFromChannel(_client,message.Channel, MaxMessages));
+                ChannelMessages.Add(message.Channel.Id, GetMessagesFromChannel(_client,message.Channel, MaxMessages).Result);
             }
         }
 
-        public async Task<string> GetSequenceForChannel(Channel channel)
+        public string GetSequenceForChannel(Channel channel)
         {
             TextMarkovChain textMarkovChain;
             if (ChannelMarkovChains.TryGetValue(channel.Id, out textMarkovChain))
@@ -75,7 +85,7 @@ namespace KiteBot
 
             long tmpMessageTracker = latestMessage.Id;
 
-            while (messages.Count <= MaxMessages)
+            while (messages.Count < MaxMessages)
             {
                 messages.AddRange(await Program.Client.DownloadMessages(channel, 100, tmpMessageTracker, RelativeDirection.Before));
 

@@ -21,14 +21,14 @@ namespace KiteBot
         public static string[] _mealResponses;
         public static string[] _bekGreetings;
 
-        public static KitePizza kitePizza = new KitePizza();
-        public static KiteSandwich kiteSandwich = new KiteSandwich();
-		public static KiteDunk kiteDunk = new KiteDunk();
-		public static GiantBombRss giantBombRss = new GiantBombRss();
-		public static DiceRoller diceRoller = new DiceRoller();
-		public static KitCoGame kiteGame = new KitCoGame();
-		public static LivestreamChecker streamChecker = new LivestreamChecker();
-        public static TextMarkovChain textMarkovChain = new TextMarkovChain();
+        public static KitePizza KitePizza = new KitePizza();
+        public static KiteSandwich KiteSandwich = new KiteSandwich();
+		public static KiteDunk KiteDunk = new KiteDunk();
+		public static GiantBombRss GiantBombRss = new GiantBombRss();
+		public static DiceRoller DiceRoller = new DiceRoller();
+		public static KitCoGame KiteGame = new KitCoGame();
+		public static LivestreamChecker StreamChecker = new LivestreamChecker();
+        public static TextMarkovChainHelper TextMarkovChainHelper = new TextMarkovChainHelper();
 
         public static string ChatDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
         public static string GreetingFileLocation = ChatDirectory + "\\Content\\Greetings.txt";
@@ -50,13 +50,6 @@ namespace KiteBot
             _mealResponses = arrayOfMeals;
             _randomSeed = randomSeed;
 	        RaeCounter = 0;
-
-            //Timer for generating randomly timed MarkovChain strings.
-            /*_chatTimer = new Timer();
-            _chatTimer.Elapsed += IntervalMarkov;
-            _chatTimer.Interval = 30000;
-            _chatTimer.AutoReset = true;
-            _chatTimer.Enabled = true;*/
         }
 
         public async Task AsyncParseChat(object s, MessageEventArgs e, DiscordClient client)
@@ -65,18 +58,18 @@ namespace KiteBot
 		    IsRaeTyping(e);
 
             //add all messages to the Markov Chain list
-            AddToMarkovChain(e);
+            TextMarkovChainHelper.Feed(e.Message);
 
             if (e.Channel.Name.ToLower().Contains("vinncorobocorps"))
 			{
-				string response = kiteGame.GetGameResponse(e.Message);
+				string response = KiteGame.GetGameResponse(e.Message);
 				if (response != null)
 					await client.SendMessage(e.Channel, response);
 			}
 
 			else if (!e.Message.IsAuthor && e.Message.Text.StartsWith("/roll"))
 			{
-				await client.SendMessage(e.Channel, diceRoller.ParseRoll(e.Message.Text));
+				await client.SendMessage(e.Channel, DiceRoller.ParseRoll(e.Message.Text));
 			}
 
 			else if (!e.Message.IsAuthor && 0 <= e.Message.Text.IndexOf("GetDunked"))
@@ -86,12 +79,12 @@ namespace KiteBot
 
 			else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /forceUpdate"))
 			{
-				giantBombRss.UpdateFeeds();
+				GiantBombRss.UpdateFeeds();
 			}
 
             else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /testMarkov"))
             {
-                await client.SendMessage(e.Channel, await GetMarkovChain(e.Message));
+                await client.SendMessage(e.Channel, TextMarkovChainHelper.GetSequenceForChannel(e.Channel));
             }
 
             else if (!e.Message.IsAuthor && e.Message.Text.StartsWith("@KiteBot"))
@@ -139,7 +132,7 @@ namespace KiteBot
 
 				else if (0 <= e.Message.Text.ToLower().IndexOf("dunk", 0))
 				{
-					await client.SendMessage(e.Channel, kiteDunk.GetUpdatedKiteDunk());
+					await client.SendMessage(e.Channel, KiteDunk.GetUpdatedKiteDunk());
 				}
 				else if (0 <= e.Message.Text.ToLower().IndexOf("fuck you", 0) || 0 <= e.Message.Text.ToLower().IndexOf("fuckyou", 0))
 				{
@@ -155,11 +148,11 @@ namespace KiteBot
 				}
 				else if (0 <= e.Message.Text.ToLower().IndexOf("/pizza", 0))
 				{
-					await client.SendMessage(e.Channel, kitePizza.ParsePizza(e.User.Name, e.Message.Text));
+					await client.SendMessage(e.Channel, KitePizza.ParsePizza(e.User.Name, e.Message.Text));
 				}
 				else if (0 <= e.Message.Text.ToLower().IndexOf("sandwich", 0))
 				{
-					await client.SendMessage(e.Channel, kiteSandwich.ParseSandwich(e.User.Name));
+					await client.SendMessage(e.Channel, KiteSandwich.ParseSandwich(e.User.Name));
 				}
 				else if (0 <= e.Message.Text.ToLower().IndexOf("hi", 0) || 0 <= e.Message.Text.ToLower().IndexOf("hey", 0) ||
 				         0 <= e.Message.Text.ToLower().IndexOf("hello", 0))
@@ -188,77 +181,7 @@ namespace KiteBot
 			HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 			return response.ResponseUri.AbsoluteUri;
 		}
-
-        private async Task<string> GetMarkovChain(Message e)
-        {
-            //Check if the dictionary entry for the channel exists, populate the new list if it does not.
-            if(!chatLogDictionary.ContainsKey(e.Channel.Id))
-            {
-                chatLogDictionary.Add(e.Channel.Id, new List<Message>());
-
-                long tmpMessageTracker = e.Id;
-
-                while (chatLogDictionary[e.Channel.Id].Count <= 500)
-                {
-                    chatLogDictionary[e.Channel.Id].AddRange(await Program.Client.DownloadMessages(e.Channel, 100, tmpMessageTracker, RelativeDirection.Before));
-                    tmpMessageTracker = chatLogDictionary[e.Channel.Id][chatLogDictionary[e.Channel.Id].Count-1].Id;//grabs the last message in the savd list
-                }
-            }
-
-            TextMarkovChain textMarkovChain = new TextMarkovChain();
-            foreach (var v in chatLogDictionary[e.Channel.Id])
-            {
-                if (v.Text.ToLower().Contains("@kitebot") || v.User.Name.Equals("KiteBot"))
-                {
-                    
-                }
-                else
-                {
-                    if (v.Text.Contains("testMarkov"))
-                    {
-                        v.Text.Replace("testMarkov", "");
-                    }
-
-                    if (v.Text.Contains("testmarkov"))
-                    {
-                        v.Text.Replace("testmarkov", "");
-                    }
-
-                    textMarkovChain.feed(v.Text);
-                }
-            }
-
-            if (textMarkovChain.readyToGenerate())
-            {
-                return textMarkovChain.generateSentence().Replace("  ", " ").Replace(" .", ".");
-            }
-            else
-            {
-                return "poop";
-            }
-        }
-
-        private void AddToMarkovChain(MessageEventArgs e)
-        {
-            if (chatLogDictionary.ContainsKey(e.Channel.Id) && !e.User.Name.ToLower().Contains("kitebot"))
-            {
-                chatLogDictionary[e.Channel.Id].Add(e.Message);
-                chatLogDictionary[e.Channel.Id].RemoveRange(0, 1);
-            }
-        }
-
-        //Calls from timer to activate random markov string saying.  Currently sends the most recent chat message into the
-        //GetMarkovChain method, which menas it doubles up that message in the database...
-        /*private async void IntervalMarkov(object sender, ElapsedEventArgs elapsedEventArgs)
-        {
-            if (chatLogDictionary.ContainsKey(85842104034541568))
-            {
-                Message[] tmpMessageArray = await Program.Client.DownloadMessages(Program.Client.GetChannel(85842104034541568), 1);
-                await Program.Client.SendMessage(Program.Client.GetChannel(85842104034541568), await GetMarkovChain(tmpMessageArray[0]));
-                _chatTimer.Interval = _randomSeed.Next(900000, 1500000);
-            }
-        }*/
-
+        
         //returns a greeting from the greetings.txt list on a per user or generic basis
 	    private string ParseGreeting(string userName)
         {

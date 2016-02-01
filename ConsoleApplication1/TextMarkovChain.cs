@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace KiteBot
@@ -21,6 +22,7 @@ namespace KiteBot
         public void feed(string s)
         {
             s = s.ToLower();
+            if (!s.Contains('.')) s += '.';
             s = s.Replace('/',' ').Replace(',',' ').Replace("[]", "");
             s = s.Replace(".", " .").Replace("!", " !").Replace("?", " ?");
             string[] splitValues = s.Split(' ');
