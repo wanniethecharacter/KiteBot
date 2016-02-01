@@ -7,7 +7,7 @@ namespace KiteBot
 {
     public class TextMarkovChainHelper
     {
-        private const int MaxMessages = 1500;
+        private const int MaxMessages = 500;
         private static readonly Dictionary<long,List<Message>> ChannelMessages = 
             new Dictionary<long,List<Message>>();
         private static readonly Dictionary<long, TextMarkovChain> ChannelMarkovChains =
@@ -78,6 +78,29 @@ namespace KiteBot
                     }
                     ChannelMarkovChains.Add(channel.Id, textMarkovChain);
                     return textMarkovChain.generateSentence();
+                }
+            }
+            return "I'm not ready yet Senpai!";
+        }
+
+        public string GetSequenceForChannel(Channel channel,string input)
+        {
+            if (_isInitialized)
+            {
+                TextMarkovChain textMarkovChain;
+                if (ChannelMarkovChains.TryGetValue(channel.Id, out textMarkovChain))
+                {
+                    return textMarkovChain.generateSentence(input);
+                }
+                else
+                {
+                    textMarkovChain = new TextMarkovChain();
+                    foreach (Message message in ChannelMessages[channel.Id])
+                    {
+                        FeedMarkovChain(textMarkovChain, message);
+                    }
+                    ChannelMarkovChains.Add(channel.Id, textMarkovChain);
+                    return textMarkovChain.generateSentence(input);
                 }
             }
             return "I'm not ready yet Senpai!";

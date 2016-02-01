@@ -120,6 +120,34 @@ namespace KiteBot
             return s.ToString().Replace("  "," ").Replace(" .",".");
         }
 
+        public string generateSentence(string input)
+        {
+            StringBuilder s = new StringBuilder();
+            Chain nextString;
+            if (chains.ContainsKey(input))
+            {
+                nextString = chains[input];
+            }
+            else
+            {
+                nextString = head.getNextChain();
+            }
+            while (nextString.word != "!" && nextString.word != "?" && nextString.word != ".")
+            {
+                s.Append(nextString.word);
+                s.Append(" ");
+                nextString = nextString.getNextChain();
+                if (nextString == null)
+                    return s.ToString();
+            }
+
+            s.Append(nextString.word); //Add punctuation at end
+
+            s[0] = char.ToUpper(s[0]);
+
+            return s.ToString().Replace("  ", " ").Replace(" .", ".");
+        }
+
         private class Chain
         {
             public string word;
