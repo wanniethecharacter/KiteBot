@@ -100,7 +100,7 @@ namespace KiteBot
             return head.getNextChain() != null;
         }
 
-        public string generateSentence()
+        public async Task<string> generateSentence()
         {
             StringBuilder s = new StringBuilder();
             Chain nextString = head.getNextChain();
@@ -120,7 +120,7 @@ namespace KiteBot
             return s.ToString().Replace("  "," ").Replace(" .",".");
         }
 
-        public string generateSentence(string input)
+        public async Task<string> generateSentence(string input)
         {
             StringBuilder s = new StringBuilder();
             Chain nextString;

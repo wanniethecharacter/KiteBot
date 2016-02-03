@@ -7,7 +7,7 @@ namespace KiteBot
 {
     public class TextMarkovChainHelper
     {
-        private const int MaxMessages = 500;
+        private const int MaxMessages = 1500;
         private static readonly Dictionary<long,List<Message>> ChannelMessages = 
             new Dictionary<long,List<Message>>();
         private static readonly Dictionary<long, TextMarkovChain> ChannelMarkovChains =
@@ -28,79 +28,110 @@ namespace KiteBot
         {
             if (!_isInitialized)
             {
+                List<long> channelIds = new List<long>();
                 foreach (Channel channel in _client.AllServers.SelectMany(server => server.Channels).Where(channel => ChannelType.Text == channel.Type))
                 {
                     if (channel.Members.Contains(_client.GetUser(channel.Server,_client.CurrentUser.Id)))
                     {
-                        ChannelMessages.Add(channel.Id, await GetMessagesFromChannel(_client, channel, MaxMessages));
+                        channelIds.Add(channel.Id);
+                        ChannelMarkovChains.Add(channel.Id, new TextMarkovChain());
+                        ChannelMessages.Add(channel.Id, new List<Message>());
                     }
                 }
                 _isInitialized = true;
+
+                foreach (long id in channelIds)
+                {
+                    ChannelMessages[id].AddRange(await GetMessagesFromChannel(Program.Client, Program.Client.GetChannel(id), MaxMessages));
+                }
             }
-            return true;
+            return _isInitialized;
         }
+
 
         public void Feed(Message message)
         {
-            if (!_isInitialized)
+            if (ChannelMessages.ContainsKey(message.Channel.Id))
             {
-                if (ChannelMessages.ContainsKey(message.Channel.Id))
-                {
-                    ChannelMessages[message.Channel.Id].Add(message);
+                ChannelMessages[message.Channel.Id].Add(message);
 
-                    if (ChannelMarkovChains.ContainsKey(message.Channel.Id))
-                    {
-                        FeedMarkovChain(ChannelMarkovChains[message.Channel.Id],message);
-                    }
-                }
-                else
+                if (ChannelMarkovChains.ContainsKey(message.Channel.Id) && ChannelMarkovChains[message.Channel.Id].readyToGenerate())
                 {
-                    ChannelMessages.Add(message.Channel.Id, GetMessagesFromChannel(_client, message.Channel, MaxMessages).Result);
+                    FeedMarkovChain(ChannelMarkovChains[message.Channel.Id], message);
                 }
+            }
+            else
+            {
+                ChannelMessages.Add(message.Channel.Id, GetMessagesFromChannel(_client, message.Channel, MaxMessages).Result);
             }
         }
 
-        public string GetSequenceForChannel(Channel channel)
+        public async Task<string> GetSequenceForChannel(Channel channel)
         {
             if (_isInitialized)
             {
                 TextMarkovChain textMarkovChain;
                 if (ChannelMarkovChains.TryGetValue(channel.Id, out textMarkovChain))
                 {
-                    return textMarkovChain.generateSentence();
+                    foreach (Message message in ChannelMessages[channel.Id])
+                    {
+                        FeedMarkovChain(textMarkovChain,message);
+                    }
+                    ChannelMessages[channel.Id].Clear();
+                    if (textMarkovChain.readyToGenerate())
+                    {
+                        return textMarkovChain.generateSentence().Result;
+                    }
                 }
                 else
                 {
                     textMarkovChain = new TextMarkovChain();
-                    foreach (Message message in ChannelMessages[channel.Id])
+                    List<Message> newList = await GetMessagesFromChannel(Program.Client, channel, MaxMessages);
+                    foreach (Message message in newList)
                     {
                         FeedMarkovChain(textMarkovChain, message);
                     }
                     ChannelMarkovChains.Add(channel.Id, textMarkovChain);
-                    return textMarkovChain.generateSentence();
+                    if (textMarkovChain.readyToGenerate())
+                    {
+                        return textMarkovChain.generateSentence().Result;
+                    }
                 }
             }
             return "I'm not ready yet Senpai!";
         }
 
-        public string GetSequenceForChannel(Channel channel,string input)
+        public async Task<string> GetSequenceForChannel(Channel channel,string input)
         {
             if (_isInitialized)
             {
                 TextMarkovChain textMarkovChain;
                 if (ChannelMarkovChains.TryGetValue(channel.Id, out textMarkovChain))
                 {
-                    return textMarkovChain.generateSentence(input);
-                }
-                else
-                {
-                    textMarkovChain = new TextMarkovChain();
                     foreach (Message message in ChannelMessages[channel.Id])
                     {
                         FeedMarkovChain(textMarkovChain, message);
                     }
+                    ChannelMessages[channel.Id].Clear();
+                    if (textMarkovChain.readyToGenerate())
+                    {
+                        return textMarkovChain.generateSentence(input).Result;
+                    }
+                }
+                else
+                {
+                    textMarkovChain = new TextMarkovChain();
+                    List<Message> newList = await GetMessagesFromChannel(Program.Client, channel, MaxMessages);
+                    ChannelMessages.Add(channel.Id,newList);
+                    foreach (Message message in newList)
+                    {
+                        FeedMarkovChain(textMarkovChain, message);
+                    }
                     ChannelMarkovChains.Add(channel.Id, textMarkovChain);
-                    return textMarkovChain.generateSentence(input);
+                    if (textMarkovChain.readyToGenerate())
+                    {
+                        return textMarkovChain.generateSentence(input).Result;
+                    }
                 }
             }
             return "I'm not ready yet Senpai!";

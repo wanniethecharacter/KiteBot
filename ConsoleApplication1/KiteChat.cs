@@ -35,7 +35,6 @@ namespace KiteBot
         public static string ResponseFileLocation = ChatDirectory + "\\Content\\Responses.txt";
         public static string MealFileLocation = ChatDirectory + "\\Content\\Meals.txt";
 
-        private Dictionary<long, List<Message>> chatLogDictionary = new Dictionary<long, List<Message>>();
 
         public KiteChat() : this(File.ReadAllLines(GreetingFileLocation), File.ReadAllLines(ResponseFileLocation),
                                 File.ReadAllLines(MealFileLocation), new Random(DateTime.Now.Millisecond))
@@ -83,11 +82,11 @@ namespace KiteBot
 			}
             else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /testMarkov "))
             {
-                await client.SendMessage(e.Channel, TextMarkovChainHelper.GetSequenceForChannel(e.Channel,e.Message.Text.Substring(21).ToLower()));//this is bad
+                await client.SendMessage(e.Channel, await TextMarkovChainHelper.GetSequenceForChannel(e.Channel,e.Message.Text.Substring(21).ToLower()));//this is bad
             }
             else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /testMarkov"))
             {
-                await client.SendMessage(e.Channel, TextMarkovChainHelper.GetSequenceForChannel(e.Channel));
+                await client.SendMessage(e.Channel, await TextMarkovChainHelper.GetSequenceForChannel(e.Channel));
             }
 
             else if (!e.Message.IsAuthor && e.Message.Text.StartsWith("@KiteBot"))
