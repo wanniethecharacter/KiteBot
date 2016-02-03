@@ -13,7 +13,7 @@ namespace KiteBot
         private static readonly Dictionary<long, TextMarkovChain> ChannelMarkovChains =
             new Dictionary<long, TextMarkovChain>();   
         private static DiscordClient _client;
-        private static bool _isInitialized = false;
+        private static bool _isInitialized;
 
         public TextMarkovChainHelper() : this(Program.Client)
         {
@@ -158,7 +158,7 @@ namespace KiteBot
 
             while (messages.Count < MaxMessages)
             {
-                messages.AddRange(await Program.Client.DownloadMessages(channel, 100, tmpMessageTracker, RelativeDirection.Before));
+                messages.AddRange(await Program.Client.DownloadMessages(channel, 100, tmpMessageTracker));
 
                 long newMessageTracker = messages[messages.Count - 1].Id;
                 if (tmpMessageTracker != newMessageTracker)     //Checks if there are any more messages in channel, and if not, returns the List

@@ -5,21 +5,20 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
-using System.Timers;
 
 namespace KiteBot
 {
     public class KiteChat
     {
         //private static Timer _chatTimer;
-        public static Random _randomSeed;
+        public static Random RandomSeed;
 
 		public static int RaeCounter;
 
-        public static string[] _greetings;
-        public static string[] _responses;
-        public static string[] _mealResponses;
-        public static string[] _bekGreetings;
+        private static string[] _greetings;
+        private static string[] _responses;
+        private static string[] _mealResponses;
+        private static string[] _bekGreetings;
 
         public static KitePizza KitePizza = new KitePizza();
         public static KiteSandwich KiteSandwich = new KiteSandwich();
@@ -30,7 +29,7 @@ namespace KiteBot
 		public static LivestreamChecker StreamChecker = new LivestreamChecker();
         public static TextMarkovChainHelper TextMarkovChainHelper = new TextMarkovChainHelper();
 
-        public static string ChatDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
+        public static string ChatDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.FullName;
         public static string GreetingFileLocation = ChatDirectory + "\\Content\\Greetings.txt";
         public static string ResponseFileLocation = ChatDirectory + "\\Content\\Responses.txt";
         public static string MealFileLocation = ChatDirectory + "\\Content\\Meals.txt";
@@ -47,7 +46,7 @@ namespace KiteBot
             _greetings = arrayOfGreetings;
             _responses = arrayOfResponses;
             _mealResponses = arrayOfMeals;
-            _randomSeed = randomSeed;
+            RandomSeed = randomSeed;
 	        RaeCounter = 0;
         }
 
@@ -151,7 +150,7 @@ namespace KiteBot
 
                     await
                         client.SendMessage(e.Channel,
-                            _possibleResponses[_randomSeed.Next(0, _possibleResponses.Count)].Replace("USER",
+                            _possibleResponses[RandomSeed.Next(0, _possibleResponses.Count)].Replace("USER",
                                 e.User.Name));
                 }
                 else if (0 <= e.Message.Text.ToLower().IndexOf("/pizza", 0))
@@ -174,7 +173,7 @@ namespace KiteBot
                 {
                     await
                         client.SendMessage(e.Channel,
-                            _mealResponses[_randomSeed.Next(0, _mealResponses.Length)].Replace("USER",
+                            _mealResponses[RandomSeed.Next(0, _mealResponses.Length)].Replace("USER",
                                 e.User.Name));
                 }
                 else
@@ -198,7 +197,7 @@ namespace KiteBot
         {
 		    if (userName.Equals("Bekenel"))
 		    {
-			    return (_bekGreetings[_randomSeed.Next(0, _bekGreetings.Length)]);
+			    return (_bekGreetings[RandomSeed.Next(0, _bekGreetings.Length)]);
 		    }
 			else
 			{
@@ -224,7 +223,7 @@ namespace KiteBot
                 }
 
 				//return a random response from the context provided, replacing the string "USER" with the appropriate username
-				return (_possibleResponses[_randomSeed.Next(0, _possibleResponses.Count)].Replace("USER", userName));
+				return (_possibleResponses[RandomSeed.Next(0, _possibleResponses.Count)].Replace("USER", userName));
 		    }
 		    
         }

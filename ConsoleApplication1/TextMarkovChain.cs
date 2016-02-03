@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -9,14 +8,14 @@ namespace KiteBot
 {
     public class TextMarkovChain
     {
-        private Dictionary<string, Chain> chains;
-        private Chain head;
+        private readonly Dictionary<string, Chain> _chains;
+        private readonly Chain _head;
 
         public TextMarkovChain()
         {
-            chains = new Dictionary<string, Chain>();
-            head = new Chain("[]");
-            chains.Add("[]", head);
+            _chains = new Dictionary<string, Chain>();
+            _head = new Chain("[]");
+            _chains.Add("[]", _head);
         }
 
         public void feed(string s)
@@ -44,12 +43,12 @@ namespace KiteBot
 
         private void addWord(string prev, string next)
         {
-            if (chains.ContainsKey(prev) && chains.ContainsKey(next))
-                chains[prev].addWord(chains[next]);
-            else if (chains.ContainsKey(prev))
+            if (_chains.ContainsKey(prev) && _chains.ContainsKey(next))
+                _chains[prev].addWord(_chains[next]);
+            else if (_chains.ContainsKey(prev))
             {
-                chains.Add(next, new Chain(next));
-                chains[prev].addWord(chains[next]);
+                _chains.Add(next, new Chain(next));
+                _chains[prev].addWord(_chains[next]);
             }
         }
 
@@ -60,18 +59,18 @@ namespace KiteBot
             {
                 //First add all chains that are not there already
                 Chain nc = new Chain(n);
-                if(!chains.ContainsKey(nc.word))
-                    chains.Add(nc.word, nc); 
+                if(!_chains.ContainsKey(nc.word))
+                    _chains.Add(nc.word, nc); 
             }
 
             foreach (XmlNode n in root.ChildNodes)
             {
                 //Now that all words have been added, we can add the probabilities
                 XmlNode nextChains = n.ChildNodes[0];
-                Chain current = chains[n.Attributes["Word"].Value.ToString()];
+                Chain current = _chains[n.Attributes["Word"].Value.ToString()];
                 foreach (XmlNode nc in nextChains)
                 {
-                    Chain c = chains[nc.Attributes["Word"].Value.ToString()];
+                    Chain c = _chains[nc.Attributes["Word"].Value.ToString()];
                     current.addWord(c, Convert.ToInt32(nc.Attributes["Count"].Value));
                 }
             }
@@ -89,21 +88,21 @@ namespace KiteBot
             XmlElement root = xd.CreateElement("Chains");
             xd.AppendChild(root);
 
-            foreach (string key in chains.Keys)
-                root.AppendChild(chains[key].getXMLElement(xd));
+            foreach (string key in _chains.Keys)
+                root.AppendChild(_chains[key].getXMLElement(xd));
 
             return xd;
         }
 
         public bool readyToGenerate()
         {
-            return head.getNextChain() != null;
+            return _head.getNextChain() != null;
         }
 
         public async Task<string> generateSentence()
         {
             StringBuilder s = new StringBuilder();
-            Chain nextString = head.getNextChain();
+            Chain nextString = _head.getNextChain();
             while (nextString.word != "!" && nextString.word != "?" && nextString.word != ".")
             {
                 s.Append(nextString.word);
@@ -124,13 +123,13 @@ namespace KiteBot
         {
             StringBuilder s = new StringBuilder();
             Chain nextString;
-            if (chains.ContainsKey(input))
+            if (_chains.ContainsKey(input))
             {
-                nextString = chains[input];
+                nextString = _chains[input];
             }
             else
             {
-                nextString = head.getNextChain();
+                nextString = _head.getNextChain();
             }
             while (nextString.word != "!" && nextString.word != "?" && nextString.word != ".")
             {
@@ -153,25 +152,25 @@ namespace KiteBot
             public string word;
 
             private Dictionary<string, ChainProbability> chains;
-            private int fullCount;
+            private int _fullCount;
 
             public Chain(string w)
             {
                 word = w;
                 chains = new Dictionary<string, ChainProbability>();
-                fullCount = 0;
+                _fullCount = 0;
             }
 
             public Chain(XmlNode node)
             {
                 word = node.Attributes["Word"].Value;
-                fullCount = 0;  //Full Count is stored, but this will be loaded when adding new words to the chain.  Default to 0 when loading XML
+                _fullCount = 0;  //Full Count is stored, but this will be loaded when adding new words to the chain.  Default to 0 when loading XML
                 chains = new Dictionary<string, ChainProbability>();
             }
 
             public void addWord(Chain chain, int increase = 1)
             {
-                fullCount += increase;
+                _fullCount += increase;
                 if (chains.ContainsKey(chain.word))
                     chains[chain.word].count += increase;
                 else
@@ -185,7 +184,7 @@ namespace KiteBot
                 //The reason it is implemented this way is it allows new sentences to be read in much faster
                 //since it will not need to recalculate probabilities and only needs to add a counter.  I don't
                 //believe the tradeoff is worth it in this case.  I need to do a timed evaluation of this and decide.
-                int currentCount = RandomHandler.random.Next(fullCount);
+                int currentCount = RandomHandler.random.Next(_fullCount);
                 foreach (string key in chains.Keys)
                 {
                     for (int i = 0; i < chains[key].count; i++)
@@ -201,8 +200,8 @@ namespace KiteBot
             public XmlElement getXMLElement(XmlDocument xd)
             {
                 XmlElement e = xd.CreateElement("Chain");
-                e.SetAttribute("Word", this.word);
-                e.SetAttribute("FullCount", this.fullCount.ToString());
+                e.SetAttribute("Word", word);
+                e.SetAttribute("FullCount", _fullCount.ToString());
 
                 XmlElement nextChains = xd.CreateElement("NextChains");
                 XmlElement nextChain;
