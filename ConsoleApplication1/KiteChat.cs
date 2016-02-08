@@ -27,7 +27,7 @@ namespace KiteBot
 		public static DiceRoller DiceRoller = new DiceRoller();
 		public static KitCoGame KiteGame = new KitCoGame();
 		public static LivestreamChecker StreamChecker = new LivestreamChecker();
-        public static TextMarkovChainHelper TextMarkovChainHelper = new TextMarkovChainHelper();
+        public static MultiTextMarkovChainHelper MultiDeepMarkovChain = new MultiTextMarkovChainHelper(Program.Client,3);
 
         public static string ChatDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.FullName;
         public static string GreetingFileLocation = ChatDirectory + "\\Content\\Greetings.txt";
@@ -56,7 +56,7 @@ namespace KiteBot
 		    IsRaeTyping(e);
 
             //add all messages to the Markov Chain list
-            TextMarkovChainHelper.Feed(e.Message);
+            MultiDeepMarkovChain.Feed(e.Message);
 
             if (e.Channel.Name.ToLower().Contains("vinncorobocorps"))
 			{
@@ -79,13 +79,14 @@ namespace KiteBot
 			{
 				GiantBombRss.UpdateFeeds();
 			}
-            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /testMarkov "))
+            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /saveXML") && e.User.Name.Equals("Lassie"))
             {
-                await client.SendMessage(e.Channel, await TextMarkovChainHelper.GetSequenceForChannel(e.Channel,e.Message.Text.Substring(21).ToLower()));//this is bad
+                MultiDeepMarkovChain.save();
+                await client.SendMessage(e.Channel, "Done.");
             }
             else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /testMarkov"))
             {
-                await client.SendMessage(e.Channel, await TextMarkovChainHelper.GetSequenceForChannel(e.Channel));
+                await client.SendMessage(e.Channel, MultiDeepMarkovChain.GetSequence());
             }
 
             else if (!e.Message.IsAuthor && e.Message.Text.StartsWith("@KiteBot"))

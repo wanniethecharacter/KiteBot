@@ -101,6 +101,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MultiDeepMarkovChain.cs" />
+    <Compile Include="MultiDeepMarkovChainHelper.cs" />
     <Compile Include="TextMarkovChainHelper.cs" />
     <Compile Include="Properties\auth.Designer.cs">
       <AutoGen>True</AutoGen>
