@@ -7,7 +7,6 @@ namespace KiteBot
 {
     public class MultiDeepMarkovChain
     {
-        private static XmlDocument xmlDocument;
         private Dictionary<string, Chain> chains;
         private Chain head;
         private int depth;
@@ -284,17 +283,7 @@ namespace KiteBot
         /// <param name="path">The file path to save to.</param>
         public void save(string path)
         {
-            XmlDocument xd = getXmlDocument();
-            xd.Save(path);
-        }
-
-        /// <summary>
-        /// Get the data for this Markov Chain as an XmlDocument object.
-        /// </summary>
-        /// <returns></returns>
-        public XmlDocument getXmlDocument()
-        {
-            xmlDocument = new XmlDocument();
+            XmlDocument xmlDocument = new XmlDocument();
             XmlElement root = xmlDocument.CreateElement("Chains");
             root.SetAttribute("Depth", this.depth.ToString());
             xmlDocument.AppendChild(root);
@@ -302,7 +291,10 @@ namespace KiteBot
             foreach (string key in chains.Keys)
                 root.AppendChild(chains[key].getXml(xmlDocument));
 
-            return xmlDocument;
+            xmlDocument.Save(path);
+            xmlDocument = null;
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
 
         private class Chain

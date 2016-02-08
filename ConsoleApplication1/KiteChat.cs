@@ -23,10 +23,10 @@ namespace KiteBot
         public static KitePizza KitePizza = new KitePizza();
         public static KiteSandwich KiteSandwich = new KiteSandwich();
 		public static KiteDunk KiteDunk = new KiteDunk();
-		public static GiantBombRss GiantBombRss = new GiantBombRss();
 		public static DiceRoller DiceRoller = new DiceRoller();
 		public static KitCoGame KiteGame = new KitCoGame();
 		public static LivestreamChecker StreamChecker = new LivestreamChecker();
+        public static GiantBombVideoChecker GbVideoChecker = new GiantBombVideoChecker();
         public static MultiTextMarkovChainHelper MultiDeepMarkovChain = new MultiTextMarkovChainHelper(Program.Client,3);
 
         public static string ChatDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.FullName;
@@ -253,14 +253,14 @@ namespace KiteBot
 
 		public void IsRaeTyping(MessageEventArgs e)
 		{
-			if (e.User.Name.Equals("Rae Kusoni"))
+			if (e.User.Id == 85876755797139456)
 			{
 				RaeCounter += -1;
 			}
 		}
 	    public void IsRaeTyping(UserChannelEventArgs e)
 	    {
-			if (e.User.Name.Equals("Rae Kusoni"))
+			if (e.User.Id == 85876755797139456)
 			{
 				RaeCounter += 1;
 			}

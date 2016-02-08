@@ -5,7 +5,7 @@ using KiteBot.Properties;
 
 namespace KiteBot
 {
-	public class LivestreamChecker
+    public class LivestreamChecker
 	{
 		public static string ApiCallUrl;
 		private static Timer _chatTimer;//Garbage collection doesnt like local variables that only fire a couple times per hour

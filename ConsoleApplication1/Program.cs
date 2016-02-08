@@ -11,7 +11,7 @@ namespace KiteBot
 	    {
 		    Client = new DiscordClient();
 		    var kiteChat = new KiteChat();
-            //bool shutUp = false;
+
             //Display all log messages in the console
             Client.LogMessage += (s, e) => Console.WriteLine("[{"+e.Severity+"}] {"+e.Source+"}: {"+e.Message+"}");
 

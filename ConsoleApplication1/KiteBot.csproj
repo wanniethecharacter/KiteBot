@@ -101,6 +101,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GiantBombVideoChecker.cs" />
     <Compile Include="MultiDeepMarkovChain.cs" />
     <Compile Include="MultiDeepMarkovChainHelper.cs" />
     <Compile Include="TextMarkovChainHelper.cs" />

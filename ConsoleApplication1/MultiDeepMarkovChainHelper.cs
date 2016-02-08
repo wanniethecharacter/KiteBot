@@ -38,6 +38,7 @@ namespace KiteBot
                     var XDoc = new XmlDocument();
                     XDoc.Load(XmlFileLocation);
                     multiDeep.feed(XDoc);
+                    // ReSharper disable once RedundantAssignment
                     XDoc = null;
                 }
                 else
