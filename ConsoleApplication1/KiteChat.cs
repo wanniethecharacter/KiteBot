@@ -75,10 +75,6 @@ namespace KiteBot
 				await client.SendMessage(e.Channel, "http://i.imgur.com/QhcNUWo.gifv");
 			}
 
-			else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /forceUpdate"))
-			{
-				GiantBombRss.UpdateFeeds();
-			}
             else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /saveXML") && e.User.Name.Equals("Lassie"))
             {
                 MultiDeepMarkovChain.save();
