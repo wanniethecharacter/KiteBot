@@ -17,7 +17,7 @@ namespace KiteBot
 
 		public GiantBombVideoChecker()
 		{
-			ApiCallUrl = "http://www.giantbomb.com/api/promo/?api_key=" + auth.Default.GiantBombAPI;
+			ApiCallUrl = "http://www.giantbomb.com/api/promos/?api_key=" + auth.Default.GiantBombAPI;
 			_chatTimer = new Timer();
 			_chatTimer.Elapsed += RefreshVideosApi;
 			_chatTimer.Interval = 60000;//1 minute
@@ -35,7 +35,7 @@ namespace KiteBot
 		    _latestXElement = GetXDocumentFromUrl(ApiCallUrl);
             var promo = _latestXElement.Element("results")?.Element("promo");
             DateTime newPublishTime = GetGiantBombFormatDateTime(promo?.Element("date_added")?.Value);
-		    if (firstTime && newPublishTime.Equals(lastPublishTime))
+		    if (firstTime || newPublishTime.Equals(lastPublishTime))
 		    {
                 lastPublishTime = newPublishTime;
                 firstTime = false;
@@ -46,6 +46,7 @@ namespace KiteBot
                 var deck = deGiantBombifyer(promo?.Element("deck")?.Value);
                 var link = deGiantBombifyer(promo?.Element("link")?.Value);
                 var user = deGiantBombifyer(promo?.Element("user")?.Value);
+                lastPublishTime = newPublishTime;
 
                 Program.Client.SendMessage(Program.Client.GetChannel(85842104034541568),
                 title + ": " + deck + Environment.NewLine + "by: " + user + Environment.NewLine + link);
@@ -57,7 +58,7 @@ namespace KiteBot
             //This is really ugly, but all the feeds use different ways to encode their timezones and I JUST DONT CARE anymore.
             //Since the feeds are atleast consistent within that particular feed, this shouldn't cause a conflict when comparing timeDates
             return DateTime.ParseExact(timeString,
-                "yyyy-mm-dd hh:mm:ss",
+                "yyyy-MM-dd HH:mm:ss",
                 CultureInfo.InvariantCulture);
         }
 
@@ -67,9 +68,16 @@ namespace KiteBot
 		}
 
 		private XElement GetXDocumentFromUrl(string url)
-		{
-			XDocument document = XDocument.Load(url);
-			return document.XPathSelectElement(@"//response");
-		}
+        {
+		    try
+		    {
+		        XDocument document = XDocument.Load(url);
+		        return document.XPathSelectElement(@"//response");
+		    }
+		    catch (Exception e)
+		    {
+		        return GetXDocumentFromUrl(url);
+		    }
+        }
 	}
 }

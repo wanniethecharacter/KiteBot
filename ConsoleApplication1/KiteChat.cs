@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Mime;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
@@ -75,10 +76,16 @@ namespace KiteBot
 				await client.SendMessage(e.Channel, "http://i.imgur.com/QhcNUWo.gifv");
 			}
 
-            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /saveXML") && e.User.Name.Equals("Lassie"))
+            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /saveXML") && e.User.Id == 85817630560108544)
             {
                 MultiDeepMarkovChain.save();
                 await client.SendMessage(e.Channel, "Done.");
+            }
+            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /saveExit") && e.User.Id == 85817630560108544)
+            {
+                MultiDeepMarkovChain.save();
+                await client.SendMessage(e.Channel, "Done.");
+                Environment.Exit(1);
             }
             else if (!e.Message.IsAuthor && (e.Message.Text.StartsWith(@"@KiteBot /testMarkov") || e.Message.Text.StartsWith(@"@KiteBot /tm")))
             {
