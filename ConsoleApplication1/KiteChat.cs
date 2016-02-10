@@ -80,7 +80,7 @@ namespace KiteBot
                 MultiDeepMarkovChain.save();
                 await client.SendMessage(e.Channel, "Done.");
             }
-            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /testMarkov"))
+            else if (!e.Message.IsAuthor && (e.Message.Text.StartsWith(@"@KiteBot /testMarkov") || e.Message.Text.StartsWith(@"@KiteBot /tm")))
             {
                 await client.SendMessage(e.Channel, MultiDeepMarkovChain.GetSequence());
             }
@@ -176,7 +176,7 @@ namespace KiteBot
                 else
                 {
                     await
-                        client.SendMessage(e.Channel, "KiteBot ver. 0.8.3 \"Less Pizza, More Meat.\"");
+                        client.SendMessage(e.Channel, "KiteBot ver. 0.9.1 \"Almost.\"");
                 }
             }
 	    }
