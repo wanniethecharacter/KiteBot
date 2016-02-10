@@ -38,14 +38,13 @@ namespace KiteBot
                     var XDoc = new XmlDocument();
                     XDoc.Load(XmlFileLocation);
                     multiDeep.feed(XDoc);
-                    // ReSharper disable once RedundantAssignment
                     XDoc = null;
                 }
                 else
                 {
-                    List<Message> list = await GetMessagesFromChannel(_client, _client.GetChannel(85842104034541568), 50000);
-                    list.AddRange(await GetMessagesFromChannel(_client, _client.GetChannel(96786127238725632), 5000));
-                    list.AddRange(await GetMessagesFromChannel(_client, _client.GetChannel(94122326802571264), 5000));
+                    List<Message> list = await GetMessagesFromChannel(_client, _client.GetChannel(85842104034541568), 75000);
+                    list.AddRange(await GetMessagesFromChannel(_client, _client.GetChannel(96786127238725632), 10000));
+                    list.AddRange(await GetMessagesFromChannel(_client, _client.GetChannel(94122326802571264), 10000));
                     foreach (Message message in list)
                     {
                         try

@@ -34,14 +34,14 @@ namespace KiteBot
             int newVideoCount;
 		    if (totalVideos == 0)
 		    {
-		        if (int.TryParse(_latestXElement.Element("number_of_total_results")?.Value, out newVideoCount))
+		        if (int.TryParse(_latestXElement?.Element("number_of_total_results").Value, out newVideoCount))
 		        {
 		            totalVideos = newVideoCount;
 		        }
 		    }
 		    else
 		    {
-                if (int.TryParse(_latestXElement.Element("number_of_total_results")?.Value, out newVideoCount))
+                if (int.TryParse(_latestXElement?.Element("number_of_total_results").Value, out newVideoCount))
                 {
                     if (newVideoCount > totalVideos)
                     {
@@ -51,7 +51,7 @@ namespace KiteBot
                         var link = deGiantBombifyer(video?.Element("site_detail_url")?.Value);
 
                         Program.Client.SendMessage(Program.Client.GetChannel(85842104034541568),
-                        title + ": " + deck + Environment.NewLine + "Is LIVE now at " + link + " you should probably check it out");
+                        title + ": " + deck + Environment.NewLine + link);
                     }
                 }
             }
@@ -64,8 +64,15 @@ namespace KiteBot
 
 		private XElement GetXDocumentFromUrl(string url)
 		{
-			XDocument document = XDocument.Load(url);
-			return document.XPathSelectElement(@"//response");
+		    try
+		    {
+		        XDocument document = XDocument.Load(url);
+		        return document.XPathSelectElement(@"//response");
+		    }
+		    catch (Exception e)
+		    {
+		        return null;
+		    }
 		}
 	}
 }
