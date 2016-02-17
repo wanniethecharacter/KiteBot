@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Net;
 using System.Timers;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -48,8 +49,7 @@ namespace KiteBot
                 var user = deGiantBombifyer(promo?.Element("user")?.Value);
                 lastPublishTime = newPublishTime;
 
-                Program.Client.SendMessage(Program.Client.GetChannel(85842104034541568),
-                title + ": " + deck + Environment.NewLine + "by: " + user + Environment.NewLine + link);
+                Program.Client.GetChannel(85842104034541568).SendMessage(title + ": " + deck + Environment.NewLine + "by: " + user + Environment.NewLine + link);
             }
         }
         private DateTime GetGiantBombFormatDateTime(string dateTimeString)
@@ -71,10 +71,12 @@ namespace KiteBot
         {
 		    try
 		    {
-		        XDocument document = XDocument.Load(url);
+                WebClient client = new WebClient();
+                client.Headers.Add("user-agent", "LassieMEKiteBot/0.9 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+                XDocument document = XDocument.Load(client.OpenRead(url));
 		        return document.XPathSelectElement(@"//response");
 		    }
-		    catch (Exception e)
+		    catch (Exception)
 		    {
 		        return GetXDocumentFromUrl(url);
 		    }

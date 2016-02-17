@@ -1,4 +1,5 @@
 ﻿using System;
+using KiteBot.Properties;
 using Discord;
 
 namespace KiteBot
@@ -6,33 +7,52 @@ namespace KiteBot
     class Program
     {
 		public static DiscordClient Client;
+        private static KiteChat kiteChat;
 
         private static void Main(string[] args)
-	    {
-		    Client = new DiscordClient();
-		    var kiteChat = new KiteChat();
+        {
+            Client = new DiscordClient();
+            kiteChat = new KiteChat();
 
             //Display all log messages in the console
-            Client.LogMessage += (s, e) => Console.WriteLine("[{"+e.Severity+"}] {"+e.Source+"}: {"+e.Message+"}");
+            //Client.LogMessage += (s, e) => Console.WriteLine("[{"+e.Severity+"}] {"+e.Source+"}: {"+e.Message+"}");
 
-	        Client.UserIsTypingUpdated += (s, e) => kiteChat.IsRaeTyping(e);
+	        Client.UserIsTyping += (s, e) => kiteChat.IsRaeTyping(e);
 
 			Client.MessageReceived += async (s, e) => await kiteChat.AsyncParseChat(s, e, Client);
 
-            Client.Connected += async (s, e) => Console.WriteLine(await KiteChat.MultiDeepMarkovChain.Initialize());
+            Client.LoggedIn += async (s, e) =>
+            {
+                Console.WriteLine(await KiteChat.MultiDeepMarkovChain.Initialize());
+            };
 
 			//Convert our sync method to an async one and block the Main function until the bot disconnects
-		    Client.Run(async () =>
-			{
-				//Connect to the Discord server using our email and password
-				await Client.Connect(Properties.auth.Default.DiscordEmail,Properties.auth.Default.DiscordPassword);
-			});
+		    Client.ExecuteAndWait(async () =>
+            {
+                while (true)
+                {
+                    try
+                    {
+                        await Client.Connect(auth.Default.DiscordEmail, auth.Default.DiscordPassword);
+#if DEBUG
+                        Client.SetGame("with Fire");
+#else
+                        Client.SetGame("with Freedom");
+#endif
+
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("FUCK THIS :" + ex.Message);
+                    }
+                }
+            });
         }
 
 	    public static void RssFeedSendMessage(object s, Feed.UpdatedFeedEventArgs e)
 	    {
-		    Client.SendMessage(Client.GetChannel(85842104034541568),
-			    e.Title + " live now at GiantBomb.com\r\n" + e.Link);
+		    Client.GetChannel(85842104034541568).SendMessage(e.Title + " live now at GiantBomb.com\r\n" + e.Link);
 	    }
     }
 }
