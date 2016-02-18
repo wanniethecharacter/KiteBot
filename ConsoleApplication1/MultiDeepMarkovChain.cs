@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Xml;
 
@@ -10,6 +11,7 @@ namespace KiteBot
         private Dictionary<string, Chain> chains;
         private Chain head;
         private int depth;
+        private string[] currentChains;
 
         /// <summary>
         /// Creates a new multi-deep Markov Chain with the depth passed in
@@ -151,66 +153,66 @@ namespace KiteBot
         /// <returns></returns>
         public string generateSentence()
         {
-            StringBuilder sb = new StringBuilder();
-            string[] currentChains = new string[depth];
-            currentChains[0] = head.getNextWord().text;
-            sb.Append(currentChains[0]);
-            string[] temp;
-            bool doneProcessing = false;
-            for (int i = 1; i < depth; i++)
-            {
-                //Generate the first row
-                temp = new string[i];
-                for (int j = 0; j < i; j++)
+                StringBuilder sb = new StringBuilder();
+            currentChains = new string[depth];
+                currentChains[0] = head.getNextWord().text;
+                sb.Append(currentChains[0]);
+                string[] temp;
+                bool doneProcessing = false;
+                for (int i = 1; i < depth; i++)
                 {
-                    temp[j] = currentChains[j];
-                }
-                if (temp[0].Equals(".") || temp[0].Equals("!") || temp[0].Equals("?"))
-                {
-                    return generateSentence();
-                }
-                currentChains[i] = head.getNextWord(temp).text;
-                if (currentChains[i] == "."
-                    || currentChains[i] == "?"
-                    || currentChains[i] == "!")
-                {
-                    doneProcessing = true;
+                    //Generate the first row
+                    temp = new string[i];
+                    for (int j = 0; j < i; j++)
+                    {
+                        temp[j] = currentChains[j];
+                    }
+                    if (temp[0].Equals(".") || temp[0].Equals("!") || temp[0].Equals("?"))
+                    {
+                        return generateSentence();
+                    }
+                    currentChains[i] = head.getNextWord(temp).text;
+                    if (currentChains[i] == "."
+                        || currentChains[i] == "?"
+                        || currentChains[i] == "!")
+                    {
+                        doneProcessing = true;
+                        sb.Append(currentChains[i]);
+                        break;
+                    }
+                    sb.Append(" ");
                     sb.Append(currentChains[i]);
-                    break;
                 }
-                sb.Append(" ");
-                sb.Append(currentChains[i]);
-            }
 
-            int breakCounter = 0;
-            while (!doneProcessing)
-            {
-                for (int j = 1; j < depth; j++)
-                    currentChains[j - 1] = currentChains[j];
-                Chain newHead = chains[currentChains[0]];
-                temp = new string[depth - 2];
-                for (int j = 1; j < depth - 1; j++)
-                    temp[j - 1] = currentChains[j];
-
-                currentChains[depth - 1] = newHead.getNextWord(temp).text;
-                if (currentChains[depth - 1] == "." ||
-                    currentChains[depth - 1] == "?" ||
-                    currentChains[depth - 1] == "!")
+                int breakCounter = 0;
+                while (!doneProcessing)
                 {
+                    for (int j = 1; j < depth; j++)
+                        currentChains[j - 1] = currentChains[j];
+                    Chain newHead = chains[currentChains[0]];
+                    temp = new string[depth - 2];
+                    for (int j = 1; j < depth - 1; j++)
+                        temp[j - 1] = currentChains[j];
+
+                    currentChains[depth - 1] = newHead.getNextWord(temp).text;
+                    if (currentChains[depth - 1] == "." ||
+                        currentChains[depth - 1] == "?" ||
+                        currentChains[depth - 1] == "!")
+                    {
+                        sb.Append(currentChains[depth - 1]);
+                        break;
+                    }
+                    sb.Append(" ");
                     sb.Append(currentChains[depth - 1]);
-                    break;
+
+                    breakCounter++;
+                    if (breakCounter >= 50) //This is still relatively untested software.  Better safe than sorry :)
+                        break;
                 }
-                sb.Append(" ");
-                sb.Append(currentChains[depth - 1]);
-
-                breakCounter++;
-                if (breakCounter >= 50) //This is still relatively untested software.  Better safe than sorry :)
-                    break;
-            }
 
 
-            sb[0] = char.ToUpper(sb[0]);
-            return sb.ToString();
+                sb[0] = char.ToUpper(sb[0]);
+                return sb.ToString();
         }
 
         public List<string> getNextLikelyWord(string previousText)
@@ -269,7 +271,7 @@ namespace KiteBot
                     foreach (ChainProbability cp in nextChains)
                         results.Add(cp.chain.text);
                 }
-                catch (Exception excp)
+                catch (Exception)
                 {
                     return new List<string>();
                 }
@@ -315,11 +317,11 @@ namespace KiteBot
                     throw new ArgumentException("The array of chains passed in is of zero length.");
                 if (c.Length == 1)
                 {
-                    this.fullCount += count;
-                    if (!this.nextNodes.ContainsKey(c[0].text))
-                        this.nextNodes.Add(c[0].text, new ChainProbability(c[0], count));
+                    fullCount += count;
+                    if (!nextNodes.ContainsKey(c[0].text))
+                        nextNodes.Add(c[0].text, new ChainProbability(c[0], count));
                     else
-                        this.nextNodes[c[0].text].count += count;
+                        nextNodes[c[0].text].count += count;
                     return;
                 }
 
@@ -331,7 +333,7 @@ namespace KiteBot
 
             internal Chain getNextWord()
             {
-                int currentCount = RandomHandler.random.Next(fullCount) + 1;
+                int currentCount = RandomHandler.random.Next(fullCount);
                 foreach (string key in nextNodes.Keys)
                 {
                     currentCount -= nextNodes[key].count;
@@ -345,16 +347,19 @@ namespace KiteBot
             {
                 ChainProbability currentChain = nextNodes[words[0]];
                 for (int i = 1; i < words.Length; i++)
+                {
                     currentChain = currentChain.getNextNode(words[i]);
+                }
 
-                int currentCount = RandomHandler.random.Next(currentChain.count) + 1;
+                List<string> list = new List<string>();
                 foreach (string key in currentChain.nextNodes.Keys)
                 {
-                    currentCount -= currentChain.nextNodes[key].count;
-                    if (currentCount <= 0)
-                        return currentChain.nextNodes[key].chain;
+                    for (int i = 0; i < currentChain.nextNodes[key].count; i++)
+                    {
+                        list.Add(key);
+                    }
                 }
-                return null;
+                return currentChain.nextNodes[list[RandomHandler.random.Next(list.Count)]].chain;
             }
 
             internal List<ChainProbability> getPossibleNextWords(string[] words)

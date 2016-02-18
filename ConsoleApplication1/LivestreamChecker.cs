@@ -1,4 +1,5 @@
-﻿using System.Timers;
+﻿using System.Net;
+using System.Timers;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using KiteBot.Properties;
@@ -17,7 +18,7 @@ namespace KiteBot
 			ApiCallUrl = "http://www.giantbomb.com/api/chats/?api_key=" + auth.Default.GiantBombAPI;
 			_chatTimer = new Timer();
 			_chatTimer.Elapsed += RefreshChatsApi;
-			_chatTimer.Interval = 120000;//2 minutes 2*60*1000=120 000
+			_chatTimer.Interval = 150000;//2,5 minutes 2*60*1000=120 000
 			_chatTimer.AutoReset = true;
 			_chatTimer.Enabled = true;
 		}
@@ -39,14 +40,12 @@ namespace KiteBot
 				var title = deGiantBombifyer(stream.Element("title").Value);
 				var deck = deGiantBombifyer(stream.Element("deck").Value);
 
-				Program.Client.SendMessage(Program.Client.GetChannel(85842104034541568),
-			    title +": "+ deck + " is LIVE at http://www.giantbomb.com/chat/ you should maybe check it out");
+				Program.Client.GetChannel(85842104034541568).SendMessage(title +": "+ deck + " is LIVE at http://www.giantbomb.com/chat/ you should maybe check it out");
 			}
 			else if (isStreamRunning && _latestXElement.Element("number_of_page_results").Value.Equals("0"))
 			{
 				isStreamRunning = false;
-				Program.Client.SendMessage(Program.Client.GetChannel(85842104034541568),
-			    "Show is over folks, if you need more Giant Bomb videos, maybe check this out: " + KiteChat.GetResponseUriFromRandomQlCrew());
+				Program.Client.GetChannel(85842104034541568).SendMessage("Show is over folks, if you need more Giant Bomb videos, maybe check this out: " + KiteChat.GetResponseUriFromRandomQlCrew());
 			}
 		}
 
@@ -57,7 +56,9 @@ namespace KiteBot
 
 		private XElement GetXDocumentFromUrl(string url)
 		{
-			XDocument document = XDocument.Load(url);
+            WebClient client = new WebClient();
+            client.Headers.Add("user-agent", "LassieMEKiteBot/0.9 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+            XDocument document = XDocument.Load(client.OpenRead(url));
 			return document.XPathSelectElement(@"//response");
 		}
 	}

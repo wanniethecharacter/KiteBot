@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml;
 using Discord;
+using Newtonsoft.Json;
 
 namespace KiteBot
 {
@@ -13,9 +13,10 @@ namespace KiteBot
         public static int Depth;
         private static MultiDeepMarkovChain multiDeep;
         private static DiscordClient _client;
+        private static List<JsonMessage> JsonList = new List<JsonMessage>();
 
         public static string RootDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.FullName;
-        public static string XmlFileLocation = RootDirectory + "\\Content\\MarkovChain.xml";
+        public static string JsonFileLocation => RootDirectory + "\\Content\\messages" + Depth + ".json";
         private static bool _isInitialized;
 
         public MultiTextMarkovChainHelper(int depth) : this(Program.Client, depth)
@@ -33,41 +34,46 @@ namespace KiteBot
         {
             if (!_isInitialized)
             {
-                if (File.Exists(path: XmlFileLocation))
+                if (File.Exists(path: JsonFileLocation))
                 {
-                    var XDoc = new XmlDocument();
-                    XDoc.Load(XmlFileLocation);
-                    multiDeep.feed(XDoc);
-                    XDoc = null;
+                    JsonList = JsonConvert.DeserializeObject<List<JsonMessage>>(File.ReadAllText(JsonFileLocation));
+                    ulong id = JsonList.First(item => item.CI == 85842104034541568).MI;
+                    foreach (JsonMessage message in JsonList)
+                    {
+                        multiDeep.feed(message.M);//Any messages here have already been thru all the if checks, and hence, we dont need to run thru all of those again.
+                    }
+                    _isInitialized = true;
+
+                    List<Message> list = await DownloadMessagesAfterId(id, _client.GetChannel(85842104034541568));
+                    foreach (Message message in list)
+                    {
+                        FeedMarkovChain(message);
+                        var json = new JsonMessage
+                        {
+                            M = message.Text,
+                            MI = message.Id,
+                            CI = message.Channel.Id,
+                        };
+                        JsonList.Add(json);
+                    }
                 }
                 else
                 {
-                    List<Message> list = await GetMessagesFromChannel(_client, _client.GetChannel(85842104034541568), 75000);
-                    list.AddRange(await GetMessagesFromChannel(_client, _client.GetChannel(96786127238725632), 10000));
-                    list.AddRange(await GetMessagesFromChannel(_client, _client.GetChannel(94122326802571264), 10000));
+                    List<Message> list = await GetMessagesFromChannel(_client.GetChannel(85842104034541568), 200000);
+                    list.AddRange(await GetMessagesFromChannel(_client.GetChannel(96786127238725632), 10000));
+                    list.AddRange(await GetMessagesFromChannel(_client.GetChannel(94122326802571264), 10000));
                     foreach (Message message in list)
                     {
-                        try
+                        if (message != null && !message.Text.Equals(""))
                         {
-                            if (message != null && !message.User.Name.ToLower().Contains("kitebot"))
+                            FeedMarkovChain(message);
+                            var json = new JsonMessage
                             {
-                                if (!message.Text.Equals("") &&
-                                    !message.Text.Contains("http") &&
-                                    !message.Text.ToLower().Contains("testmarkov") &&
-                                    !message.IsMentioningMe)
-                                {
-                                    var lowerCaseMessage = message.Text.ToLower();
-                                    if (!lowerCaseMessage.Contains("."))
-                                    {
-                                        lowerCaseMessage += ".";
-                                    }
-                                    multiDeep.feed(lowerCaseMessage);
-                                }
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            Console.WriteLine(message?.Text);
+                                M = message.Text,
+                                MI = message.Id,
+                                CI = message.Channel.Id,
+                            };
+                            JsonList.Add(json);
                         }
                     }
                 }
@@ -76,6 +82,31 @@ namespace KiteBot
             return _isInitialized;
         }
 
+        private async Task<List<Message>> DownloadMessagesAfterId(ulong id, Channel channel)
+        {
+            List<Message> messages = new List<Message>();
+            var latestMessage = await channel.DownloadMessages(100, id,Relative.After);
+            messages.AddRange(latestMessage);
+
+            ulong tmpMessageTracker = latestMessage.Last().Id;
+            ulong newMessageTracker;
+
+            while (true)
+            {
+                messages.AddRange(await channel.DownloadMessages(100, tmpMessageTracker,Relative.After));
+
+                newMessageTracker = messages[messages.Count - 1].Id;
+                if (tmpMessageTracker != newMessageTracker)     //Checks if there are any more messages in channel, and if not, returns the List
+                {
+                    tmpMessageTracker = newMessageTracker;      //grabs the last message added, and uses the new Id as the start of the next query
+                }
+                else
+                {
+                    messages.RemoveAt(messages.Count - 1);//removes the excessive object
+                    return messages;
+                }
+            }
+        }
 
         public void Feed(Message message)
         {
@@ -95,7 +126,7 @@ namespace KiteBot
         {
             if (!message.User.Name.ToLower().Contains("kitebot"))
             {
-                if(!message.Text.Equals("") && !message.Text.Contains("http") && !message.Text.ToLower().Contains("testmarkov") && !message.IsMentioningMe)
+                if(!message.Text.Equals("") && !message.Text.Contains("http") && !message.Text.ToLower().Contains("testmarkov") && !message.Text.ToLower().Contains("getdunked") && !message.IsMentioningMe())
                 {
                     if (message.Text.Contains("."))
                     {
@@ -106,19 +137,19 @@ namespace KiteBot
             }
         }
 
-        private async Task<List<Message>> GetMessagesFromChannel(DiscordClient client, Channel channel, int i)
+        private async Task<List<Message>> GetMessagesFromChannel(Channel channel, int i)
         {
             List<Message> messages = new List<Message>();
-            var latestMessage = client.DownloadMessages(channel, i);
-            messages.AddRange(client.DownloadMessages(channel, i).Result);
+            var latestMessage = await channel.DownloadMessages(i);
+            messages.AddRange(latestMessage);
 
-            long tmpMessageTracker = latestMessage.Id;
+            ulong tmpMessageTracker = latestMessage.Last().Id;
 
             while (messages.Count < i)
             {
-                messages.AddRange(await Program.Client.DownloadMessages(channel, 100, tmpMessageTracker));
+                messages.AddRange(await channel.DownloadMessages(100, tmpMessageTracker));
 
-                long newMessageTracker = messages[messages.Count - 1].Id;
+                ulong newMessageTracker = messages[messages.Count - 1].Id;
                 if (tmpMessageTracker != newMessageTracker)     //Checks if there are any more messages in channel, and if not, returns the List
                 {
                     tmpMessageTracker = newMessageTracker;      //grabs the last message added, and uses the new Id as the start of the next query
@@ -132,9 +163,16 @@ namespace KiteBot
             return messages;
         }
 
-        public void save()
+        public void Save()
         {
-            multiDeep.save(XmlFileLocation);
+            File.WriteAllText(JsonFileLocation, JsonConvert.SerializeObject(JsonList, Newtonsoft.Json.Formatting.None));
         }
+    }
+
+    class JsonMessage
+    {
+        public string M { get; set; }
+        public ulong MI { get; set; }
+        public ulong CI { get; set; }
     }
 }

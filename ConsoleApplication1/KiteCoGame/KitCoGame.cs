@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
-using System.Linq;
 using System.IO;
 using Discord;
 
@@ -76,9 +75,9 @@ namespace KiteBot
 
             if (!message.IsAuthor && message.Text.StartsWith("@KiteBotBeta"))
             {
-                if (characters.ContainsKey(message.User.Id))
+                if (characters.ContainsKey((long) message.User.Id))
                 {
-                    Character currentCharacter = characters[message.User.Id];
+                    Character currentCharacter = characters[(long) message.User.Id];
                    
                     foreach(XElement e in characterList)
                     {

@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.Mime;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
@@ -28,7 +27,7 @@ namespace KiteBot
 		public static KitCoGame KiteGame = new KitCoGame();
 		public static LivestreamChecker StreamChecker = new LivestreamChecker();
         public static GiantBombVideoChecker GbVideoChecker = new GiantBombVideoChecker();
-        public static MultiTextMarkovChainHelper MultiDeepMarkovChain = new MultiTextMarkovChainHelper(Program.Client,3);
+        public static MultiTextMarkovChainHelper MultiDeepMarkovChain = new MultiTextMarkovChainHelper(Program.Client, 3);
 
         public static string ChatDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.FullName;
         public static string GreetingFileLocation = ChatDirectory + "\\Content\\Greetings.txt";
@@ -63,33 +62,46 @@ namespace KiteBot
 			{
 				string response = KiteGame.GetGameResponse(e.Message);
 				if (response != null)
-					await client.SendMessage(e.Channel, response);
+					await e.Channel.SendMessage(response);
 			}
 
 			else if (!e.Message.IsAuthor && e.Message.Text.StartsWith("/roll"))
 			{
-				await client.SendMessage(e.Channel, DiceRoller.ParseRoll(e.Message.Text));
+				await e.Channel.SendMessage(DiceRoller.ParseRoll(e.Message.Text));
 			}
 
 			else if (!e.Message.IsAuthor && 0 <= e.Message.Text.IndexOf("GetDunked"))
 			{
-				await client.SendMessage(e.Channel, "http://i.imgur.com/QhcNUWo.gifv");
+				await e.Channel.SendMessage("http://i.imgur.com/QhcNUWo.gifv");
 			}
 
-            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /saveXML") && e.User.Id == 85817630560108544)
+            else if (!e.Message.IsAuthor && e.Message.Text.Contains(@"/saveJSON") && e.User.Id == 85817630560108544)
             {
-                MultiDeepMarkovChain.save();
-                await client.SendMessage(e.Channel, "Done.");
+                MultiDeepMarkovChain.Save();
+                await e.Channel.SendMessage("Done.");
             }
-            else if (!e.Message.IsAuthor && e.Message.Text.StartsWith(@"@KiteBot /saveExit") && e.User.Id == 85817630560108544)
+            else if (!e.Message.IsAuthor && e.Message.Text.Contains(@"/saveExit") && e.User.Id == 85817630560108544)
             {
-                MultiDeepMarkovChain.save();
-                await client.SendMessage(e.Channel, "Done.");
+                MultiDeepMarkovChain.Save();
+                await e.Channel.SendMessage("Done.");
                 Environment.Exit(1);
             }
-            else if (!e.Message.IsAuthor && (e.Message.Text.StartsWith(@"@KiteBot /testMarkov") || e.Message.Text.StartsWith(@"@KiteBot /tm")))
+            else if (!e.Message.IsAuthor && (e.Message.Text.Contains(@"/testMarkov") || e.Message.Text.StartsWith(@"@KiteBot /tm")))
             {
-                await client.SendMessage(e.Channel, MultiDeepMarkovChain.GetSequence());
+                try
+                {
+                    await e.Channel.SendMessage(MultiDeepMarkovChain.GetSequence());
+                    if (e.User.Id == 85817630560108544)
+                    {
+                        await e.Message.Delete();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    MultiDeepMarkovChain.Save();
+                    Environment.Exit(1);
+                }
             }
 
             else if (!e.Message.IsAuthor && e.Message.Text.StartsWith("@KiteBot"))
@@ -97,12 +109,12 @@ namespace KiteBot
                 if (e.Message.Text.StartsWith("@KiteBot #420") || e.Message.Text.ToLower().StartsWith("@KiteBot #blaze") ||
                     0 <= e.Message.Text.ToLower().IndexOf("waifu", 0))
                 {
-                    await client.SendMessage(e.Channel, "http://420.moe/");
+                    await e.Channel.SendMessage("http://420.moe/");
                 }
                 else if (0 <= e.Message.Text.ToLower().IndexOf("help", 5))
                 {
                     var nl = Environment.NewLine;
-                    await client.SendMessage(e.Channel, "Current Commands are:" + nl + "#420"
+                    await e.Channel.SendMessage("Current Commands are:" + nl + "#420"
                                                         + nl + "randomql" + nl + "google" + nl + "youtube" + nl +
                                                         "kitedunk"
                                                         + nl + "/pizza" + nl + "Whats for dinner" + nl + "sandwich" + nl +
@@ -112,36 +124,33 @@ namespace KiteBot
                 else if (0 <= e.Message.Text.ToLower().IndexOf("randomql", 5))
                 {
                     await
-                        client.SendMessage(e.Channel,
-                            GetResponseUriFromRandomQlCrew());
+                        e.Channel.SendMessage(GetResponseUriFromRandomQlCrew());
                 }
                 else if (0 <= e.Message.Text.ToLower().IndexOf("raecounter", 0))
                 {
-                    await client.SendMessage(e.Channel, @"Rae has ghost-typed " + RaeCounter);
+                    await e.Channel.SendMessage(@"Rae has ghost-typed " + RaeCounter);
                 }
                 else if (0 <= e.Message.Text.ToLower().IndexOf("google", 0))
                 {
                     await
-                        client.SendMessage(e.Channel,
-                            "http://lmgtfy.com/?q=" + e.Message.Text.ToLower().Substring(16).Replace(' ', '+'));
+                        e.Channel.SendMessage("http://lmgtfy.com/?q=" + e.Message.Text.ToLower().Substring(16).Replace(' ', '+'));
                 }
                 else if (0 <= e.Message.Text.ToLower().IndexOf("youtube", 0))
                 {
                     if (e.Message.Text.Length > 16)
                     {
-                        await client.SendMessage(e.Channel,
-                            "https://www.youtube.com/results?search_query=" +
+                        await e.Channel.SendMessage("https://www.youtube.com/results?search_query=" +
                             e.Message.Text.ToLower().Substring(17).Replace(' ', '+'));
                     }
                     else
                     {
-                        await client.SendMessage(e.Channel, "Please add a query after youtube, starting with a space.");
+                        await e.Channel.SendMessage("Please add a query after youtube, starting with a space.");
                     }
                 }
 
                 else if (0 <= e.Message.Text.ToLower().IndexOf("dunk", 0))
                 {
-                    await client.SendMessage(e.Channel, KiteDunk.GetUpdatedKiteDunk());
+                    await e.Channel.SendMessage(KiteDunk.GetUpdatedKiteDunk());
                 }
                 else if (0 <= e.Message.Text.ToLower().IndexOf("fuck you", 0) ||
                          0 <= e.Message.Text.ToLower().IndexOf("fuckyou", 0))
@@ -153,37 +162,34 @@ namespace KiteBot
                     _possibleResponses.Add("Fuck you too USER!");
 
                     await
-                        client.SendMessage(e.Channel,
-                            _possibleResponses[RandomSeed.Next(0, _possibleResponses.Count)].Replace("USER",
+                        e.Channel.SendMessage(_possibleResponses[RandomSeed.Next(0, _possibleResponses.Count)].Replace("USER",
                                 e.User.Name));
                 }
                 else if (0 <= e.Message.Text.ToLower().IndexOf("/pizza", 0))
                 {
-                    await client.SendMessage(e.Channel, KitePizza.ParsePizza(e.User.Name, e.Message.Text));
+                    await e.Channel.SendMessage(KitePizza.ParsePizza(e.User.Name, e.Message.Text));
                 }
                 else if (0 <= e.Message.Text.ToLower().IndexOf("sandwich", 0))
                 {
-                    await client.SendMessage(e.Channel, KiteSandwich.ParseSandwich(e.User.Name));
+                    await e.Channel.SendMessage(KiteSandwich.ParseSandwich(e.User.Name));
                 }
                 else if (0 <= e.Message.Text.ToLower().IndexOf("hi", 0) ||
                          0 <= e.Message.Text.ToLower().IndexOf("hey", 0) ||
                          0 <= e.Message.Text.ToLower().IndexOf("hello", 0))
                 {
-                    await client.SendMessage(e.Channel, ParseGreeting(e.User.Name));
+                    await e.Channel.SendMessage(ParseGreeting(e.User.Name));
                 }
                 else if (0 <= e.Message.Text.ToLower().IndexOf("/meal", 0) ||
                          0 <= e.Message.Text.ToLower().IndexOf("dinner", 0)
                          || 0 <= e.Message.Text.ToLower().IndexOf("lunch", 0))
                 {
-                    await
-                        client.SendMessage(e.Channel,
-                            _mealResponses[RandomSeed.Next(0, _mealResponses.Length)].Replace("USER",
+                    await e.Channel.SendMessage(_mealResponses[RandomSeed.Next(0, _mealResponses.Length)].Replace("USER",
                                 e.User.Name));
                 }
                 else
                 {
                     await
-                        client.SendMessage(e.Channel, "KiteBot ver. 0.9.1 \"Almost.\"");
+                        e.Channel.SendMessage("KiteBot ver. 0.9.1 \"Almost.\"");
                 }
             }
 	    }
@@ -254,19 +260,20 @@ namespace KiteBot
 			_bekGreetings = stringArray;
 		}
 
-		public void IsRaeTyping(MessageEventArgs e)
-		{
-			if (e.User.Id == 85876755797139456)
-			{
-				RaeCounter += -1;
-			}
-		}
-	    public void IsRaeTyping(UserChannelEventArgs e)
-	    {
-			if (e.User.Id == 85876755797139456)
-			{
-				RaeCounter += 1;
-			}
-	    }
+        public void IsRaeTyping(MessageEventArgs e)
+        {
+            if (e.User.Id == 85876755797139456)
+            {
+                RaeCounter += -1;
+            }
+        }
+
+        public void IsRaeTyping(ChannelUserEventArgs channelUserEventArgs)
+        {
+            if (channelUserEventArgs.User.Id == 85876755797139456)
+            {
+                RaeCounter += 1;
+            }
+        }
     }
 }
