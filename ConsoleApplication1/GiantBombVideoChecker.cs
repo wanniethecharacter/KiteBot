@@ -13,15 +13,15 @@ namespace KiteBot
 		public static string ApiCallUrl;
 		private static Timer _chatTimer;//Garbage collection doesnt like local variables that only fire a couple times per hour
 		private XElement _latestXElement;
-        private DateTime lastPublishTime;
-        private bool firstTime = true;
+        	private DateTime lastPublishTime;
+        	private bool firstTime = true;
 
 		public GiantBombVideoChecker()
 		{
 			ApiCallUrl = "http://www.giantbomb.com/api/promos/?api_key=" + auth.Default.GiantBombAPI;
 			_chatTimer = new Timer();
 			_chatTimer.Elapsed += RefreshVideosApi;
-			_chatTimer.Interval = 60000;//1 minute
+			_chatTimer.Interval = 150000;//2,5 minute
 			_chatTimer.AutoReset = true;
 			_chatTimer.Enabled = true;
 		}
