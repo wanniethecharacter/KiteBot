@@ -18,7 +18,7 @@ namespace KiteBot
 			ApiCallUrl = "http://www.giantbomb.com/api/chats/?api_key=" + auth.Default.GiantBombAPI;
 			_chatTimer = new Timer();
 			_chatTimer.Elapsed += RefreshChatsApi;
-			_chatTimer.Interval = 120000;//2 minutes 2*60*1000=120 000
+			_chatTimer.Interval = 150000;//2,5 minutes 2*60*1000=120 000
 			_chatTimer.AutoReset = true;
 			_chatTimer.Enabled = true;
 		}
