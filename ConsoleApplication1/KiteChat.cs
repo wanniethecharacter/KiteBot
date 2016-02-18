@@ -189,7 +189,7 @@ namespace KiteBot
                 else
                 {
                     await
-                        e.Channel.SendMessage("KiteBot ver. 0.9.1 \"Almost.\"");
+                        e.Channel.SendMessage("KiteBot ver. 1.0.1 \"Done. I hate computers.\"");
                 }
             }
 	    }
