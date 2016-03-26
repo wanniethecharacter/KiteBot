@@ -31,6 +31,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -117,6 +118,9 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
+    <Reference Include="TextMarkovChains">
+      <HintPath>..\..\MarkovChainSentenceGenerator\TextMarkovChains\bin\Release\TextMarkovChains.dll</HintPath>
+    </Reference>
     <Reference Include="WebSocket4Net, Version=0.14.1.0, Culture=neutral, PublicKeyToken=eb4e154b696bf72a, processorArchitecture=MSIL">
       <HintPath>..\packages\WebSocket4Net.0.14.1\lib\net45\WebSocket4Net.dll</HintPath>
       <Private>True</Private>
@@ -134,7 +138,6 @@
       <DependentUpon>auth.settings</DependentUpon>
     </Compile>
     <Compile Include="GiantBombVideoChecker.cs" />
-    <Compile Include="MultiDeepMarkovChain.cs" />
     <Compile Include="MultiDeepMarkovChainHelper.cs" />
     <Compile Include="RandomHandler.cs" />
     <Compile Include="LivestreamChecker.cs" />

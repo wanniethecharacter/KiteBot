@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using KiteBot.Properties;
 using Discord;
 
@@ -6,11 +7,51 @@ namespace KiteBot
 {
     class Program
     {
-		public static DiscordClient Client;
+        static bool exitSystem;
+
+        #region Trap application termination
+        [DllImport("Kernel32")]
+        private static extern bool SetConsoleCtrlHandler(EventHandler handler, bool add);
+
+        private delegate bool EventHandler(CtrlType sig);
+        static EventHandler _handler;
+
+        enum CtrlType
+        {
+            CTRL_C_EVENT = 0,
+            CTRL_BREAK_EVENT = 1,
+            CTRL_CLOSE_EVENT = 2,
+            CTRL_LOGOFF_EVENT = 5,
+            CTRL_SHUTDOWN_EVENT = 6
+        }
+
+        private static bool Handler(CtrlType sig)
+        {
+            Console.WriteLine("Exiting system due to external CTRL-C, or process kill, or shutdown");
+
+            //cleanup here
+            KiteChat.MultiDeepMarkovChain.Save();
+
+            Console.WriteLine("Cleanup complete");
+
+            //allow main to run off
+            exitSystem = true;
+
+            //shutdown right away so there are no lingering threads
+            Environment.Exit(-1);
+
+            return true;
+        }
+        #endregion
+
+        public static DiscordClient Client;
         private static KiteChat kiteChat;
 
         private static void Main(string[] args)
         {
+            _handler += Handler;
+            SetConsoleCtrlHandler(_handler, true);
+
             Client = new DiscordClient();
             kiteChat = new KiteChat();
 
@@ -29,7 +70,7 @@ namespace KiteBot
 			//Convert our sync method to an async one and block the Main function until the bot disconnects
 		    Client.ExecuteAndWait(async () =>
             {
-                while (true)
+                while (!exitSystem)
                 {
                     try
                     {
@@ -39,7 +80,6 @@ namespace KiteBot
 #else
                         Client.SetGame("with Freedom");
 #endif
-
                         break;
                     }
                     catch (Exception ex)

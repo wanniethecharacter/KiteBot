@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using System.Timers;
@@ -13,15 +14,15 @@ namespace KiteBot
 		public static string ApiCallUrl;
 		private static Timer _chatTimer;//Garbage collection doesnt like local variables that only fire a couple times per hour
 		private XElement _latestXElement;
-        	private DateTime lastPublishTime;
-        	private bool firstTime = true;
+        private DateTime lastPublishTime;
+        private bool firstTime = true;
 
 		public GiantBombVideoChecker()
 		{
 			ApiCallUrl = "http://www.giantbomb.com/api/promos/?api_key=" + auth.Default.GiantBombAPI;
 			_chatTimer = new Timer();
 			_chatTimer.Elapsed += RefreshVideosApi;
-			_chatTimer.Interval = 150000;//2,5 minute
+			_chatTimer.Interval = 120000;//2 minutes
 			_chatTimer.AutoReset = true;
 			_chatTimer.Enabled = true;
 		}
@@ -35,22 +36,29 @@ namespace KiteBot
 		{
 		    _latestXElement = GetXDocumentFromUrl(ApiCallUrl);
             var promo = _latestXElement.Element("results")?.Element("promo");
-            DateTime newPublishTime = GetGiantBombFormatDateTime(promo?.Element("date_added")?.Value);
-		    if (firstTime || newPublishTime.Equals(lastPublishTime))
+		    var promos = _latestXElement.Element("results")?.Elements("promo");
+		    foreach (XElement item in promos)
 		    {
-                lastPublishTime = newPublishTime;
-                firstTime = false;
-            }
-            else
-            {
-                var title = deGiantBombifyer(promo?.Element("name")?.Value);
-                var deck = deGiantBombifyer(promo?.Element("deck")?.Value);
-                var link = deGiantBombifyer(promo?.Element("link")?.Value);
-                var user = deGiantBombifyer(promo?.Element("user")?.Value);
-                lastPublishTime = newPublishTime;
+                DateTime newPublishTime = GetGiantBombFormatDateTime(item?.Element("date_added")?.Value);
+                if (newPublishTime.CompareTo(lastPublishTime) > 0)
+		        {
+		            if (firstTime)
+		            {
+		                lastPublishTime = newPublishTime;
+		            }
+		            else
+		            {
+                        var title = deGiantBombifyer(item?.Element("name")?.Value);
+                        var deck = deGiantBombifyer(item?.Element("deck")?.Value);
+                        var link = deGiantBombifyer(item?.Element("link")?.Value);
+                        var user = deGiantBombifyer(item?.Element("user")?.Value);
+                        lastPublishTime = newPublishTime;
 
-                Program.Client.GetChannel(85842104034541568).SendMessage(title + ": " + deck + Environment.NewLine + "by: " + user + Environment.NewLine + link);
-            }
+                        Program.Client.GetChannel(85842104034541568).SendMessage(title + ": " + deck + Environment.NewLine + "by: " + user + Environment.NewLine + link);
+                    }
+		        }
+		    }
+            firstTime = false;
         }
         private DateTime GetGiantBombFormatDateTime(string dateTimeString)
         {

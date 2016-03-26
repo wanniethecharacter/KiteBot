@@ -196,16 +196,22 @@ namespace KiteBot
 
 		public static string GetResponseUriFromRandomQlCrew()
 		{
-			string url = "http://qlcrew.com/main.php?anyone=anyone&inc%5B0%5D=&p=999&exc%5B0%5D=&per_page=15&random";
-			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-			HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            string url = "http://qlcrew.com/main.php?anyone=anyone&inc%5B0%5D=&p=999&exc%5B0%5D=&per_page=15&random";
+
+            /*WebClient client = new WebClient();
+            client.Headers.Add("user-agent", "LassieMEKiteBot/0.9 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+		    client..OpenRead(url);*/
+
+		    HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
+            request.UserAgent = "LassieMEKiteBot/0.9 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)";
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 			return response.ResponseUri.AbsoluteUri;
 		}
         
         //returns a greeting from the greetings.txt list on a per user or generic basis
 	    private string ParseGreeting(string userName)
         {
-		    if (userName.Equals("Bekenel"))
+		    if (userName.Equals("Bekenel") || userName.Equals("Pete"))
 		    {
 			    return (_bekGreetings[RandomSeed.Next(0, _bekGreetings.Length)]);
 		    }
@@ -242,22 +248,35 @@ namespace KiteBot
 		private void LoadBekGreetings()
 		{
 			const string url = "https://www.reddit.com/user/UWotM8_SS";
-			string htmlCode;
-			using (WebClient client = new WebClient())
-			{
-				htmlCode = client.DownloadString(url);
-			}
-			var regex1 = new Regex(@"<div class=""md""><p>(?<quote>.+)</p>");
-			var matches = regex1.Matches(htmlCode);
-			var stringArray = new string[matches.Count];
-			var i = 0;
-			foreach (Match match in matches)
-			{
-				var s = match.Groups["quote"].Value.Replace("&#39;", "'").Replace("&quot;", "\"");
-				stringArray[i] = s;
-				i++;
-			}
-			_bekGreetings = stringArray;
+			string htmlCode = null;
+		    try
+		    {
+		        using (WebClient client = new WebClient())
+		        {
+		            htmlCode = client.DownloadString(url);
+		        }
+		    }
+		    catch (Exception e)
+		    {
+		        Console.WriteLine("Could not load Bek greetings, server not found: " + e.Message);
+		    }
+		    finally
+		    {
+		        var regex1 = new Regex(@"<div class=""md""><p>(?<quote>.+)</p>");
+		        if (htmlCode != null)
+		        {
+		            var matches = regex1.Matches(htmlCode);
+		            var stringArray = new string[matches.Count];
+		            var i = 0;
+		            foreach (Match match in matches)
+		            {
+		                var s = match.Groups["quote"].Value.Replace("&#39;", "'").Replace("&quot;", "\"");
+		                stringArray[i] = s;
+		                i++;
+		            }
+		            _bekGreetings = stringArray;
+		        }
+		    }
 		}
 
         public void IsRaeTyping(MessageEventArgs e)
