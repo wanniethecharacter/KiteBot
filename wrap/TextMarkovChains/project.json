@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0-*",
+  "frameworks": {
+    "net45": {
+      "bin": {
+        "assembly": "../../../MarkovChainSentenceGenerator/TextMarkovChains/bin/Release/TextMarkovChains.dll",
+        "pdb": "../../../MarkovChainSentenceGenerator/TextMarkovChains/bin/Release/TextMarkovChains.pdb"
+      }
+    }
+  }
+}

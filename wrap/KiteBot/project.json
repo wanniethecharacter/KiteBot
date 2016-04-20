@@ -1,0 +1,24 @@
+{
+  "version": "1.0.0-*",
+  "frameworks": {
+    "net45": {
+      "wrappedProject": "../../ConsoleApplication1/KiteBot.csproj",
+      "bin": {
+        "assembly": "../../ConsoleApplication1/obj/{configuration}/KiteBot.exe",
+        "pdb": "../../ConsoleApplication1/obj/{configuration}/KiteBot.pdb"
+      },
+      "dependencies": {
+        "Newtonsoft.Json": "8.0.3",
+        "Nito.AsyncEx": "3.0.1",
+        "RestSharp": "105.2.3",
+        "WebSocket4Net": "0.14.1",
+        "ChatterBotAPI": "1.0.0-*",
+        "Discord.Net.Audio": "1.0.0-*",
+        "Discord.Net.Commands": "1.0.0-*",
+        "Discord.Net": "1.0.0-*",
+        "Discord.Net.Modules": "1.0.0-*",
+        "TextMarkovChains": "1.0.0-*"
+      }
+    }
+  }
+}

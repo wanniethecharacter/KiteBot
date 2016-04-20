@@ -31,24 +31,24 @@ namespace KiteBot
 		{
 			byte[] b = new byte[4];
 			r.GetBytes(b);
-			return (double)BitConverter.ToUInt32(b, 0) / UInt32.MaxValue;
+			return (double)BitConverter.ToUInt32(b, 0) / uint.MaxValue;
 		}
 		///<summary>
 		/// Returns a random number within the specified range.
 		///</summary>
 		///<param name=”minValue”>The inclusive lower bound of the random number returned.</param>
-		///<param name=”maxValue”>The exclusive upper bound of the random number returned. maxValue must be greater than or equal to minValue.</param>
+		///<param name=”maxValue”>The inclusive upper bound of the random number returned. maxValue must be greater than or equal to minValue.</param>
 		public int Next(int minValue, int maxValue)
 		{
-			var v = Math.Round(NextDouble() * (maxValue - minValue + 1));
-			return minValue + (int)v;
+			var v = Math.Round(NextDouble() * (maxValue - minValue)) + minValue;
+			return (int)v;
 		}
 		///<summary>
 		/// Returns a nonnegative random number.
 		///</summary>
 		public int Next()
 		{
-			return Next(0, Int32.MaxValue);
+			return Next(0, int.MaxValue);
 		}
 		///<summary>
 		/// Returns a nonnegative random number less than the specified maximum

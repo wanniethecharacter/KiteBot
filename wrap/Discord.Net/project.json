@@ -1,0 +1,21 @@
+{
+  "version": "1.0.0-*",
+  "frameworks": {
+    "net45": {
+      "bin": {
+        "assembly": "../../../Discord.Net2/artifacts/bin/Discord.Net/Release/net45/Discord.Net.dll",
+        "pdb": "../../../Discord.Net2/artifacts/bin/Discord.Net/Release/net45/Discord.Net.pdb"
+      }
+    },
+    "dnxcore50": {
+      "bin": {
+        "assembly": "../../lib/dnxcore50/Discord.Net.dll"
+      }
+    },
+    "dnx451": {
+      "bin": {
+        "assembly": "../../lib/dnx451/Discord.Net.dll"
+      }
+    }
+  }
+}

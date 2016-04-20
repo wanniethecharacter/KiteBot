@@ -1,0 +1,10 @@
+{
+  "version": "1.0.0-*",
+  "frameworks": {
+    "net45": {
+      "bin": {
+        "assembly": "D:\\Users\\sindr\\Desktop\\Projects\\ChatterBot\\ChatterBotAPI\\bin\\Release\\ChatterBotAPI.dll"
+      }
+    }
+  }
+}

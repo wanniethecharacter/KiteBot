@@ -16,10 +16,11 @@ namespace KiteBot
         public static int Depth;
         private static IMarkovChain _markovChain;
         private static DiscordClient _client;
-        private static List<JsonMessage> JsonList = new List<JsonMessage>();
+        private static List<JsonMessage> _jsonList = new List<JsonMessage>();
+        private static JsonLastMessage _lastMessage = new JsonLastMessage();
 
         public static string RootDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.FullName;
-        public static string JsonLastMessage => RootDirectory + "\\Content\\LastMessage.json";
+        public static string JsonLastMessageLocation => RootDirectory + "\\Content\\LastMessage.json";
         public static string JsonMessageFileLocation => RootDirectory + "\\Content\\messages.zip";
         private static bool _isInitialized;
 
@@ -55,39 +56,44 @@ namespace KiteBot
             {
                 if (File.Exists(path: JsonMessageFileLocation))
                 {
-                    JsonList = JsonConvert.DeserializeObject<List<JsonMessage>>(Open());
-                    var lastMessageId = await _client.GetChannel(85842104034541568).DownloadMessages(1);
-                    foreach (JsonMessage message in JsonList)
+                    _jsonList = JsonConvert.DeserializeObject<List<JsonMessage>>(Open());
+
+                    foreach (JsonMessage message in _jsonList)
                     {
                         _markovChain.feed(message.M);//Any messages here have already been thru all the if checks, and hence, we dont need to run thru all of those again.
                     }
                     _isInitialized = true;
-                    if (lastMessageId[0].Id != JsonList.Last(item => item.CI == 85842104034541568).MI)
+                    if (File.Exists(JsonLastMessageLocation))
                     {
-                        List<Message> list = await DownloadMessagesAfterId(JsonList.Last(item => item.CI == 85842104034541568).MI, _client.GetChannel(85842104034541568));
-                        foreach (Message message in list)
+                        try
                         {
-                            FeedMarkovChain(message);
+                            string s = File.ReadAllText(JsonLastMessageLocation);
+                            _lastMessage = JsonConvert.DeserializeObject<JsonLastMessage>(s);
+                            List<Message> list =
+                                await DownloadMessagesAfterId(_lastMessage.MessageId,_client.GetChannel(_lastMessage.ChannelId));
+                            foreach (Message message in list)
+                            {
+                                FeedMarkovChain(message);
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            Console.WriteLine("fucking Last Message JSON is killing me");
                         }
                     }
                 }
                 else
                 {
-                    List<Message> list = await GetMessagesFromChannel(_client.GetChannel(85842104034541568), 100000);
-                    list.AddRange(await GetMessagesFromChannel(_client.GetChannel(96786127238725632), 20000));
-                    list.AddRange(await GetMessagesFromChannel(_client.GetChannel(94122326802571264), 20000));
+                    List<Message> list = await GetMessagesFromChannel(_client.GetChannel(85842104034541568), 40000);
+                    list.AddRange(await GetMessagesFromChannel(_client.GetChannel(96786127238725632), 10000));
+                    list.AddRange(await GetMessagesFromChannel(_client.GetChannel(94122326802571264), 10000));
                     foreach (Message message in list)
                     {
                         if (message != null && !message.Text.Equals(""))
                         {
                             FeedMarkovChain(message);
-                            var json = new JsonMessage
-                            {
-                                M = message.Text,
-                                MI = message.Id,
-                                CI = message.Channel.Id,
-                            };
-                            JsonList.Add(json);
+                            var json = new JsonMessage{M = message.Text};
+                            _jsonList.Add(json);
                         }
                     }
                 }
@@ -99,10 +105,12 @@ namespace KiteBot
         private async Task<List<Message>> DownloadMessagesAfterId(ulong id, Channel channel)
         {
             List<Message> messages = new List<Message>();
-            var latestMessage = await channel.DownloadMessages(100, id,Relative.After);
-            messages.AddRange(latestMessage);
+            var latestMessages = await channel.DownloadMessages(100, id,Relative.After);
+            messages.AddRange(latestMessages);
 
-            ulong tmpMessageTracker = latestMessage.Last().Id;
+            if (latestMessages.Length == 0) return messages;
+
+            ulong tmpMessageTracker = latestMessages.Last().Id;
             ulong newMessageTracker;
 
             while (true)
@@ -116,7 +124,7 @@ namespace KiteBot
                 }
                 else
                 {
-                    messages.RemoveAt(messages.Count - 1);//removes the excessive object
+                    messages.RemoveAt(messages.Count - 1);      //removes the excessive object
                     return messages;
                 }
             }
@@ -147,17 +155,7 @@ namespace KiteBot
                         _markovChain.feed(message.Text);
                     }
                     _markovChain.feed(message.Text + ".");
-                    var json = new JsonMessage
-                    {
-                        M = message.Text,
-                        MI = message.Id,
-                        CI = message.Channel.Id,
-                    };
-                    /*if (message.Channel.Id == JsonList.Last(item => item.CI == 85842104034541568).MI)
-                    {
-                        _lastMessage.MessageId = message.Id;
-                    }*/
-                    JsonList.Add(json);
+                    _jsonList.Add(new JsonMessage() { M = message.Text });
                 }
             }
         }
@@ -181,7 +179,7 @@ namespace KiteBot
                 }
                 else
                 {
-                    messages.RemoveAt(messages.Count - 1);//removes the excessive object
+                    messages.RemoveAt(messages.Count - 1);      //removes the excessive object
                     return messages;
                 }
             }
@@ -192,15 +190,23 @@ namespace KiteBot
         {
             if (_isInitialized)
             {
-                var text = Encoding.Default.GetBytes(JsonConvert.SerializeObject(JsonList, Formatting.None));
+                var text = Encoding.Default.GetBytes(JsonConvert.SerializeObject(_jsonList, Formatting.None));
                 using (var fileStream = File.Open(JsonMessageFileLocation, FileMode.OpenOrCreate))
                 {
-                    using (var stream = new GZipStream(fileStream, CompressionMode.Compress))
+                    using (var stream = new GZipStream(fileStream, CompressionLevel.Optimal))
                     {
-                        stream.Write(text, 0, text.Length);
-                        // Write to the `stream` here and the result will be compressed
+                        stream.Write(text, 0, text.Length);     // Write to the `stream` here and the result will be compressed
                     }
                 }
+                Message message = _client.GetChannel(85842104034541568).DownloadMessages(1).Result[0];
+                var x = new JsonLastMessage
+                {
+                    MessageId = message.Id,
+                    ChannelId = message.Channel.Id
+                };
+
+                var lastmessageJSON = JsonConvert.SerializeObject(x, Formatting.Indented);
+                File.WriteAllText(JsonLastMessageLocation, lastmessageJSON);
             }
         }
 
@@ -229,13 +235,7 @@ namespace KiteBot
         }
     }
 
-    class JsonMessage : NewJsonMessage
-    {
-        public ulong MI { get; set; }
-        public ulong CI { get; set; }
-    }
-
-    class NewJsonMessage
+    class JsonMessage
     {
         public string M { get; set; }
     }

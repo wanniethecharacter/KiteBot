@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using System.Timers;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using KiteBot.Properties;
 
 namespace KiteBot
 {
@@ -17,17 +15,17 @@ namespace KiteBot
         private DateTime lastPublishTime;
         private bool firstTime = true;
 
-		public GiantBombVideoChecker()
-		{
-			ApiCallUrl = "http://www.giantbomb.com/api/promos/?api_key=" + auth.Default.GiantBombAPI;
-			_chatTimer = new Timer();
-			_chatTimer.Elapsed += RefreshVideosApi;
-			_chatTimer.Interval = 120000;//2 minutes
-			_chatTimer.AutoReset = true;
-			_chatTimer.Enabled = true;
-		}
+        public GiantBombVideoChecker(string GBapi,int streamRefresh)
+        {
+            ApiCallUrl = "http://www.giantbomb.com/api/promos/?api_key=" + GBapi;
+            _chatTimer = new Timer();
+            _chatTimer.Elapsed += RefreshVideosApi;
+            _chatTimer.Interval = streamRefresh;
+            _chatTimer.AutoReset = true;
+            _chatTimer.Enabled = true;
+        }
 
-		private void RefreshVideosApi(object sender, ElapsedEventArgs elapsedEventArgs)
+        private void RefreshVideosApi(object sender, ElapsedEventArgs elapsedEventArgs)
 		{
 			RefreshVideosApi();
 		}

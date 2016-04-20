@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Net;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Timers;
+using System.Threading;
 
-namespace KiteBot
+namespace KiteCore
 {
 	public class KiteDunk
 	{
 		private static string[,] _updatedKiteDunks;
 	    private static Random _random;
 		//private static CryptoRandom _cryptoRandom;
-        private const string GoogleSpreadsheetApiUrl = "http://spreadsheets.google.com/feeds/list/11024r_0u5Mu-dLFd-R9lt8VzOYXWgKX1I5JamHJd8S4/od6/public/values?hl=en_US&&alt=json";
+        private const string GoogleSpreadsheetApiUrl = "https://spreadsheets.google.com/feeds/list/11024r_0u5Mu-dLFd-R9lt8VzOYXWgKX1I5JamHJd8S4/od6/public/values?hl=en_US&&alt=json";
 		// ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
 		private static Timer _kiteDunkTimer;
 
@@ -21,11 +22,7 @@ namespace KiteBot
             _random = new Random();
 	        UpdateKiteDunks().Wait();
 
-			_kiteDunkTimer = new Timer();
-			_kiteDunkTimer.Elapsed += UpdateKiteDunks;
-			_kiteDunkTimer.Interval = 86400000;//24 hours
-			_kiteDunkTimer.AutoReset = true;
-			_kiteDunkTimer.Enabled = true;
+			_kiteDunkTimer = new Timer(async delegate {await UpdateKiteDunks();}, null, 0, 120000);
         }
 
 		public string GetUpdatedKiteDunk()
@@ -34,19 +31,14 @@ namespace KiteBot
 			return "\"" + _updatedKiteDunks[i, 1] + "\" - " + _updatedKiteDunks[i, 0];
 		}
 
-		private async void UpdateKiteDunks(object sender, ElapsedEventArgs elapsedEventArgs)
-		{
-		    await UpdateKiteDunks();
-		}
-
         public async Task UpdateKiteDunks()
         {
             try
             {
                 string response;
-                using (var client = new WebClient())
+                using (var client = new HttpClient())
                 {
-                    response = await client.DownloadStringTaskAsync(GoogleSpreadsheetApiUrl);
+                    response = await client.GetStringAsync(GoogleSpreadsheetApiUrl);
                 }
                 var regex1 =
                     new Regex(

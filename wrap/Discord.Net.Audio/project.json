@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0-*",
+  "frameworks": {
+    "net45": {
+      "bin": {
+        "assembly": "../../../Discord.Net2/artifacts/bin/Discord.Net.Audio/Release/net45/Discord.Net.Audio.dll",
+        "pdb": "../../../Discord.Net2/artifacts/bin/Discord.Net.Audio/Release/net45/Discord.Net.Audio.pdb"
+      }
+    },
+    "dnxcore50": {
+      "bin": {
+        "assembly": "../../lib/dnxcore50/Discord.Net.Audio.dll"
+      },
+      "dependencies": {
+        "Discord.Net": "1.0.0-*"
+      }
+    },
+    "dnx451": {
+      "bin": {
+        "assembly": "../../lib/dnx451/Discord.Net.Audio.dll"
+      },
+      "dependencies": {
+        "Discord.Net": "1.0.0-*"
+      }
+    }
+  }
+}

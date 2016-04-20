@@ -2,7 +2,6 @@
 using System.Timers;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using KiteBot.Properties;
 
 namespace KiteBot
 {
@@ -13,17 +12,22 @@ namespace KiteBot
 		private XElement _latestXElement;
 		private bool isStreamRunning;
 
-		public LivestreamChecker()
+        public LivestreamChecker()
 		{
-			ApiCallUrl = "http://www.giantbomb.com/api/chats/?api_key=" + auth.Default.GiantBombAPI;
-			_chatTimer = new Timer();
-			_chatTimer.Elapsed += RefreshChatsApi;
-			_chatTimer.Interval = 150000;//2,5 minutes 2*60*1000=120 000
-			_chatTimer.AutoReset = true;
-			_chatTimer.Enabled = true;
+			
 		}
 
-		private void RefreshChatsApi(object sender, ElapsedEventArgs elapsedEventArgs)
+        public LivestreamChecker(string GBapi,int videoRefresh)
+        {
+            ApiCallUrl = "http://www.giantbomb.com/api/chats/?api_key=" + GBapi;
+            _chatTimer = new Timer();
+            _chatTimer.Elapsed += RefreshChatsApi;
+            _chatTimer.Interval = videoRefresh;
+            _chatTimer.AutoReset = true;
+            _chatTimer.Enabled = true;
+        }
+
+        private void RefreshChatsApi(object sender, ElapsedEventArgs elapsedEventArgs)
 		{
 			RefreshChatsApi();
 		}

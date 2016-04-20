@@ -1,0 +1,29 @@
+{
+  "version": "1.0.0-*",
+  "frameworks": {
+    "net45": {
+      "bin": {
+        "assembly": "../../../Discord.Net2/artifacts/bin/Discord.Net.Modules/Release/net45/Discord.Net.Modules.dll",
+        "pdb": "../../../Discord.Net2/artifacts/bin/Discord.Net.Modules/Release/net45/Discord.Net.Modules.pdb"
+      }
+    },
+    "dnxcore50": {
+      "bin": {
+        "assembly": "../../lib/dnxcore50/Discord.Net.Modules.dll"
+      },
+      "dependencies": {
+        "Discord.Net.Commands": "1.0.0-*",
+        "Discord.Net": "1.0.0-*"
+      }
+    },
+    "dnx451": {
+      "bin": {
+        "assembly": "../../lib/dnx451/Discord.Net.Modules.dll"
+      },
+      "dependencies": {
+        "Discord.Net.Commands": "1.0.0-*",
+        "Discord.Net": "1.0.0-*"
+      }
+    }
+  }
+}
