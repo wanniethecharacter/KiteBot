@@ -67,7 +67,7 @@ namespace KiteBot
 
             await RefreshAnilistToken();
 
-            var link = "http://anilist.co/api/anime/search/" + Uri.EscapeUriString(query);
+            //var link = "http://anilist.co/api/anime/search/" + Uri.EscapeUriString(query);
             var smallContent = "";
             var cl = new RestSharp.RestClient("http://anilist.co/api");
             var rq = new RestSharp.RestRequest("/anime/search/" + Uri.EscapeUriString(query));
@@ -89,7 +89,7 @@ namespace KiteBot
 
             await RefreshAnilistToken();
 
-            var link = "http://anilist.co/api/anime/search/" + Uri.EscapeUriString(query);
+            //var link = "http://anilist.co/api/anime/search/" + Uri.EscapeUriString(query);
             var smallContent = "";
             var cl = new RestSharp.RestClient("http://anilist.co/api");
             var rq = new RestSharp.RestRequest("/manga/search/" + Uri.EscapeUriString(query));
