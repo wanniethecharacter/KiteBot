@@ -1,10 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Discord;
+using Discord.Commands;
+using Discord.Modules;
 using Newtonsoft.Json;
+using KiteBot.Commands;
+
 
 namespace KiteBot
 {
@@ -12,65 +15,76 @@ namespace KiteBot
     {
         static bool _exitSystem = true;
 
-        #region Trap application termination
-        [DllImport("Kernel32")]
-        private static extern bool SetConsoleCtrlHandler(EventHandler handler, bool add);
+//#region Trap application termination
+//        [DllImport("Kernel32")]
+//        private static extern bool SetConsoleCtrlHandler(EventHandler handler, bool add);
 
-        private delegate bool EventHandler(CtrlType sig);
-        static EventHandler _handler;
+//        private delegate bool EventHandler(CtrlType sig);
+//        static EventHandler _handler;
 
-        enum CtrlType
-        {
-            CtrlCEvent = 0,
-            CtrlBreakEvent = 1,
-            CtrlCloseEvent = 2,
-            CtrlLogoffEvent = 5,
-            CtrlShutdownEvent = 6
-        }
+//        enum CtrlType
+//        {
+//            CtrlCEvent = 0,
+//            CtrlBreakEvent = 1,
+//            CtrlCloseEvent = 2,
+//            CtrlLogoffEvent = 5,
+//            CtrlShutdownEvent = 6
+//        }
 
-        private static bool Handler(CtrlType sig)
-        {
-            Console.WriteLine("Exiting system due to external CTRL-C, or process kill, or shutdown");
+//        private static bool Handler(CtrlType sig)
+//        {
+//            Console.WriteLine("Exiting system due to external CTRL-C, or process kill, or shutdown");
 
-            //cleanup here
-            KiteChat.MultiDeepMarkovChains.Save();
+//            //cleanup here
+//            KiteChat.MultiDeepMarkovChains.Save();
 
-            Console.WriteLine("Cleanup complete");
+//            Console.WriteLine("Cleanup complete");
 
-            //allow main to run off
-            _exitSystem = false;
+//            //allow main to run off
+//            _exitSystem = false;
 
-            //shutdown right away so there are no lingering threads
-            Environment.Exit(-1);
+//            //shutdown right away so there are no lingering threads
+//            Environment.Exit(-1);
 
-            return true;
-        }
-        #endregion
+//            return true;
+//        }
+//#endregion
 
         public static DiscordClient Client;
-        private static JsonSettings _settings;
+        public static JsonSettings Settings;
         private static KiteChat _kiteChat;
         public static string ContentDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.FullName;
-        private static string SettingsPath => ContentDirectory + "\\Content\\settings.json";
+        private static string SettingsPath => ContentDirectory + "/Content/settings.json";
 
         private static void Main()
         {
-            _handler += Handler;
-            SetConsoleCtrlHandler(_handler, true);
+            //_handler += Handler;
+            //SetConsoleCtrlHandler(_handler, true);
 
             Client = new DiscordClient();
-            _settings = File.Exists(SettingsPath) ? 
+            Settings = File.Exists(SettingsPath) ? 
                 JsonConvert.DeserializeObject<JsonSettings>(File.ReadAllText(SettingsPath)) 
-                : new JsonSettings("email", "password", 
+                : new JsonSettings("email",
+                "password", 
                 "Token", 
                 "GBAPIKey", 
                 true, 2, 60000, 60000);
 
-            _kiteChat = new KiteChat(_settings.MarkovChainStart,
-                _settings.GiantBombApiKey,
-                _settings.GiantBombLiveStreamRefreshRate,
-                _settings.GiantBombVideoRefreshRate, 
-                _settings.MarkovChainDepth);
+            _kiteChat = new KiteChat(Settings.MarkovChainStart,
+                Settings.GiantBombApiKey,
+                Settings.GiantBombLiveStreamRefreshRate,
+                Settings.GiantBombVideoRefreshRate, 
+                Settings.MarkovChainDepth);
+
+            Client.AddService(new ModuleService());
+            Client.UsingCommands(conf =>
+            {
+                conf.AllowMentionPrefix = true;
+                conf.HelpMode = HelpMode.Disabled;
+                conf.PrefixChar = '.';
+            });
+
+            Eval.RegisterEvalCommand(Client);
 
             //Event handlers
             Client.UserIsTyping += async (s, e) => await Task.Run(delegate { _kiteChat.IsRaeTyping(e); });
@@ -87,7 +101,7 @@ namespace KiteBot
                     Console.WriteLine( await _kiteChat.InitializeMarkovChain());
                 }
             };
-
+            
             Client.JoinedServer += (s, e) =>
             {
                 Console.WriteLine("Connected to " + e.Server.Name);
@@ -103,16 +117,16 @@ namespace KiteBot
                         if (Client.State.CompareTo(ConnectionState.Disconnected) == 0)
                         {
                             Console.WriteLine("Connecting...");
-                            if (_settings.DiscordEmail == null || _settings.DiscordPassword != null)
+                            if (Settings.DiscordEmail == null || Settings.DiscordPassword != null)
                             {
-                                await Client.Connect(_settings.DiscordToken);
+                                await Client.Connect(Settings.DiscordToken);
 
                             }
                             else
                             {
-                                await Client.Connect(_settings.DiscordEmail,_settings.DiscordPassword);
+                                await Client.Connect(Settings.DiscordEmail, Settings.DiscordPassword);
                             }
-                            
+
                             Client.SetGame("with Fury v1.1.0");
                             break;
                         }
@@ -121,6 +135,13 @@ namespace KiteBot
                     {
                         Console.WriteLine("Login Failed: " + ex.Message);
                         await Task.Delay(5000);
+                    }
+                    finally
+                    {
+                        if (Client.State.CompareTo(ConnectionState.Connected) == 0)
+                        {
+                            Console.WriteLine("Connected.");
+                        }
                     }
                 }
             });
@@ -137,6 +158,7 @@ namespace KiteBot
             public string DiscordPassword { get; set; }
             public string DiscordToken { get; set; }
             public string GiantBombApiKey { get; set; }
+            public ulong OwnerId { get; private set; }
 
             public bool MarkovChainStart { get; set; }
             public int MarkovChainDepth { get; set; }
@@ -153,6 +175,12 @@ namespace KiteBot
                 MarkovChainDepth = markovChainDepth;
                 GiantBombVideoRefreshRate = videoRefresh;
                 GiantBombLiveStreamRefreshRate = livestreamRefresh;
+                OwnerId = 85817630560108544;
+            }
+
+            internal void setOwner(ulong id)
+            {
+                OwnerId = id;
             }
         }
     }

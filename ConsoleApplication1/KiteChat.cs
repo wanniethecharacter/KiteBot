@@ -30,8 +30,8 @@ namespace KiteBot
         public static MultiTextMarkovChainHelper MultiDeepMarkovChains;
 
         public static string ChatDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.FullName;
-        public static string GreetingFileLocation = ChatDirectory + "\\Content\\Greetings.txt";
-        public static string MealFileLocation = ChatDirectory + "\\Content\\Meals.txt";
+        public static string GreetingFileLocation = ChatDirectory + "/Content/Greetings.txt";
+        public static string MealFileLocation = ChatDirectory + "/Content/Meals.txt";
 
 
         public KiteChat(bool markovbool, string GBapi, int streamRefresh, int videoRefresh, int depth) : this(markovbool, depth,GBapi, streamRefresh, videoRefresh, File.ReadAllLines(GreetingFileLocation), File.ReadAllLines(MealFileLocation), new Random())
@@ -48,7 +48,7 @@ namespace KiteBot
 
             StreamChecker = new LivestreamChecker(GBapi, streamRefresh);
             GbVideoChecker = new GiantBombVideoChecker(GBapi, videoRefresh);
-            if(StartMarkovChain)MultiDeepMarkovChains = new MultiTextMarkovChainHelper(depth);
+            MultiDeepMarkovChains = new MultiTextMarkovChainHelper(depth);
         }
 
         public async Task<bool> InitializeMarkovChain()

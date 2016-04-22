@@ -20,8 +20,8 @@ namespace KiteBot
         private static JsonLastMessage _lastMessage = new JsonLastMessage();
 
         public static string RootDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.FullName;
-        public static string JsonLastMessageLocation => RootDirectory + "\\Content\\LastMessage.json";
-        public static string JsonMessageFileLocation => RootDirectory + "\\Content\\messages.zip";
+        public static string JsonLastMessageLocation => RootDirectory + "/Content/LastMessage.json";
+        public static string JsonMessageFileLocation => RootDirectory + "/Content/messages.zip";
         private static bool _isInitialized;
 
         public MultiTextMarkovChainHelper(int depth) : this(Program.Client, depth)
