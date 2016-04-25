@@ -222,7 +222,7 @@ namespace KiteBot
                     else
                     {
                         await
-                            e.Channel.SendMessage("KiteBot ver. 1.0.1 \"Done. I hate computers.\"");
+                            e.Channel.SendMessage("KiteBot ver. 1.1.2 \"Now with real dairy.\"");
                     }
                 }
             }

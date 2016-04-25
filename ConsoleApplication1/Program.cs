@@ -76,15 +76,15 @@ namespace KiteBot
                 Settings.GiantBombVideoRefreshRate, 
                 Settings.MarkovChainDepth);
 
-            Client.AddService(new ModuleService());
-            Client.UsingCommands(conf =>
-            {
-                conf.AllowMentionPrefix = true;
-                conf.HelpMode = HelpMode.Disabled;
-                conf.PrefixChar = '.';
-            });
+            //Client.AddService(new ModuleService());
+            //Client.UsingCommands(conf =>
+            //{
+            //    conf.AllowMentionPrefix = true;
+            //    conf.HelpMode = HelpMode.Disabled;
+            //    conf.PrefixChar = '.';
+            //});
 
-            Eval.RegisterEvalCommand(Client);
+            //Eval.RegisterEvalCommand(Client);
 
             //Event handlers
             Client.UserIsTyping += async (s, e) => await Task.Run(delegate { _kiteChat.IsRaeTyping(e); });
