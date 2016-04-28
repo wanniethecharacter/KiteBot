@@ -8,6 +8,7 @@ namespace KiteBot
     public class LivestreamChecker
 	{
 		public static string ApiCallUrl;
+        public static int RefreshRate;
 		private static Timer _chatTimer;//Garbage collection doesnt like local variables that only fire a couple times per hour
 		private XElement _latestXElement;
 		private bool isStreamRunning;
@@ -20,6 +21,7 @@ namespace KiteBot
         public LivestreamChecker(string GBapi,int videoRefresh)
         {
             ApiCallUrl = "http://www.giantbomb.com/api/chats/?api_key=" + GBapi;
+            RefreshRate = videoRefresh;
             _chatTimer = new Timer();
             _chatTimer.Elapsed += RefreshChatsApi;
             _chatTimer.Interval = videoRefresh;
@@ -61,7 +63,7 @@ namespace KiteBot
 		private XElement GetXDocumentFromUrl(string url)
 		{
             WebClient client = new WebClient();
-            client.Headers.Add("user-agent", "LassieMEKiteBot/0.9 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+            client.Headers.Add("user-agent", $"KiteBot/1.1, Discord Bot for the GiantBomb EvE online \"corp\" looking for livestreams. GETs endpoint every {RefreshRate / 1000} seconds.");
             XDocument document = XDocument.Load(client.OpenRead(url));
 			return document.XPathSelectElement(@"//response");
 		}

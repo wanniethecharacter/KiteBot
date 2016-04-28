@@ -68,6 +68,7 @@ namespace KiteBot
                 "password", 
                 "Token", 
                 "GBAPIKey", 
+                0,
                 true, 2, 60000, 60000);
 
             _kiteChat = new KiteChat(Settings.MarkovChainStart,
@@ -76,15 +77,15 @@ namespace KiteBot
                 Settings.GiantBombVideoRefreshRate, 
                 Settings.MarkovChainDepth);
 
-            //Client.AddService(new ModuleService());
-            //Client.UsingCommands(conf =>
-            //{
-            //    conf.AllowMentionPrefix = true;
-            //    conf.HelpMode = HelpMode.Disabled;
-            //    conf.PrefixChar = '.';
-            //});
+            Client.AddService(new ModuleService());
+            Client.UsingCommands(conf =>
+            {
+                conf.AllowMentionPrefix = true;
+                conf.HelpMode = HelpMode.Disabled;
+                conf.PrefixChar = '-';
+            });
 
-            //Eval.RegisterEvalCommand(Client);
+            Eval.RegisterEvalCommand(Client);
 
             //Event handlers
             Client.UserIsTyping += async (s, e) => await Task.Run(delegate { _kiteChat.IsRaeTyping(e); });
@@ -158,14 +159,14 @@ namespace KiteBot
             public string DiscordPassword { get; set; }
             public string DiscordToken { get; set; }
             public string GiantBombApiKey { get; set; }
-            public ulong OwnerId { get; private set; }
+            public ulong OwnerId { get; set; }
 
             public bool MarkovChainStart { get; set; }
             public int MarkovChainDepth { get; set; }
             public int GiantBombVideoRefreshRate { get; set; }
             public int GiantBombLiveStreamRefreshRate { get; set; }
 
-            public JsonSettings(string email, string password, string token, string gbApi, bool markovChainStart,int markovChainDepth, int videoRefresh, int livestreamRefresh)
+            public JsonSettings(string email, string password, string token, string gbApi, ulong ownerID, bool markovChainStart,int markovChainDepth, int videoRefresh, int livestreamRefresh)
             {
                 DiscordEmail = email;
                 DiscordPassword = password;
@@ -175,12 +176,7 @@ namespace KiteBot
                 MarkovChainDepth = markovChainDepth;
                 GiantBombVideoRefreshRate = videoRefresh;
                 GiantBombLiveStreamRefreshRate = livestreamRefresh;
-                OwnerId = 85817630560108544;
-            }
-
-            internal void setOwner(ulong id)
-            {
-                OwnerId = id;
+                OwnerId = ownerID;
             }
         }
     }

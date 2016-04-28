@@ -192,7 +192,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnimeResult.cs" />
-    <Compile Include="Commands\Class1.cs" />
+    <Compile Include="Commands\Eval.cs" />
     <Compile Include="GiantBombVideoChecker.cs" />
     <Compile Include="MultiDeepMarkovChainHelper.cs" />
     <Compile Include="RandomHandler.cs" />
@@ -209,6 +209,7 @@
     <Compile Include="KiteDunk.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reminder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -56,7 +56,6 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Newtonsoft.Json;
-using MechHisui.FateGOLib;
 namespace DynamicCompile
 {{
     public class DynEval
@@ -90,7 +89,6 @@ namespace DynamicCompile
                                 null,
                                 obj,
                                 new object[2] { client, cea });
-
                             await cea.Channel.SendMessage($"**Result:** {((Task<string>)res).GetAwaiter().GetResult()}");
                         }
                         else

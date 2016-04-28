@@ -98,6 +98,11 @@ namespace KiteBot
                     await e.Channel.SendMessage(DiceRoller.ParseRoll(e.Message.Text));
                 }
 
+                else if (e.Message.Text.StartsWith("!Reminder"))
+                {
+                    await e.Channel.SendMessage(Reminder.AddNewEvent(e.Message));
+                }
+
                 else if (e.Message.Text.Contains("GetDunked"))
                 {
                     await e.Channel.SendMessage("http://i.imgur.com/QhcNUWo.gifv");
@@ -114,7 +119,8 @@ namespace KiteBot
                     await e.Channel.SendMessage("Done.");
                     Environment.Exit(1);
                 }
-                else if ((e.Message.Text.Contains(@"/testMarkov") || e.Message.Text.StartsWith(@"@KiteBot /tm")) && StartMarkovChain)
+                else if ((e.Message.Text.Contains(@"/testMarkov") || e.Message.Text.StartsWith(@"@KiteBot /tm")) &&
+                         StartMarkovChain)
                 {
                     try
                     {

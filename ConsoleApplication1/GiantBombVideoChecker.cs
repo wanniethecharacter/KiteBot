@@ -13,6 +13,7 @@ namespace KiteBot
     public class GiantBombVideoChecker
 	{
 		public static string ApiCallUrl;
+        public static int RefreshRate;
 		private static Timer _chatTimer;//Garbage collection doesnt like local variables that only fire a couple times per hour.
 		//private XElement _latestXElement; Dont Need this anymore I think.
         private DateTime lastPublishTime;
@@ -21,6 +22,7 @@ namespace KiteBot
         public GiantBombVideoChecker(string GBapi,int streamRefresh)
         {
             ApiCallUrl = $"http://www.giantbomb.com/api/promos/?api_key={GBapi}&field_list=name,deck,date_added,link,user";
+            RefreshRate = streamRefresh;
             _chatTimer = new Timer();
             _chatTimer.Elapsed += RefreshVideosApi;
             _chatTimer.Interval = streamRefresh;
@@ -35,14 +37,14 @@ namespace KiteBot
 
 		private async Task RefreshVideosApi()
 		{
-            var _latestXElement = GetXDocumentFromUrl(ApiCallUrl);
-            IEnumerable<XElement> promos = _latestXElement?.Element("results")?.Elements("promo");
+            var latestXElement = GetXDocumentFromUrl(ApiCallUrl);
+            IEnumerable<XElement> promos = latestXElement?.Element("results")?.Elements("promo");
 
-            IOrderedEnumerable<XElement> sortedXElements = promos.OrderByDescending(e => GetGiantBombFormatDateTime(e.Element("date_added")?.Value));
+            IOrderedEnumerable<XElement> sortedXElements = promos.OrderBy(e => GetGiantBombFormatDateTime(e.Element("date_added")?.Value));
 
 		    if (firstTime)
 		    {
-		        lastPublishTime = GetGiantBombFormatDateTime(sortedXElements.First().Element("date_added")?.Value);
+		        lastPublishTime = GetGiantBombFormatDateTime(sortedXElements.Last().Element("date_added")?.Value);
 		        firstTime = false;
 		    }
 		    else
@@ -84,7 +86,7 @@ namespace KiteBot
 		    try
 		    {
                 WebClient client = new WebClient();
-                client.Headers.Add("user-agent", "LassieMEKiteBot/0.9 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+                client.Headers.Add("user-agent", $"KiteBot/1.1, Discord Bot for the GiantBomb EvE online \"corp\" looking for new videos, articles and podcasts. GETs endpoint every {RefreshRate/1000} seconds. <3 u edgework");
                 XDocument document = XDocument.Load(client.OpenRead(url));
 		        return document.XPathSelectElement(@"//response");
 		    }
