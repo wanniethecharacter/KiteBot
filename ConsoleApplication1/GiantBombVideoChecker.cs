@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Timer = System.Timers.Timer;
 
 namespace KiteBot
 {
@@ -90,9 +92,11 @@ namespace KiteBot
                 XDocument document = XDocument.Load(client.OpenRead(url));
 		        return document.XPathSelectElement(@"//response");
 		    }
-		    catch (Exception)
+		    catch (Exception ex)
 		    {
-		        return GetXDocumentFromUrl(url);
+                Console.WriteLine(ex.Message);
+                Thread.Sleep(10000);
+                return GetXDocumentFromUrl(url);
 		    }
         }
 	}

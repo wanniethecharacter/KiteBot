@@ -92,7 +92,16 @@ namespace KiteBot
 
             Client.MessageReceived += async (s, e) =>
             {
-                await _kiteChat.AsyncParseChat(s, e, Client);
+                try
+                {
+                    await _kiteChat.AsyncParseChat(s, e, Client);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    Console.WriteLine(ex);
+                    Environment.Exit(-1);
+                }
             }; 
 
             Client.ServerAvailable += async (s, e) =>

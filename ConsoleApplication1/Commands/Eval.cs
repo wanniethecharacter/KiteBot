@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
+using Discord.Modules;
 using Discord.Commands;
 using Newtonsoft.Json;
 using Microsoft.CodeAnalysis;
@@ -28,7 +29,7 @@ namespace KiteBot.Commands
                 //MetadataReference.CreateFromFile(typeof(DateTimeWithZone).Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(JsonConvert).Assembly.Location)
             };
-            client.GetService<CommandService>().CreateCommand("eval")
+            client.Services.Get<CommandService>().CreateCommand("eval")
                 .Parameter("func", ParameterType.Unparsed)
                 .Hide()
                 .AddCheck((c, u, ch) => u.Id == Program.Settings.OwnerId)

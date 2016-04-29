@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -37,11 +38,11 @@ namespace KiteBot
         public static string WhoIsLocation = ChatDirectory + "/Content/Whois.json";
 
 
-        public KiteChat(bool markovbool, string GBapi, int streamRefresh, int videoRefresh, int depth) : this(markovbool, depth,GBapi, streamRefresh, videoRefresh, File.ReadAllLines(GreetingFileLocation), File.ReadAllLines(MealFileLocation), new Random())
+        public KiteChat(bool markovbool, string gBapi, int streamRefresh, int videoRefresh, int depth) : this(markovbool, depth,gBapi, streamRefresh, videoRefresh, File.ReadAllLines(GreetingFileLocation), File.ReadAllLines(MealFileLocation), new Random())
         {
         }
 
-        public KiteChat(bool markovbool, int depth, string GBapi,int streamRefresh, int videoRefresh, string[] arrayOfGreetings, string[] arrayOfMeals, Random randomSeed)
+        public KiteChat(bool markovbool, int depth, string gBapi,int streamRefresh, int videoRefresh, string[] arrayOfGreetings, string[] arrayOfMeals, Random randomSeed)
         {
             StartMarkovChain = markovbool;
             _greetings = arrayOfGreetings;
@@ -49,8 +50,8 @@ namespace KiteBot
             RandomSeed = randomSeed;
             RaeCounter = 0;
 
-            StreamChecker = new LivestreamChecker(GBapi, streamRefresh);
-            GbVideoChecker = new GiantBombVideoChecker(GBapi, videoRefresh);
+            StreamChecker = new LivestreamChecker(gBapi, streamRefresh);
+            GbVideoChecker = new GiantBombVideoChecker(gBapi, videoRefresh);
             MultiDeepMarkovChains = new MultiTextMarkovChainHelper(depth);
             WhoIsDictionary = File.Exists(WhoIsLocation)
                 ? JsonConvert.DeserializeObject<Dictionary<ulong, WhoIsPerson>>(File.ReadAllText(WhoIsLocation))
@@ -104,9 +105,18 @@ namespace KiteBot
                     await e.Channel.SendMessage(DiceRoller.ParseRoll(e.Message.Text));
                 }
 
-                else if (e.Message.Text.StartsWith("!Reminder"))
+                else if (e.Message.Text.ToLower().StartsWith("!reminder"))
                 {
                     await e.Channel.SendMessage(Reminder.AddNewEvent(e.Message));
+                }
+
+                else if(e.Message.Text.ToLower().StartsWith("!whois"))
+                {
+                    var userMentioned = e.Message.MentionedUsers.FirstOrDefault(x => x.Id != Program.Client.CurrentUser.Id);
+                    if (userMentioned != null)
+                    {
+                        await e.Channel.SendMessage($"Former names for {userMentioned.Name} are: {EnumWhoIs(userMentioned.Id)}.".Replace(",.","."));
+                    }
                 }
 
                 else if (e.Message.Text.Contains("GetDunked"))
@@ -197,11 +207,13 @@ namespace KiteBot
                     else if (0 <= e.Message.Text.ToLower().IndexOf("fuck you", 0) ||
                              0 <= e.Message.Text.ToLower().IndexOf("fuckyou", 0))
                     {
-                        List<string> _possibleResponses = new List<string>();
-                        _possibleResponses.Add("Hey fuck you too USER!");
-                        _possibleResponses.Add("I bet you'd like that wouldn't you USER?");
-                        _possibleResponses.Add("No, fuck you USER!");
-                        _possibleResponses.Add("Fuck you too USER!");
+                        List<string> _possibleResponses = new List<string>
+                        {
+                            "Hey fuck you too USER!",
+                            "I bet you'd like that wouldn't you USER?",
+                            "No, fuck you USER!",
+                            "Fuck you too USER!"
+                        };
 
                         await
                             e.Channel.SendMessage(
@@ -358,6 +370,22 @@ namespace KiteBot
                 });
             }
             File.WriteAllText(WhoIsLocation,JsonConvert.SerializeObject(WhoIsDictionary));
+        }
+
+        public string EnumWhoIs(ulong id)
+        {
+            WhoIsPerson person;
+            if (WhoIsDictionary.TryGetValue(id, out person))
+            {
+                var output = "";
+                var list = person.OldNames;
+                foreach (var name in list)
+                {
+                    output += $"{name},";
+                }
+                return output;
+            }
+            return "No former names found,";
         }
 
         public class WhoIsPerson

@@ -32,21 +32,24 @@ namespace KiteBot
         {
             _client = client;
             Depth = depth;
-            if (depth == 1)
+            switch (depth)
             {
-                _markovChain = new TextMarkovChain();
-            }
-            else if (depth == 2)
-            {
-                _markovChain = new DeepMarkovChain();
-            }
-            else if (depth < 2)
-            {
-                _markovChain = new MultiDeepMarkovChain(Depth);
-            }
-            else
-            {
-                _markovChain = new TextMarkovChain();
+                case 1:
+                    _markovChain = new TextMarkovChain();
+                    break;
+                case 2:
+                    _markovChain = new DeepMarkovChain();
+                    break;
+                default:
+                    if (depth < 2)
+                    {
+                        _markovChain = new MultiDeepMarkovChain(Depth);
+                    }
+                    else
+                    {
+                        _markovChain = new TextMarkovChain();
+                    }
+                    break;
             }
         }
 
@@ -84,9 +87,9 @@ namespace KiteBot
                 }
                 else
                 {
-                    List<Message> list = await GetMessagesFromChannel(_client.GetChannel(85842104034541568), 40000);
-                    list.AddRange(await GetMessagesFromChannel(_client.GetChannel(96786127238725632), 10000));
-                    list.AddRange(await GetMessagesFromChannel(_client.GetChannel(94122326802571264), 10000));
+                    List<Message> list = await GetMessagesFromChannel(_client.GetChannel(85842104034541568), 10000);
+                    list.AddRange(await GetMessagesFromChannel(_client.GetChannel(96786127238725632), 5000));
+                    list.AddRange(await GetMessagesFromChannel(_client.GetChannel(94122326802571264), 5000));
                     foreach (Message message in list)
                     {
                         if (message != null && !message.Text.Equals(""))
@@ -205,8 +208,8 @@ namespace KiteBot
                     ChannelId = message.Channel.Id
                 };
 
-                var lastmessageJSON = JsonConvert.SerializeObject(x, Formatting.Indented);
-                File.WriteAllText(JsonLastMessageLocation, lastmessageJSON);
+                var lastmessageJson = JsonConvert.SerializeObject(x, Formatting.Indented);
+                File.WriteAllText(JsonLastMessageLocation, lastmessageJson);
             }
         }
 
