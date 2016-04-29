@@ -121,7 +121,7 @@ namespace KiteBot
 
                 else if (e.Message.Text.Contains("GetDunked"))
                 {
-                    await e.Channel.SendMessage("http://i.imgur.com/QhcNUWo.gifv");
+                    await e.Channel.SendMessage("http://i.imgur.com/QhcNUWo.gif");
                 }
 
                 else if (e.Message.Text.Contains(@"/saveJSON") && e.User.Id == 85817630560108544 && StartMarkovChain)
