@@ -5,7 +5,7 @@
 ####Set Up Guide
 1. Clone or download repositor to local machine
 2. Open the KiteBot.sln with visual studio
-3. Get dependanies. 
+3. Get dependencies. 
   a. Use nuget to install Discord.NET, Discord.NET.Commands, and Discord.NET.Modules. Note that all of these are pre release check search release
   b. Get TextMarkovChains. Either go to https://github.com/LassieME/MarkovChainSentenceGenerator and download and compile or go to https://github.com/LassieME/MarkovChainSentenceGenerator/releases/tag/0.1 and extract.
   
@@ -26,5 +26,5 @@
 4. Go to https://discordapp.com/developers/docs/intro and create a bot account
 5. Go to Giantbomb.com and create an account.
 6. Fill in DiscordToken, GiantBombApiKey, OwnerID (this is your discord account not the bot)
-7. Invite Bot to sever with https://discordapp.com/oauth2/authorize?&client_id=175710238161240064&scope=bot
+7. Invite Bot to sever with https://discordapp.com/oauth2/authorize?&client_id=YOUR_BOT_ID_HERE&scope=bot
 8. Complile and run
