@@ -102,6 +102,15 @@
       <HintPath>..\packages\Common.Logging.2.1.2\lib\net40\Common.Logging.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Discord.Net">
+      <HintPath>..\..\Discord.Net\artifacts\bin\Discord.Net\Release\net45\Discord.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="Discord.Net.Commands">
+      <HintPath>..\..\Discord.Net\artifacts\bin\Discord.Net.Commands\Release\net45\Discord.Net.Commands.dll</HintPath>
+    </Reference>
+    <Reference Include="Discord.Net.Modules">
+      <HintPath>..\..\Discord.Net\artifacts\bin\Discord.Net.Modules\Release\net45\Discord.Net.Modules.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CodeAnalysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\ScriptCs.Engine.Roslyn.0.16.1\lib\net45\Microsoft.CodeAnalysis.dll</HintPath>
       <Private>True</Private>
@@ -158,18 +167,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="TextMarkovChains">
       <HintPath>..\..\MarkovChainSentenceGenerator\TextMarkovChains\bin\Release\TextMarkovChains.dll</HintPath>
-    </Reference>
-    <Reference Include="Discord.Net">
-      <HintPath>..\..\Discord.Net2\artifacts\bin\Discord.Net\Release\net45\Discord.Net.dll</HintPath>
-    </Reference>
-    <Reference Include="Discord.Net.Audio">
-      <HintPath>..\..\Discord.Net2\artifacts\bin\Discord.Net.Audio\Release\net45\Discord.Net.Audio.dll</HintPath>
-    </Reference>
-    <Reference Include="Discord.Net.Commands">
-      <HintPath>..\..\Discord.Net2\artifacts\bin\Discord.Net.Commands\Release\net45\Discord.Net.Commands.dll</HintPath>
-    </Reference>
-    <Reference Include="Discord.Net.Modules">
-      <HintPath>..\..\Discord.Net2\artifacts\bin\Discord.Net.Modules\Release\net45\Discord.Net.Modules.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>

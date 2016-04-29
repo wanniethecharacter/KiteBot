@@ -5,6 +5,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
+using Newtonsoft.Json;
 
 namespace KiteBot
 {
@@ -28,10 +29,12 @@ namespace KiteBot
         public static LivestreamChecker StreamChecker;
         public static GiantBombVideoChecker GbVideoChecker;
         public static MultiTextMarkovChainHelper MultiDeepMarkovChains;
+        public static Dictionary<ulong,WhoIsPerson> WhoIsDictionary; 
 
         public static string ChatDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.FullName;
         public static string GreetingFileLocation = ChatDirectory + "/Content/Greetings.txt";
         public static string MealFileLocation = ChatDirectory + "/Content/Meals.txt";
+        public static string WhoIsLocation = ChatDirectory + "/Content/Whois.json";
 
 
         public KiteChat(bool markovbool, string GBapi, int streamRefresh, int videoRefresh, int depth) : this(markovbool, depth,GBapi, streamRefresh, videoRefresh, File.ReadAllLines(GreetingFileLocation), File.ReadAllLines(MealFileLocation), new Random())
@@ -49,6 +52,9 @@ namespace KiteBot
             StreamChecker = new LivestreamChecker(GBapi, streamRefresh);
             GbVideoChecker = new GiantBombVideoChecker(GBapi, videoRefresh);
             MultiDeepMarkovChains = new MultiTextMarkovChainHelper(depth);
+            WhoIsDictionary = File.Exists(WhoIsLocation)
+                ? JsonConvert.DeserializeObject<Dictionary<ulong, WhoIsPerson>>(File.ReadAllText(WhoIsLocation))
+                : new Dictionary<ulong, WhoIsPerson>();
         }
 
         public async Task<bool> InitializeMarkovChain()
@@ -334,6 +340,30 @@ namespace KiteBot
             {
                 RaeCounter += 1;
             }
+        }
+
+        public void AddWhoIs(UserUpdatedEventArgs e)
+        {
+            if (WhoIsDictionary.ContainsKey(e.After.Id))
+            {
+                WhoIsDictionary[e.Before.Id].OldNames.Add(e.After.Name);
+            }
+            else
+            {
+                string[] names = {e.Before.Name,e.After.Name};
+                WhoIsDictionary.Add(e.Before.Id, new WhoIsPerson
+                {
+                    UserId = e.Before.Id,
+                    OldNames = new List<string>(names)
+                });
+            }
+            File.WriteAllText(WhoIsLocation,JsonConvert.SerializeObject(WhoIsDictionary));
+        }
+
+        public class WhoIsPerson
+        {
+            public ulong UserId { get; set; }
+            public List<string> OldNames { get; set; }
         }
     }
 }
