@@ -108,6 +108,15 @@ namespace KiteBot
                 Console.WriteLine("Connected to " + e.Server.Name);
             };
 
+            Client.UserUpdated += async (s, e) =>
+            {
+                if (!e.Before.Name.Equals(e.After.Name))
+                {
+                    await Client.GetChannel(85842104034541568).SendMessage($"{e.Before.Name} changed his name to {e.After.Name}.");
+                    _kiteChat.AddWhoIs(e);
+                }
+            };
+
             //Convert our sync method to an async one and block the Main function until the bot disconnects
             Client.ExecuteAndWait(async () =>
             {
@@ -166,7 +175,7 @@ namespace KiteBot
             public int GiantBombVideoRefreshRate { get; set; }
             public int GiantBombLiveStreamRefreshRate { get; set; }
 
-            public JsonSettings(string email, string password, string token, string gbApi, ulong ownerID, bool markovChainStart,int markovChainDepth, int videoRefresh, int livestreamRefresh)
+            public JsonSettings(string email, string password, string token, string gbApi, ulong ownerId, bool markovChainStart,int markovChainDepth, int videoRefresh, int livestreamRefresh)
             {
                 DiscordEmail = email;
                 DiscordPassword = password;
@@ -176,7 +185,7 @@ namespace KiteBot
                 MarkovChainDepth = markovChainDepth;
                 GiantBombVideoRefreshRate = videoRefresh;
                 GiantBombLiveStreamRefreshRate = livestreamRefresh;
-                OwnerId = ownerID;
+                OwnerId = ownerId;
             }
         }
     }
