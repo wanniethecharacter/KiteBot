@@ -98,18 +98,27 @@
     <StartupObject>KiteBot.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Common.Logging, Version=2.1.2.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Common.Logging.2.1.2\lib\net40\Common.Logging.dll</HintPath>
+    <Reference Include="Common.Logging, Version=3.3.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.3.3.1\lib\net40\Common.Logging.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Discord.Net">
-      <HintPath>..\..\Discord.Net\artifacts\bin\Discord.Net\Release\net45\Discord.Net.dll</HintPath>
+    <Reference Include="Common.Logging.Core, Version=3.3.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.Core.3.3.1\lib\net40\Common.Logging.Core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Discord.Net.Commands">
-      <HintPath>..\..\Discord.Net\artifacts\bin\Discord.Net.Commands\Release\net45\Discord.Net.Commands.dll</HintPath>
+    <Reference Include="Discord.Net, Version=0.9.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Discord.Net2\src\Discord.Net.Net45\bin\Debug\Discord.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="Discord.Net.Audio">
+      <HintPath>..\..\Discord.Net2\src\Discord.Net.Audio.Net45\bin\Debug\Discord.Net.Audio.dll</HintPath>
+    </Reference>
+    <Reference Include="Discord.Net.Commands, Version=0.9.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Discord.Net2\src\Discord.Net.Commands.Net45\bin\Debug\Discord.Net.Commands.dll</HintPath>
     </Reference>
     <Reference Include="Discord.Net.Modules">
-      <HintPath>..\..\Discord.Net\artifacts\bin\Discord.Net.Modules\Release\net45\Discord.Net.Modules.dll</HintPath>
+      <HintPath>..\..\Discord.Net2\src\Discord.Net.Modules.Net45\bin\Debug\Discord.Net.Modules.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CodeAnalysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\ScriptCs.Engine.Roslyn.0.16.1\lib\net45\Microsoft.CodeAnalysis.dll</HintPath>
@@ -209,6 +218,7 @@
     <Compile Include="Reminder.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

@@ -124,6 +124,11 @@ namespace KiteBot
                     await Client.GetChannel(85842104034541568).SendMessage($"{e.Before.Name} changed his name to {e.After.Name}.");
                     _kiteChat.AddWhoIs(e);
                 }
+                else if (!e.Before.Nickname.Equals(e.After.Nickname))
+                {
+                    await Client.GetChannel(85842104034541568).SendMessage($"{e.Before.Name} changed his nickname to {e.After.Name}.");
+                    _kiteChat.AddWhoIs(e);
+                }
             };
 
             //Convert our sync method to an async one and block the Main function until the bot disconnects

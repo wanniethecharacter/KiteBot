@@ -13,11 +13,6 @@ namespace KiteBot
 		private XElement _latestXElement;
 		private bool isStreamRunning;
 
-        public LivestreamChecker()
-		{
-			
-		}
-
         public LivestreamChecker(string GBapi,int videoRefresh)
         {
             ApiCallUrl = "http://www.giantbomb.com/api/chats/?api_key=" + GBapi;
