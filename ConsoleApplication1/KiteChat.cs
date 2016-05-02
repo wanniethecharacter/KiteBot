@@ -158,11 +158,11 @@ namespace KiteBot
                 {
                     if (e.Message.Text.StartsWith("@KiteBot #420") ||
                         e.Message.Text.ToLower().StartsWith("@KiteBot #blaze") ||
-                        0 <= e.Message.Text.ToLower().IndexOf("waifu", 0))
+                        e.Message.Text.ToLower().Contains("waifu"))
                     {
                         await e.Channel.SendMessage("http://420.moe/");
                     }
-                    else if (0 <= e.Message.Text.ToLower().IndexOf("help", 5))
+                    else if (e.Message.Text.ToLower().Contains("help"))
                     {
                         var nl = Environment.NewLine;
                         await e.Channel.SendMessage("Current Commands are:" + nl + "#420"
@@ -172,22 +172,22 @@ namespace KiteBot
                                                     "RaeCounter"
                                                     + nl + "help");
                     }
-                    else if (0 <= e.Message.Text.ToLower().IndexOf("randomql", 5))
+                    else if (e.Message.Text.ToLower().Contains("randomql"))
                     {
                         await
                             e.Channel.SendMessage(GetResponseUriFromRandomQlCrew());
                     }
-                    else if (0 <= e.Message.Text.ToLower().IndexOf("raecounter", 0))
+                    else if (e.Message.Text.ToLower().Contains("raecounter"))
                     {
                         await e.Channel.SendMessage(@"Rae has ghost-typed " + RaeCounter);
                     }
-                    else if (0 <= e.Message.Text.ToLower().IndexOf("google", 0))
+                    else if (e.Message.Text.ToLower().Contains("google"))
                     {
                         await
                             e.Channel.SendMessage("http://lmgtfy.com/?q=" +
                                                   e.Message.Text.ToLower().Substring(16).Replace(' ', '+'));
                     }
-                    else if (0 <= e.Message.Text.ToLower().IndexOf("youtube", 0))
+                    else if (e.Message.Text.ToLower().Contains("youtube"))
                     {
                         if (e.Message.Text.Length > 16)
                         {
@@ -200,14 +200,14 @@ namespace KiteBot
                         }
                     }
 
-                    else if (0 <= e.Message.Text.ToLower().IndexOf("dunk", 0))
+                    else if (e.Message.Text.ToLower().Contains("dunk"))
                     {
                         await e.Channel.SendMessage(KiteDunk.GetUpdatedKiteDunk());
                     }
-                    else if (0 <= e.Message.Text.ToLower().IndexOf("fuck you", 0) ||
-                             0 <= e.Message.Text.ToLower().IndexOf("fuckyou", 0))
+                    else if (e.Message.Text.ToLower().Contains("fuck you") ||
+                             e.Message.Text.ToLower().Contains("fuckyou"))
                     {
-                        List<string> _possibleResponses = new List<string>
+                        List<string> possibleResponses = new List<string>
                         {
                             "Hey fuck you too USER!",
                             "I bet you'd like that wouldn't you USER?",
@@ -217,26 +217,26 @@ namespace KiteBot
 
                         await
                             e.Channel.SendMessage(
-                                _possibleResponses[RandomSeed.Next(0, _possibleResponses.Count)].Replace("USER",
+                                possibleResponses[RandomSeed.Next(0, possibleResponses.Count)].Replace("USER",
                                     e.User.Name));
                     }
-                    else if (0 <= e.Message.Text.ToLower().IndexOf("/pizza", 0))
+                    else if (0 <= e.Message.Text.ToLower().IndexOf("/pizza", 0, StringComparison.Ordinal))
                     {
                         await e.Channel.SendMessage(KitePizza.ParsePizza(e.User.Name, e.Message.Text));
                     }
-                    else if (0 <= e.Message.Text.ToLower().IndexOf("sandwich", 0))
+                    else if (e.Message.Text.ToLower().Contains("sandwich"))
                     {
                         await e.Channel.SendMessage(KiteSandwich.ParseSandwich(e.User.Name));
                     }
-                    else if (0 <= e.Message.Text.ToLower().IndexOf("hi", 0) ||
-                             0 <= e.Message.Text.ToLower().IndexOf("hey", 0) ||
-                             0 <= e.Message.Text.ToLower().IndexOf("hello", 0))
+                    else if (e.Message.Text.ToLower().Contains("hi") ||
+                             e.Message.Text.ToLower().Contains("hey") ||
+                             e.Message.Text.ToLower().Contains("hello"))
                     {
                         await e.Channel.SendMessage(ParseGreeting(e.User.Name));
                     }
-                    else if (0 <= e.Message.Text.ToLower().IndexOf("/meal", 0) ||
-                             0 <= e.Message.Text.ToLower().IndexOf("dinner", 0)
-                             || 0 <= e.Message.Text.ToLower().IndexOf("lunch", 0))
+                    else if (0 <= e.Message.Text.ToLower().IndexOf("/meal", 0, StringComparison.Ordinal) ||
+                             e.Message.Text.ToLower().Contains("dinner")
+                             || e.Message.Text.ToLower().Contains("lunch"))
                     {
                         await
                             e.Channel.SendMessage(
@@ -261,9 +261,13 @@ namespace KiteBot
 		    client..OpenRead(url);*/
 
 		    HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
-            request.UserAgent = "LassieMEKiteBot/0.9 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)";
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-			return response.ResponseUri.AbsoluteUri;
+            if (request != null)
+            {
+                request.UserAgent = "LassieMEKiteBot/0.9 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)";
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                return response.ResponseUri.AbsoluteUri;
+            }
+            return "Couldn't load qlcrew's Random Link.";
 		}
         
         //returns a greeting from the greetings.txt list on a per user or generic basis
@@ -273,33 +277,29 @@ namespace KiteBot
 		    {
 			    return (_bekGreetings[RandomSeed.Next(0, _bekGreetings.Length)]);
 		    }
-			else
-			{
-				List<string> _possibleResponses = new List<string>();
+	        List<string> possibleResponses = new List<string>();
 
-				for (int i = 0; i < _greetings.Length - 2; i += 2)
-				{
-					if (userName.ToLower().Contains(_greetings[i]))
-					{
-						_possibleResponses.Add(_greetings[i + 1]);
-					}
-				}
+	        for (int i = 0; i < _greetings.Length - 2; i += 2)
+	        {
+	            if (userName.ToLower().Contains(_greetings[i]))
+	            {
+	                possibleResponses.Add(_greetings[i + 1]);
+	            }
+	        }
 
-                if (_possibleResponses.Count == 0)
-                {
-                    for (int i = 0; i < _greetings.Length - 2; i += 2)
-                    {
-                        if (_greetings[i] == "generic")
-                        {
-                            _possibleResponses.Add(_greetings[i + 1]);
-                        }
-                    }
-                }
+	        if (possibleResponses.Count == 0)
+	        {
+	            for (int i = 0; i < _greetings.Length - 2; i += 2)
+	            {
+	                if (_greetings[i] == "generic")
+	                {
+	                    possibleResponses.Add(_greetings[i + 1]);
+	                }
+	            }
+	        }
 
-				//return a random response from the context provided, replacing the string "USER" with the appropriate username
-				return (_possibleResponses[RandomSeed.Next(0, _possibleResponses.Count)].Replace("USER", userName));
-		    }
-		    
+	        //return a random response from the context provided, replacing the string "USER" with the appropriate username
+	        return (possibleResponses[RandomSeed.Next(0, possibleResponses.Count)].Replace("USER", userName));
         }
 
         //grabs random greetings for user bekenel from a reddit profile

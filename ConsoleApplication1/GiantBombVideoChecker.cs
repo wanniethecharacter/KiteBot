@@ -21,15 +21,19 @@ namespace KiteBot
         private DateTime lastPublishTime;
         private bool firstTime = true;
 
-        public GiantBombVideoChecker(string GBapi,int streamRefresh)
+        public GiantBombVideoChecker(string GBapi,int videoRefresh)
         {
-            ApiCallUrl = $"http://www.giantbomb.com/api/promos/?api_key={GBapi}&field_list=name,deck,date_added,link,user";
-            RefreshRate = streamRefresh;
-            _chatTimer = new Timer();
-            _chatTimer.Elapsed += RefreshVideosApi;
-            _chatTimer.Interval = streamRefresh;
-            _chatTimer.AutoReset = true;
-            _chatTimer.Enabled = true;
+            if (GBapi.Length > 0 && videoRefresh > 3000)
+            {
+                ApiCallUrl =
+                    $"http://www.giantbomb.com/api/promos/?api_key={GBapi}&field_list=name,deck,date_added,link,user";
+                RefreshRate = videoRefresh;
+                _chatTimer = new Timer();
+                _chatTimer.Elapsed += RefreshVideosApi;
+                _chatTimer.Interval = videoRefresh;
+                _chatTimer.AutoReset = true;
+                _chatTimer.Enabled = true;
+            }
         }
 
         private async void RefreshVideosApi(object sender, ElapsedEventArgs elapsedEventArgs)

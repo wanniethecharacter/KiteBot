@@ -11,17 +11,20 @@ namespace KiteBot
         public static int RefreshRate;
 		private static Timer _chatTimer;//Garbage collection doesnt like local variables that only fire a couple times per hour
 		private XElement _latestXElement;
-		private bool isStreamRunning;
+		private static bool _isStreamRunning;
 
-        public LivestreamChecker(string GBapi,int videoRefresh)
+        public LivestreamChecker(string GBapi,int streamRefresh)
         {
-            ApiCallUrl = "http://www.giantbomb.com/api/chats/?api_key=" + GBapi;
-            RefreshRate = videoRefresh;
-            _chatTimer = new Timer();
-            _chatTimer.Elapsed += RefreshChatsApi;
-            _chatTimer.Interval = videoRefresh;
-            _chatTimer.AutoReset = true;
-            _chatTimer.Enabled = true;
+            if (GBapi.Length > 0 && streamRefresh > 3000)
+            {
+                ApiCallUrl = "http://www.giantbomb.com/api/chats/?api_key=" + GBapi;
+                RefreshRate = streamRefresh;
+                _chatTimer = new Timer();
+                _chatTimer.Elapsed += RefreshChatsApi;
+                _chatTimer.Interval = streamRefresh;
+                _chatTimer.AutoReset = true;
+                _chatTimer.Enabled = true;
+            }
         }
 
         private void RefreshChatsApi(object sender, ElapsedEventArgs elapsedEventArgs)
@@ -33,9 +36,9 @@ namespace KiteBot
 		{
 			_latestXElement = GetXDocumentFromUrl(ApiCallUrl);
 
-			if (isStreamRunning == false && !_latestXElement.Element("number_of_page_results").Value.Equals("0"))
+			if (_isStreamRunning == false && !_latestXElement.Element("number_of_page_results").Value.Equals("0"))
 			{
-				isStreamRunning = true;
+				_isStreamRunning = true;
 
 				var stream = _latestXElement.Element("results").Element("stream");
 				var title = deGiantBombifyer(stream.Element("title").Value);
@@ -43,9 +46,9 @@ namespace KiteBot
 
 				Program.Client.GetChannel(85842104034541568).SendMessage(title +": "+ deck + " is LIVE at http://www.giantbomb.com/chat/ you should maybe check it out");
 			}
-			else if (isStreamRunning && _latestXElement.Element("number_of_page_results").Value.Equals("0"))
+			else if (_isStreamRunning && _latestXElement.Element("number_of_page_results").Value.Equals("0"))
 			{
-				isStreamRunning = false;
+				_isStreamRunning = false;
 				Program.Client.GetChannel(85842104034541568).SendMessage("Show is over folks, if you need more Giant Bomb videos, maybe check this out: " + KiteChat.GetResponseUriFromRandomQlCrew());
 			}
 		}
