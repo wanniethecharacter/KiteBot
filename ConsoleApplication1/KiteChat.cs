@@ -372,6 +372,24 @@ namespace KiteBot
             File.WriteAllText(WhoIsLocation,JsonConvert.SerializeObject(WhoIsDictionary));
         }
 
+        public void AddWhoIs(UserUpdatedEventArgs e, string nicknameAfter)
+        {
+            if (WhoIsDictionary.ContainsKey(e.After.Id))
+            {
+                WhoIsDictionary[e.Before.Id].OldNames.Add(nicknameAfter);
+            }
+            else
+            {
+                string[] names = { e.Before.Name, nicknameAfter };
+                WhoIsDictionary.Add(e.Before.Id, new WhoIsPerson
+                {
+                    UserId = e.Before.Id,
+                    OldNames = new List<string>(names)
+                });
+            }
+            File.WriteAllText(WhoIsLocation, JsonConvert.SerializeObject(WhoIsDictionary));
+        }
+
         public string EnumWhoIs(ulong id)
         {
             WhoIsPerson person;

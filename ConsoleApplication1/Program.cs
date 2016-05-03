@@ -124,10 +124,36 @@ namespace KiteBot
                     await Client.GetChannel(85842104034541568).SendMessage($"{e.Before.Name} changed his name to {e.After.Name}.");
                     _kiteChat.AddWhoIs(e);
                 }
-                else if (!e.Before.Nickname.Equals(e.After.Nickname))
+                try
                 {
-                    await Client.GetChannel(85842104034541568).SendMessage($"{e.Before.Name} changed his nickname to {e.After.Name}.");
-                    _kiteChat.AddWhoIs(e);
+                    if (e.Before.Nickname != e.After.Nickname)
+                    {
+                        if (e.Before.Nickname != null && e.After.Nickname != null)
+                        {
+                            await
+                                Client.GetChannel(85842104034541568)
+                                    .SendMessage($"{e.Before.Nickname} changed his nickname to {e.After.Nickname}.");
+                            _kiteChat.AddWhoIs(e, e.After.Nickname);
+                        }
+                        else if (e.Before.Nickname == null && e.After.Nickname != null)
+                        {
+                            await
+                                Client.GetChannel(85842104034541568)
+                                    .SendMessage($"{e.Before.Name} set his nickname to {e.After.Nickname}.");
+                            _kiteChat.AddWhoIs(e,e.After.Nickname);
+                        }
+                        else
+                        {
+                            await
+                                Client.GetChannel(85842104034541568)
+                                    .SendMessage($"{e.Before.Name} reset his nickname.");
+                            _kiteChat.AddWhoIs(e);
+                        }
+                    }
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex + "\r\n" +ex.Message);
                 }
             };
 
