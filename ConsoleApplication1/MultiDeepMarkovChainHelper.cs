@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using Discord;
 using Newtonsoft.Json;
 using TextMarkovChains;
@@ -14,15 +15,17 @@ namespace KiteBot
     public class MultiTextMarkovChainHelper
     {
         public static int Depth;
+        private static Timer _timer;
         private static IMarkovChain _markovChain;
         private static DiscordClient _client;
+        private static bool _isInitialized;
         private static List<JsonMessage> _jsonList = new List<JsonMessage>();
         private static JsonLastMessage _lastMessage = new JsonLastMessage();
 
         public static string RootDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.FullName;
         public static string JsonLastMessageLocation => RootDirectory + "/Content/LastMessage.json";
         public static string JsonMessageFileLocation => RootDirectory + "/Content/messages.zip";
-        private static bool _isInitialized;
+        
 
         public MultiTextMarkovChainHelper(int depth) : this(Program.Client, depth)
         {
@@ -51,6 +54,11 @@ namespace KiteBot
                     }
                     break;
             }
+
+            _timer = new Timer();
+            _timer.Elapsed += (s,e) => Save();
+            _timer.Interval = 3600000;
+            _timer.AutoReset = true;
         }
 
         public async Task<bool> Initialize()
@@ -100,6 +108,7 @@ namespace KiteBot
                         }
                     }
                 }
+                _timer.Enabled = true;
                 return _isInitialized = true;
             }
             return _isInitialized;
@@ -213,7 +222,7 @@ namespace KiteBot
             }
         }
 
-        private string Open()
+        private static string Open()
         {
             byte[] file = File.ReadAllBytes(JsonMessageFileLocation);
             using (var stream = new GZipStream(new MemoryStream(file), CompressionMode.Decompress))

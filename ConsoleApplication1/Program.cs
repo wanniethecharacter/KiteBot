@@ -61,7 +61,13 @@ namespace KiteBot
             //_handler += Handler;
             //SetConsoleCtrlHandler(_handler, true);
 
-            Client = new DiscordClient();
+            Client = new DiscordClient(x =>
+            {
+                x.AppName = "KiteBot";
+                x.AppVersion = "1.1.1";
+                x.MessageCacheSize = 0;
+            });
+
             Settings = File.Exists(SettingsPath) ? 
                 JsonConvert.DeserializeObject<JsonSettings>(File.ReadAllText(SettingsPath)) 
                 : new JsonSettings("email",
@@ -88,7 +94,7 @@ namespace KiteBot
             Eval.RegisterEvalCommand(Client);
 
             //Event handlers
-            Client.UserIsTyping += async (s, e) => await Task.Run(delegate { _kiteChat.IsRaeTyping(e); });
+            Client.UserIsTyping += (s, e) => _kiteChat.IsRaeTyping(e);
 
             Client.MessageReceived += async (s, e) =>
             {
@@ -108,7 +114,7 @@ namespace KiteBot
             {
                 if (Client.Servers.Any())
                 {
-                    Console.WriteLine( await _kiteChat.InitializeMarkovChain());
+                    Console.WriteLine(await _kiteChat.InitializeMarkovChain());
                 }
             };
             
