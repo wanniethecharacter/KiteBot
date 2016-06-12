@@ -123,6 +123,7 @@ namespace KiteBot
             if (latestMessages.Length == 0) return messages;
 
             ulong tmpMessageTracker = latestMessages.Last().Id;
+            // ReSharper disable once TooWideLocalVariableScope
             ulong newMessageTracker;
 
             while (true)
@@ -151,7 +152,15 @@ namespace KiteBot
         {
             if (_isInitialized)
             {
-                return _markovChain.generateSentence();
+                try
+                {
+                    return _markovChain.generateSentence();
+                }
+                catch (NullReferenceException ex)
+                {
+                    Console.WriteLine("Nullref fun "+ex.Message);
+                    return GetSequence();
+                }
             }
             return "I'm not ready yet Senpai!";
         }
@@ -167,7 +176,7 @@ namespace KiteBot
                         _markovChain.feed(message.Text);
                     }
                     _markovChain.feed(message.Text + ".");
-                    _jsonList.Add(new JsonMessage() { M = message.Text });
+                    _jsonList.Add(new JsonMessage { M = message.Text });
                 }
             }
         }

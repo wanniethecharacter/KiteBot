@@ -20,6 +20,7 @@ namespace KiteBot
 		//private XElement _latestXElement; Dont Need this anymore I think.
         private DateTime lastPublishTime;
         private bool firstTime = true;
+        private int _retry;
 
         public GiantBombVideoChecker(string GBapi,int videoRefresh)
         {
@@ -36,14 +37,41 @@ namespace KiteBot
             }
         }
 
+        public void Restart()
+        {
+            if (_chatTimer == null)
+            {
+                Console.WriteLine("VideoChecker _chatTimer eaten by GC");
+                Environment.Exit(-1);
+            }
+            else if (_chatTimer.Enabled == false)
+            {
+                Console.WriteLine("Was off, turning VideoChecker back on.");
+                _chatTimer.Start();
+                if (_chatTimer.AutoReset == false)
+                {
+                    Console.WriteLine("AutoReset was off");
+                    _chatTimer.AutoReset = true;
+                }
+            }
+        }
+
         private async void RefreshVideosApi(object sender, ElapsedEventArgs elapsedEventArgs)
 		{
-			await RefreshVideosApi();
+            try
+            {
+                await RefreshVideosApi();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex);
+            }
 		}
 
 		private async Task RefreshVideosApi()
 		{
-            var latestXElement = GetXDocumentFromUrl(ApiCallUrl);
+            var latestXElement = await GetXDocumentFromUrl(ApiCallUrl);
             IEnumerable<XElement> promos = latestXElement?.Element("results")?.Elements("promo");
 
             IOrderedEnumerable<XElement> sortedXElements = promos.OrderBy(e => GetGiantBombFormatDateTime(e.Element("date_added")?.Value));
@@ -87,21 +115,26 @@ namespace KiteBot
 			return s.Replace("<![CDATA[ ", "").Replace(" ]]>", "");
 		}
 
-		private XElement GetXDocumentFromUrl(string url)
+        private async Task<XElement> GetXDocumentFromUrl(string url)
         {
-		    try
-		    {
+            try
+            {
                 WebClient client = new WebClient();
-                client.Headers.Add("user-agent", $"KiteBot/1.1, Discord Bot for the GiantBomb EvE online \"corp\" looking for new videos, articles and podcasts. GETs endpoint every {RefreshRate/1000} seconds. <3 u edgework");
-                XDocument document = XDocument.Load(client.OpenRead(url));
-		        return document.XPathSelectElement(@"//response");
-		    }
-		    catch (Exception ex)
-		    {
-                Console.WriteLine(ex.Message);
-                Thread.Sleep(10000);
-                return GetXDocumentFromUrl(url);
-		    }
+                client.Headers.Add("user-agent",
+                    $"KiteBot/1.1, Discord Bot for the GiantBomb EvE online \"corp\" looking for new videos, articles and podcasts. GETs endpoint every {RefreshRate/1000} seconds. <3 u edgework");
+                XDocument document = XDocument.Load(await client.OpenReadTaskAsync(url).ConfigureAwait(false));
+                return document.XPathSelectElement(@"//response");
+            }
+            catch (Exception)
+            {
+                _retry++;
+                if (_retry < 3)
+                {
+                    await Task.Delay(10000);
+                    return await GetXDocumentFromUrl(url).ConfigureAwait(false);
+                }
+                throw new TimeoutException();
+            }
         }
 	}
 }

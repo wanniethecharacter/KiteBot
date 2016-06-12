@@ -84,18 +84,19 @@ namespace KiteBot
                 Settings.MarkovChainDepth);
 
             Client.AddService(new ModuleService());
+
             Client.UsingCommands(conf =>
             {
                 conf.AllowMentionPrefix = true;
-                conf.HelpMode = HelpMode.Disabled;
-                conf.PrefixChar = '-';
+                conf.HelpMode = HelpMode.Public;
+                conf.PrefixChar = '!';
             });
 
             Eval.RegisterEvalCommand(Client);
+            Game.RegisterGameCommand(Client,Settings.GiantBombApiKey);
 
             //Event handlers
             Client.UserIsTyping += (s, e) => _kiteChat.IsRaeTyping(e);
-
             Client.MessageReceived += async (s, e) =>
             {
                 try
@@ -163,6 +164,7 @@ namespace KiteBot
                 }
             };
 
+            
             //Convert our sync method to an async one and block the Main function until the bot disconnects
             Client.ExecuteAndWait(async () =>
             {

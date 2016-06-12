@@ -1,7 +1,11 @@
-﻿using System.Net;
-using System.Timers;
+﻿using System;
+using System.Linq;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Timer = System.Timers.Timer;
 
 namespace KiteBot
 {
@@ -11,59 +15,125 @@ namespace KiteBot
         public static int RefreshRate;
 		private static Timer _chatTimer;//Garbage collection doesnt like local variables that only fire a couple times per hour
 		private XElement _latestXElement;
-		private static bool _isStreamRunning;
+		private static bool _wasStreamRunning;
+        private int _retry;
 
-        public LivestreamChecker(string GBapi,int streamRefresh)
+        public LivestreamChecker(string gBapi,int streamRefresh)
         {
-            if (GBapi.Length > 0 && streamRefresh > 3000)
+            if (gBapi.Length > 0 && streamRefresh > 3000)
             {
-                ApiCallUrl = "http://www.giantbomb.com/api/chats/?api_key=" + GBapi;
+                ApiCallUrl = $"http://www.giantbomb.com/api/chats/?api_key={gBapi}&field_list=deck,title";
                 RefreshRate = streamRefresh;
                 _chatTimer = new Timer();
-                _chatTimer.Elapsed += RefreshChatsApi;
+                _chatTimer.Elapsed += async (s, e) => await RefreshChatsApi();
                 _chatTimer.Interval = streamRefresh;
                 _chatTimer.AutoReset = true;
                 _chatTimer.Enabled = true;
             }
         }
 
-        private void RefreshChatsApi(object sender, ElapsedEventArgs elapsedEventArgs)
-		{
-			RefreshChatsApi();
-		}
+        public void Restart()
+        {
+            if (_chatTimer == null)
+            {
+                Console.WriteLine("_chatTimer eaten by GC");
+                Environment.Exit(-1);
+            }
+            else if (_chatTimer.Enabled == false)
+            {
+                Console.WriteLine("Was off, turning LiveStream back on.");
+                _chatTimer.Start();
+                if (_chatTimer.AutoReset == false)
+                {
+                    Console.WriteLine("AutoReset was off");
+                    _chatTimer.AutoReset = true;
+                }
+            }
+        }
 
-		private void RefreshChatsApi()
-		{
-			_latestXElement = GetXDocumentFromUrl(ApiCallUrl);
+        private async Task RefreshChatsApi()
+        {
+            _chatTimer.Stop();
+            try
+            {
+                if (Program.Client.Servers.Any())
+                {
+                    try
+                    {
+                        _retry = 0;
+                        _latestXElement = await GetXDocumentFromUrl(ApiCallUrl).ConfigureAwait(false);
+                        var numberOfResults = _latestXElement.Element("number_of_page_results");
 
-			if (_isStreamRunning == false && !_latestXElement.Element("number_of_page_results").Value.Equals("0"))
-			{
-				_isStreamRunning = true;
+                        if (numberOfResults != null && _wasStreamRunning == false && !numberOfResults.Value.Equals("0"))
+                        {
+                            _wasStreamRunning = true;
 
-				var stream = _latestXElement.Element("results").Element("stream");
-				var title = deGiantBombifyer(stream.Element("title").Value);
-				var deck = deGiantBombifyer(stream.Element("deck").Value);
+                            var stream = _latestXElement.Element("results")?.Element("stream");
+                            var title = deGiantBombifyer(stream?.Element("title")?.Value);
+                            var deck = deGiantBombifyer(stream?.Element("deck")?.Value);
 
-				Program.Client.GetChannel(85842104034541568).SendMessage(title +": "+ deck + " is LIVE at http://www.giantbomb.com/chat/ you should maybe check it out");
-			}
-			else if (_isStreamRunning && _latestXElement.Element("number_of_page_results").Value.Equals("0"))
-			{
-				_isStreamRunning = false;
-				Program.Client.GetChannel(85842104034541568).SendMessage("Show is over folks, if you need more Giant Bomb videos, maybe check this out: " + KiteChat.GetResponseUriFromRandomQlCrew());
-			}
-		}
+                            await
+                                Program.Client.GetChannel(85842104034541568)
+                                    .SendMessage(title + ": " + deck +
+                                                 " is LIVE at http://www.giantbomb.com/chat/ NOW, check it out!")
+                                    .ConfigureAwait(false);
+                        }
+                        else if (numberOfResults != null && _wasStreamRunning && numberOfResults.Value.Equals("0"))
+                        {
+                            _wasStreamRunning = false;
+                            await
+                                Program.Client.GetChannel(85842104034541568)
+                                    .SendMessage(
+                                        "Show is over folks, if you need more Giant Bomb videos, check this out: " +
+                                        KiteChat.GetResponseUriFromRandomQlCrew()).ConfigureAwait(false);
+                        }
 
-		private string deGiantBombifyer(string s)
+                    }
+                    catch (TimeoutException)
+                    {
+                        Console.WriteLine("Livestreamchecker timed out. Restarting Timer.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"LivestreamChecker sucks: {ex} \n {ex.Message}");
+                var owner = Program.Client.Servers.FirstOrDefault()?
+                    .Users.FirstOrDefault(x => x.Id == 85817630560108544);
+                if (owner != null)
+                    await owner.SendMessage($"LivestreamChecker threw an {ex.GetType()}, check the logs").ConfigureAwait(false);
+            }
+            finally
+            {
+                _chatTimer.Start();
+            }
+        }
+
+        private string deGiantBombifyer(string s)
 		{
 			return s.Replace("<![CDATA[ ", "").Replace(" ]]>", "");
 		}
 
-		private XElement GetXDocumentFromUrl(string url)
-		{
-            WebClient client = new WebClient();
-            client.Headers.Add("user-agent", $"KiteBot/1.1, Discord Bot for the GiantBomb EvE online \"corp\" looking for livestreams. GETs endpoint every {RefreshRate / 1000} seconds.");
-            XDocument document = XDocument.Load(client.OpenRead(url));
-			return document.XPathSelectElement(@"//response");
-		}
-	}
+        private async Task<XElement> GetXDocumentFromUrl(string url)
+        {
+            try
+            {
+                WebClient client = new WebClient();
+                client.Headers.Add("user-agent",
+                    $"Bot for fetching livestreams and new content for the GiantBomb Shifty Discord Server. GETs every {RefreshRate / 1000 / 60} minutes.");
+                XDocument document = XDocument.Load(await client.OpenReadTaskAsync(url).ConfigureAwait(false));
+                return document.XPathSelectElement(@"//response");
+            }
+            catch (Exception)
+            {
+                _retry++;
+                if (_retry < 3)
+                {
+                    await Task.Delay(10000);
+                    return await GetXDocumentFromUrl(url).ConfigureAwait(false);
+                }
+                throw new TimeoutException();
+            }
+        }
+    }
 }

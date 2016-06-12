@@ -135,22 +135,29 @@ namespace KiteBot
                     await e.Channel.SendMessage("Done.");
                     Environment.Exit(1);
                 }
+                else if (e.Message.Text.Contains(@"/restart") && e.User.Id == 85817630560108544)
+                {
+                    StreamChecker.Restart();
+                    GbVideoChecker.Restart();
+                }
                 else if ((e.Message.Text.Contains(@"/testMarkov") || e.Message.Text.StartsWith(@"@KiteBot /tm")) &&
                          StartMarkovChain)
                 {
                     try
                     {
                         await e.Channel.SendMessage(MultiDeepMarkovChains.GetSequence());
+                    }
+                    catch (Exception)
+                    {
+                        MultiDeepMarkovChains.Save();
+                        throw;
+                    }
+                    finally
+                    {
                         if (e.User.Id == 85817630560108544)
                         {
                             await e.Message.Delete();
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                        MultiDeepMarkovChains.Save();
-                        Environment.Exit(1);
                     }
                 }
 
@@ -246,7 +253,7 @@ namespace KiteBot
                     else
                     {
                         await
-                            e.Channel.SendMessage("KiteBot ver. 1.1.2 \"Now with real dairy.\"");
+                            e.Channel.SendMessage("KiteBot ver. 1.1.3 \"Now with real dairy.\"");
                     }
                 }
             }
@@ -263,7 +270,7 @@ namespace KiteBot
 		    HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
             if (request != null)
             {
-                request.UserAgent = "LassieMEKiteBot/0.9 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)";
+                request.UserAgent = "LassieMEKiteBot/0.11 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)";
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                 return response.ResponseUri.AbsoluteUri;
             }

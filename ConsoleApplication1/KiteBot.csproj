@@ -106,9 +106,9 @@
       <HintPath>..\packages\Common.Logging.Core.3.3.1\lib\net40\Common.Logging.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Discord.Net, Version=0.9.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Discord.Net, Version=0.9.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Discord.Net2\src\Discord.Net.Net45\bin\Debug\Discord.Net.dll</HintPath>
+      <HintPath>..\..\Discord.Net2\src\Discord.Net.Net45\bin\Release\Discord.Net.dll</HintPath>
     </Reference>
     <Reference Include="Discord.Net.Audio">
       <HintPath>..\..\Discord.Net2\src\Discord.Net.Audio.Net45\bin\Debug\Discord.Net.Audio.dll</HintPath>
@@ -199,6 +199,7 @@
   <ItemGroup>
     <Compile Include="AnimeResult.cs" />
     <Compile Include="Commands\Eval.cs" />
+    <Compile Include="Commands\Game.cs" />
     <Compile Include="GiantBombVideoChecker.cs" />
     <Compile Include="MultiDeepMarkovChainHelper.cs" />
     <Compile Include="RandomHandler.cs" />
