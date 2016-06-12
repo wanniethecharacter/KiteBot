@@ -25,7 +25,7 @@ namespace KiteBot
                 pizzaToppings.AddRange(new string[] {"Extra Cheese", "Pepperoni", "Sausage", "Chicken", "Ham", "Canadian Bacon",
                                                          "Bacon", "Green Peppers", "Black Olives", "White Onion", "Diced Tomatoes",
                                                          "Spinach", "Roasted Red Peppers", "Sun Dried Tomato", "Pineapple", "Italian Sausage",
-                                                         "Red Onion", "Green Chile", "Basil", "Mayonnaise", "Mushrooms", "Beef"});
+                                                         "Red Onion", "Green Chile", "Basil", "Mushrooms", "Beef"});
 
             int numberOfToppings = _randomSeed.Next(2, 7);//2 is 3, 7 is 8
 
