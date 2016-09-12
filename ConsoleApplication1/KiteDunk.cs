@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.Commands;
+using System;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -26,6 +27,41 @@ namespace KiteBot
 			_kiteDunkTimer.Interval = 86400000;//24 hours
 			_kiteDunkTimer.AutoReset = true;
 			_kiteDunkTimer.Enabled = true;
+
+            Console.WriteLine("Registering KiteDunk Command");
+                       
+            Program.Client.GetService<CommandService>().CreateCommand("KiteDunk")
+                    .Alias("dunk")
+                    .Description("Posts a hot Kite Dunk")
+                    .Do(async e =>
+                    {
+                        await e.Channel.SendMessage(GetUpdatedKiteDunk());                        
+                    });
+
+            Console.WriteLine("Registering KiteDunkAll Command");
+
+            Program.Client.GetService<CommandService>().CreateCommand("KiteDunkAll")
+                .Description("Posts hella KiteDunks, beware")
+                .AddCheck((c, u, ch) => u.Id == Program.Settings.OwnerId)
+                .Hide()
+                .Do(async e =>
+                {
+                    var stringBuilder = new System.Text.StringBuilder(2000);
+                    for (int i = 0; i < _updatedKiteDunks.GetLength(0);i++)
+                    {
+                        var entry = "\"" + _updatedKiteDunks[i, 1] + "\" - " + _updatedKiteDunks[i, 0] + Environment.NewLine;
+                        if (stringBuilder.Length + entry.Length > 2000)
+                        {
+                            await e.Channel.SendMessage(stringBuilder.ToString());
+                            stringBuilder.Clear();
+                        }
+                        else
+                        {
+                            stringBuilder.Append(entry);
+                        }                        
+                    }
+                    await e.Channel.SendMessage(stringBuilder.ToString());
+                });
         }
 
 		public string GetUpdatedKiteDunk()

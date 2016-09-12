@@ -33,6 +33,7 @@ namespace KiteBot
 
         public MultiTextMarkovChainHelper(DiscordClient client,int depth)
         {
+            Console.WriteLine("MultiTextMarkovChainHelper");
             _client = client;
             Depth = depth;
             switch (depth)
@@ -63,6 +64,7 @@ namespace KiteBot
 
         public async Task<bool> Initialize()
         {
+            Console.WriteLine("Initialize");
             if (!_isInitialized)
             {
                 if (File.Exists(path: JsonMessageFileLocation))
@@ -71,7 +73,8 @@ namespace KiteBot
 
                     foreach (JsonMessage message in _jsonList)
                     {
-                        _markovChain.feed(message.M);//Any messages here have already been thru all the if checks, and hence, we dont need to run thru all of those again.
+                        //if(GC.GetTotalMemory(false) < 512000000)
+                            _markovChain.feed(message.M);//Any messages here have already been thru all the if checks, so we dont need to run through all of those again.
                     }
                     _isInitialized = true;
                     if (File.Exists(JsonLastMessageLocation))
@@ -116,6 +119,7 @@ namespace KiteBot
 
         private async Task<List<Message>> DownloadMessagesAfterId(ulong id, Channel channel)
         {
+            Console.WriteLine("DownloadMessagesAfterId");
             List<Message> messages = new List<Message>();
             var latestMessages = await channel.DownloadMessages(100, id,Relative.After);
             messages.AddRange(latestMessages);
@@ -167,13 +171,14 @@ namespace KiteBot
 
         private void FeedMarkovChain(Message message)
         {
-            if (!message.User.Name.ToLower().Contains("kitebot"))
+            if (!message.User.IsBot)
             {
                 if(!message.Text.Equals("") && !message.Text.Contains("http") && !message.Text.ToLower().Contains("testmarkov") && !message.Text.ToLower().Contains("getdunked") && !message.IsMentioningMe())
                 {
                     if (message.Text.Contains("."))
                     {
-                        _markovChain.feed(message.Text);
+                        if (GC.GetTotalMemory(false) < 512000000)
+                            _markovChain.feed(message.Text);
                     }
                     _markovChain.feed(message.Text + ".");
                     _jsonList.Add(new JsonMessage { M = message.Text });
@@ -183,6 +188,7 @@ namespace KiteBot
 
         private async Task<List<Message>> GetMessagesFromChannel(Channel channel, int i)
         {
+            Console.WriteLine("GetMessagesFromChannel");
             List<Message> messages = new List<Message>();
             var latestMessage = await channel.DownloadMessages(i);
             messages.AddRange(latestMessage);
@@ -209,6 +215,7 @@ namespace KiteBot
 
         public void Save()
         {
+            Console.WriteLine("Save");
             if (_isInitialized)
             {
                 var text = Encoding.Default.GetBytes(JsonConvert.SerializeObject(_jsonList, Formatting.None));
@@ -233,9 +240,12 @@ namespace KiteBot
 
         private static string Open()
         {
+            Console.WriteLine("Open");
             byte[] file = File.ReadAllBytes(JsonMessageFileLocation);
+            Console.WriteLine("file");
             using (var stream = new GZipStream(new MemoryStream(file), CompressionMode.Decompress))
             {
+                Console.WriteLine("stream");
                 const int size = 4096;
                 byte[] buffer = new byte[size];
 
@@ -250,18 +260,19 @@ namespace KiteBot
                             memory.Write(buffer, 0, count);
                         }
                     } while (count > 0);
+                    Console.WriteLine("return");
                     return Encoding.Default.GetString(memory.ToArray());
                 }
             }
         }
     }
 
-    class JsonMessage
+    struct JsonMessage
     {
         public string M { get; set; }
     }
 
-    class JsonLastMessage
+    struct JsonLastMessage
     {
         public ulong MessageId { get; set; }
         public ulong ChannelId { get; set; }

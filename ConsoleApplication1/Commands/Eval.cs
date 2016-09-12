@@ -34,7 +34,7 @@ namespace KiteBot.Commands
                 .AddCheck((c, u, ch) => u.Id == Program.Settings.OwnerId)
                 .Do(async cea =>
                 {
-                    string arg = cea.Args[0]; //.Replace("\\", String.Empty);
+                    string arg = cea.Args[0];
                     if (arg.Contains('^'))
                     {
                         await cea.Channel.SendMessage("**Note:** `^` is the Binary XOR operator. Use `Math.Pow(base, exponent)` if you wish to calculate an exponentiation.");

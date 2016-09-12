@@ -22,7 +22,7 @@ namespace KiteBot.Commands
                     .Alias("games", "giantbomb", "videogame", "videogames")
                     .Description("Gets the first game with the given name or alias from the GiantBomb games api endpoint")
                     //.AddCheck((c, u, ch) => u.Id == 85817630560108544)
-                    .Parameter("GameTitle", ParameterType.Unparsed) //as an argument, we have a person we want to greet
+                    .Parameter("GameTitle", ParameterType.Unparsed)
                     .Do(async e =>
                     {
                         var args = e.GetArg("GameTitle");
@@ -33,7 +33,7 @@ namespace KiteBot.Commands
                         }
                         else
                         {
-                            await e.Channel.SendMessage($"Empty game name given, please spesify a game title");
+                            await e.Channel.SendMessage($"Empty game name given, please specify a game title");
                         }
                     });
         }
@@ -48,12 +48,12 @@ namespace KiteBot.Commands
                 var firstResult = document.Element("results")?.Element("game");
                 if (firstResult != null)
                 {
-                    string site_detail_url = firstResult.Element(@"site_detail_url").Value;
-                    string original_release_date = firstResult.Element(@"original_release_date").Value;
-                    string name = firstResult.Element(@"name").Value;
+                    string site_detail_url = firstResult.Element(@"site_detail_url")?.Value;
+                    string original_release_date = firstResult.Element(@"original_release_date")?.Value;
+                    string name = firstResult.Element(@"name")?.Value;
                     string platforms = "";
-                    string deck = firstResult.Element(@"deck").Value;
-                    string small_url = firstResult.Element(@"image").Element("small_url").Value;
+                    string deck = firstResult.Element(@"deck")?.Value;
+                    string small_url = firstResult.Element(@"image")?.Element("small_url")?.Value;
 
                     var collection = firstResult.Element(@"platforms")?.Elements(@"platform");
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -62,9 +61,9 @@ namespace KiteBot
                     {
                         _retry = 0;
                         _latestXElement = await GetXDocumentFromUrl(ApiCallUrl).ConfigureAwait(false);
-                        var numberOfResults = _latestXElement.Element("number_of_page_results");
+                        var numberOfResults = _latestXElement.Element("number_of_page_results")?.Value;
 
-                        if (numberOfResults != null && _wasStreamRunning == false && !numberOfResults.Value.Equals("0"))
+                        if (_wasStreamRunning == false && !numberOfResults.Equals("0"))
                         {
                             _wasStreamRunning = true;
 
@@ -75,17 +74,16 @@ namespace KiteBot
                             await
                                 Program.Client.GetChannel(85842104034541568)
                                     .SendMessage(title + ": " + deck +
-                                                 " is LIVE at http://www.giantbomb.com/chat/ NOW, check it out!")
-                                    .ConfigureAwait(false);
+                                                 " is LIVE at http://www.giantbomb.com/chat/ NOW, check it out!");
                         }
-                        else if (numberOfResults != null && _wasStreamRunning && numberOfResults.Value.Equals("0"))
+                        else if (_wasStreamRunning && numberOfResults.Equals("0"))
                         {
                             _wasStreamRunning = false;
                             await
                                 Program.Client.GetChannel(85842104034541568)
                                     .SendMessage(
                                         "Show is over folks, if you need more Giant Bomb videos, check this out: " +
-                                        KiteChat.GetResponseUriFromRandomQlCrew()).ConfigureAwait(false);
+                                        KiteChat.GetResponseUriFromRandomQlCrew());
                         }
 
                     }

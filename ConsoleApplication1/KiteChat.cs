@@ -97,8 +97,12 @@ namespace KiteBot
                     }
                     catch (Exception)
                     {
-                        await e.Channel.SendMessage("Why are you even look for manga when there is anime.");
+                        await e.Channel.SendMessage("Why are you even looking for manga when there is anime.");
                     }
+                }
+                else if (e.Message.Text.Contains("Mistake") && e.Channel.Id == 96786127238725632)
+                {
+                    await e.Channel.SendMessage("Anime is a mistake " + e.User.Mention +".");
                 }
                 else if (e.Message.Text.StartsWith("/roll"))
                 {
@@ -110,12 +114,16 @@ namespace KiteBot
                     await e.Channel.SendMessage(Reminder.AddNewEvent(e.Message));
                 }
 
-                else if(e.Message.Text.ToLower().StartsWith("!whois"))
+                else if (e.Message.Text.ToLower().StartsWith("!whois"))
                 {
-                    var userMentioned = e.Message.MentionedUsers.FirstOrDefault(x => x.Id != Program.Client.CurrentUser.Id);
+                    var userMentioned =
+                        e.Message.MentionedUsers.FirstOrDefault(x => x.Id != Program.Client.CurrentUser.Id);
                     if (userMentioned != null)
                     {
-                        await e.Channel.SendMessage($"Former names for {userMentioned.Name} are: {EnumWhoIs(userMentioned.Id)}.".Replace(",.","."));
+                        await
+                            e.Channel.SendMessage(
+                                $"Former names for {userMentioned.Name} are: {EnumWhoIs(userMentioned.Id)}.".Replace(
+                                    ",.", "."));
                     }
                 }
 
@@ -172,10 +180,17 @@ namespace KiteBot
                     else if (e.Message.Text.ToLower().Contains("help"))
                     {
                         var nl = Environment.NewLine;
-                        await e.Channel.SendMessage("Current Commands are:" + nl + "#420"
-                                                    + nl + "randomql" + nl + "google" + nl + "youtube" + nl +
-                                                    "kitedunk"
-                                                    + nl + "/pizza" + nl + "Whats for dinner" + nl + "sandwich" + nl +
+                        await e.Channel.SendMessage("Current Commands are:" + nl + 
+                                                    "#420"+ nl + 
+                                                    "randomql" + nl + 
+                                                    "google" + nl + 
+                                                    "youtube" + nl +                                                    
+                                                    "/anime" + nl +
+                                                    "/manga" + nl +
+                                                    "!reminder" + nl +
+                                                    "/pizza" + nl + 
+                                                    "Whats for dinner" + nl + 
+                                                    "sandwich" + nl +
                                                     "RaeCounter"
                                                     + nl + "help");
                     }
@@ -205,12 +220,7 @@ namespace KiteBot
                         {
                             await e.Channel.SendMessage("Please add a query after youtube, starting with a space.");
                         }
-                    }
-
-                    else if (e.Message.Text.ToLower().Contains("dunk"))
-                    {
-                        await e.Channel.SendMessage(KiteDunk.GetUpdatedKiteDunk());
-                    }
+                    }                    
                     else if (e.Message.Text.ToLower().Contains("fuck you") ||
                              e.Message.Text.ToLower().Contains("fuckyou"))
                     {
@@ -227,7 +237,7 @@ namespace KiteBot
                                 possibleResponses[RandomSeed.Next(0, possibleResponses.Count)].Replace("USER",
                                     e.User.Name));
                     }
-                    else if (0 <= e.Message.Text.ToLower().IndexOf("/pizza", 0, StringComparison.Ordinal))
+                    else if (e.Message.Text.ToLower().Contains("/pizza"))
                     {
                         await e.Channel.SendMessage(KitePizza.ParsePizza(e.User.Name, e.Message.Text));
                     }

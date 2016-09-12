@@ -77,12 +77,6 @@ namespace KiteBot
                 0,
                 true, 2, 60000, 60000);
 
-            _kiteChat = new KiteChat(Settings.MarkovChainStart,
-                Settings.GiantBombApiKey,
-                Settings.GiantBombLiveStreamRefreshRate,
-                Settings.GiantBombVideoRefreshRate, 
-                Settings.MarkovChainDepth);
-
             Client.AddService(new ModuleService());
 
             Client.UsingCommands(conf =>
@@ -92,8 +86,14 @@ namespace KiteBot
                 conf.PrefixChar = '!';
             });
 
+            _kiteChat = new KiteChat(Settings.MarkovChainStart,
+                Settings.GiantBombApiKey,
+                Settings.GiantBombLiveStreamRefreshRate,
+                Settings.GiantBombVideoRefreshRate, 
+                Settings.MarkovChainDepth);            
+
             Eval.RegisterEvalCommand(Client);
-            Game.RegisterGameCommand(Client,Settings.GiantBombApiKey);
+            Commands.Game.RegisterGameCommand(Client,Settings.GiantBombApiKey);
 
             //Event handlers
             Client.UserIsTyping += (s, e) => _kiteChat.IsRaeTyping(e);
@@ -177,7 +177,7 @@ namespace KiteBot
                             Console.WriteLine("Connecting...");
                             if (Settings.DiscordEmail == null || Settings.DiscordPassword != null)
                             {
-                                await Client.Connect(Settings.DiscordToken);
+                                await Client.Connect(Settings.DiscordToken,TokenType.Bot);
 
                             }
                             else

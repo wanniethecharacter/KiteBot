@@ -95,7 +95,7 @@ namespace KiteBot
                     }
                 }
                 Save();
-                return $"Reminder set for {reminderEvent.RequestedTime.ToUniversalTime().ToString("g",new CultureInfo("en-US"))} with reason: {reminderEvent.Reason}";
+                return $"Reminder set for {reminderEvent.RequestedTime.ToUniversalTime().ToString("g",new CultureInfo("en-US"))} UTC with reason: {reminderEvent.Reason}";
 
             }
             return "Couldn't parse your command, please use the format \"!Reminder [number] [seconds|minutes|hour|days] [optional: reason for reminder]\"";
@@ -120,7 +120,6 @@ namespace KiteBot
                                   await Program.Client.Servers.First().GetUser(reminder.UserId).CreatePMChannel();
                     await channel.SendMessage($"Reminder: {reminder.Reason}");
 
-                    //_reminderList.Remove(reminder); DONT DO THIS
                     deleteBuffer.Add(reminder);
                     if (_reminderList.Count == 0) break;
                 }
@@ -152,7 +151,7 @@ namespace KiteBot
             File.WriteAllText(ReminderPath,JsonConvert.SerializeObject(_reminderList));
         }
 
-        class ReminderEvent
+        struct ReminderEvent
         {
             public DateTime RequestedTime { get; set; }
             public ulong UserId { get; set; }
