@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using Discord.Commands;
-using Discord.Modules;
 using Newtonsoft.Json;
-using KiteBot.Commands;
 
 
 namespace KiteBot
@@ -53,7 +51,7 @@ namespace KiteBot
 //#endregion
 
         public static DiscordSocketClient Client;
-        public static CommandService CommandService;
+        public static CommandService CommandService = new CommandService();
         public static JsonSettings Settings;
         private static KiteChat _kiteChat;
         public static string ContentDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.FullName;
