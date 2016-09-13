@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
+using Discord.WebSocket;
 using Discord.Commands;
 using Discord.Modules;
 using Newtonsoft.Json;
@@ -50,22 +52,23 @@ namespace KiteBot
 //        }
 //#endregion
 
-        public static DiscordClient Client;
+        public static DiscordSocketClient Client;
+        public static CommandService CommandService;
         public static JsonSettings Settings;
         private static KiteChat _kiteChat;
         public static string ContentDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.FullName;
         private static string SettingsPath => ContentDirectory + "/Content/settings.json";
 
-        private static void Main()
+        private static void Main(string[] args) => new Program().Start().GetAwaiter().GetResult();
+
+        public async Task Start()
         {
             //_handler += Handler;
             //SetConsoleCtrlHandler(_handler, true);
-
-            Client = new DiscordClient(x =>
+            Client = new DiscordSocketClient(new DiscordSocketConfig()
             {
-                x.AppName = "KiteBot";
-                x.AppVersion = "1.1.1";
-                x.MessageCacheSize = 0;
+                LogLevel = LogSeverity.Info,
+                MessageCacheSize = 0                
             });
 
             Settings = File.Exists(SettingsPath) ? 
@@ -77,31 +80,24 @@ namespace KiteBot
                 0,
                 true, 2, 60000, 60000);
 
-            Client.AddService(new ModuleService());
-
-            Client.UsingCommands(conf =>
-            {
-                conf.AllowMentionPrefix = true;
-                conf.HelpMode = HelpMode.Public;
-                conf.PrefixChar = '!';
-            });
-
             _kiteChat = new KiteChat(Settings.MarkovChainStart,
                 Settings.GiantBombApiKey,
                 Settings.GiantBombLiveStreamRefreshRate,
                 Settings.GiantBombVideoRefreshRate, 
                 Settings.MarkovChainDepth);            
 
-            Eval.RegisterEvalCommand(Client);
-            Commands.Game.RegisterGameCommand(Client,Settings.GiantBombApiKey);
-
             //Event handlers
-            Client.UserIsTyping += (s, e) => _kiteChat.IsRaeTyping(e);
-            Client.MessageReceived += async (s, e) =>
+            Client.UserIsTyping += (u, c) =>
+            {
+                _kiteChat.IsRaeTyping(u);
+                return Task.CompletedTask;
+            };
+
+            Client.MessageReceived += async (msg) =>
             {
                 try
                 {
-                    await _kiteChat.AsyncParseChat(s, e, Client);
+                    await _kiteChat.AsyncParseChat(msg, Client);
                 }
                 catch (Exception ex)
                 {
@@ -111,104 +107,97 @@ namespace KiteBot
                 }
             }; 
 
-            Client.ServerAvailable += async (s, e) =>
+            Client.GuildAvailable += async (server) =>
             {
-                if (Client.Servers.Any())
+                if (Client.GetGuilds().Any())
                 {
                     Console.WriteLine(await _kiteChat.InitializeMarkovChain());
                 }
             };
             
-            Client.JoinedServer += (s, e) =>
+            Client.JoinedGuild += (server) =>
             {
-                Console.WriteLine("Connected to " + e.Server.Name);
+                Console.WriteLine("Connected to " + server.Name);
+                return Task.CompletedTask;
             };
 
-            Client.UserUpdated += async (s, e) =>
+            Client.UserUpdated += async (before, after) =>
             {
-                if (!e.Before.Name.Equals(e.After.Name))
-                {
-                    await Client.GetChannel(85842104034541568).SendMessage($"{e.Before.Name} changed his name to {e.After.Name}.");
-                    _kiteChat.AddWhoIs(e);
+                var channel = (ITextChannel)Client.GetChannel(85842104034541568);
+                if (!before.Username.Equals(after.Username))
+                {                    
+                    await channel.SendMessageAsync($"{before.Username} changed his name to {after.Username}.");
+                    _kiteChat.AddWhoIs(before, after);
                 }
                 try
                 {
-                    if (e.Before.Nickname != e.After.Nickname)
+                    if (before.Nickname != after.Nickname)
                     {
-                        if (e.Before.Nickname != null && e.After.Nickname != null)
+                        if (before.Nickname != null && after.Nickname != null)
                         {
-                            await
-                                Client.GetChannel(85842104034541568)
-                                    .SendMessage($"{e.Before.Nickname} changed his nickname to {e.After.Nickname}.");
-                            _kiteChat.AddWhoIs(e, e.After.Nickname);
+                            await channel.SendMessageAsync($"{before.Nickname} changed his nickname to {after.Nickname}.");
+                            _kiteChat.AddWhoIs(before, after.Nickname);
                         }
-                        else if (e.Before.Nickname == null && e.After.Nickname != null)
+                        else if (before.Nickname == null && after.Nickname != null)
                         {
-                            await
-                                Client.GetChannel(85842104034541568)
-                                    .SendMessage($"{e.Before.Name} set his nickname to {e.After.Nickname}.");
-                            _kiteChat.AddWhoIs(e,e.After.Nickname);
+                            await channel.SendMessageAsync($"{before.Username} set his nickname to {after.Nickname}.");
+                            _kiteChat.AddWhoIs(before, after.Nickname);
                         }
                         else
                         {
-                            await
-                                Client.GetChannel(85842104034541568)
-                                    .SendMessage($"{e.Before.Name} reset his nickname.");
-                            _kiteChat.AddWhoIs(e);
+                            await channel.SendMessageAsync($"{before.Username} reset his nickname.");
                         }
                     }
                 }
                 catch(Exception ex)
                 {
-                    Console.WriteLine(ex + "\r\n" +ex.Message);
+                    Console.WriteLine(ex + "\r\n" + ex.Message);
                 }
             };
 
+            await InstallCommands();
+
+            await Client.LoginAsync(TokenType.Bot, Settings.DiscordToken);
+            // Connect the client to Discord's gateway
+            await Client.ConnectAsync();
             
-            //Convert our sync method to an async one and block the Main function until the bot disconnects
-            Client.ExecuteAndWait(async () =>
-            {
-                while (_exitSystem)
-                {
-                    try
-                    {
-                        if (Client.State.CompareTo(ConnectionState.Disconnected) == 0)
-                        {
-                            Console.WriteLine("Connecting...");
-                            if (Settings.DiscordEmail == null || Settings.DiscordPassword != null)
-                            {
-                                await Client.Connect(Settings.DiscordToken,TokenType.Bot);
+            await Task.Delay(-1);
+        }
+        [Obsolete]
+        public static void RssFeedSendMessage(object s, Feed.UpdatedFeedEventArgs e)
+        {
+            var channel = (ITextChannel)Client.GetChannel(85842104034541568);
 
-                            }
-                            else
-                            {
-                                await Client.Connect(Settings.DiscordEmail, Settings.DiscordPassword);
-                            }
+            channel.SendMessageAsync(e.Title + " live now at GiantBomb.com\r\n" + e.Link);
+	    }
 
-                            Client.SetGame("with Fury v1.1.0");
-                            break;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Login Failed: " + ex.Message);
-                        await Task.Delay(5000);
-                    }
-                    finally
-                    {
-                        if (Client.State.CompareTo(ConnectionState.Connected) == 0)
-                        {
-                            Console.WriteLine("Connected.");
-                        }
-                    }
-                }
-            });
+        public async Task InstallCommands()
+        {
+            // Hook the MessageReceived Event into our Command Handler
+            Client.MessageReceived += HandleCommand;
+            // Discover all of the commands in this assembly and load them.
+            await CommandService.LoadAssembly(Assembly.GetEntryAssembly());
         }
 
-        public static void RssFeedSendMessage(object s, Feed.UpdatedFeedEventArgs e)
-	    {
-		    Client.GetChannel(85842104034541568).SendMessage(e.Title + " live now at GiantBomb.com\r\n" + e.Link);
-	    }
+        public async Task HandleCommand(IMessage paramMessage)
+        {
+            // Cast paramMessage to an IUserMessage, return if the message was a System message.
+            var msg = paramMessage as IUserMessage;
+            if (msg == null) return;
+            // Internal integer, marks where the command begins
+            int argPos = 0;
+            // Get the current user (used for Mention parsing)
+            var currentUser = await Client.GetCurrentUserAsync();
+            // Determine if the message is a command, based on if it starts with '!' or a mention prefix
+            if (msg.HasCharPrefix('~', ref argPos) || msg.HasMentionPrefix(currentUser, ref argPos))
+            {
+                // Execute the command. (result does not indicate a return value, 
+                // rather an object stating if the command executed succesfully)
+                var result = await CommandService.Execute(msg, argPos);
+                if (!result.IsSuccess)
+                    await msg.Channel.SendMessageAsync(result.ErrorReason);
+            }
+        }
 
         public struct JsonSettings
         {

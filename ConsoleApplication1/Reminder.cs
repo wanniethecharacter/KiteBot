@@ -46,9 +46,9 @@ namespace KiteBot
             }
         }
 
-        public static string AddNewEvent(Message message)
+        public static string AddNewEvent(IMessage message)
         {
-            Match matches = Regex.Match(message.Text);
+            Match matches = Regex.Match(message.Content);
             if (matches.Success)
             {
                 var milliseconds = 0;
@@ -73,7 +73,7 @@ namespace KiteBot
                 ReminderEvent reminderEvent = new ReminderEvent
                 {
                     RequestedTime = DateTime.Now.AddMilliseconds(milliseconds),
-                    UserId = message.User.Id,
+                    UserId = message.Author.Id,
                     Reason = matches.Groups["reason"].Success ? matches.Groups["reason"].Value : "No specified reason"
                 };
 
@@ -116,9 +116,9 @@ namespace KiteBot
             {
                 if (reminder.RequestedTime.CompareTo(DateTime.Now) <= 0)
                 {
-                    var channel = Program.Client.Servers.First().GetUser(reminder.UserId).PrivateChannel ??
-                                  await Program.Client.Servers.First().GetUser(reminder.UserId).CreatePMChannel();
-                    await channel.SendMessage($"Reminder: {reminder.Reason}");
+                    var channel = await Program.Client.GetDMChannelAsync(reminder.UserId);
+
+                    await channel.SendMessageAsync($"Reminder: {reminder.Reason}");
 
                     deleteBuffer.Add(reminder);
                     if (_reminderList.Count == 0) break;

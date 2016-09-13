@@ -5,15 +5,40 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 
 namespace KiteBot.Commands
 {
+    [Module]
     class Game
     {
         public static string ApiCallUrl;
         private static int _retry;
 
-        public static void RegisterGameCommand(DiscordClient client, string gBapi)
+        public Game()
+        {
+            Console.WriteLine("Registering Game Command");
+            ApiCallUrl =
+                $"http://www.giantbomb.com/api/games/?api_key={Program.Settings.GiantBombApiKey}&field_list=deck,image,name,original_release_date,platforms,site_detail_url&filter=name:";
+        }
+
+        // ~say hello -> hello
+        [Command("game"), Summary("Echos a message."),Alias("games","giantbomb","videogame") ]
+        public async Task GameCommand(IUserMessage msg, [Remainder, Summary("GameTitle")] string gameTitle)
+        {
+            var args = gameTitle;
+            if (!string.IsNullOrWhiteSpace(args))
+            {
+                string s = await GetGamesEndpoint(args).ConfigureAwait(false);
+                await msg.Channel.SendMessageAsync(s);
+            }
+            else
+            {
+                await msg.Channel.SendMessageAsync($"Empty game name given, please specify a game title");
+            }
+        }
+
+        /*public static void RegisterGameCommand(IDiscordClient client, string gBapi)
         {
             Console.WriteLine("Registering Game Command");
             ApiCallUrl =
@@ -29,14 +54,14 @@ namespace KiteBot.Commands
                         if (!string.IsNullOrWhiteSpace(args))
                         {
                             string s = await GetGamesEndpoint(args).ConfigureAwait(false);
-                            await e.Channel.SendMessage(s);
+                            await e.Channel.SendMessageAsync(s);
                         }
                         else
                         {
-                            await e.Channel.SendMessage($"Empty game name given, please specify a game title");
+                            await e.Channel.SendMessageAsync($"Empty game name given, please specify a game title");
                         }
                     });
-        }
+        }*/
 
         private static async Task<string> GetGamesEndpoint(string gameTitle)
         {

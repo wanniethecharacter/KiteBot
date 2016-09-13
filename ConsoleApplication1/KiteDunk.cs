@@ -4,22 +4,23 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Timers;
+using Discord;
+using KiteBot.Commands;
 
 namespace KiteBot
 {
+    [Module]
 	public class KiteDunk
 	{
 		private static string[,] _updatedKiteDunks;
 	    private static Random _random;
-		//private static CryptoRandom _cryptoRandom;
-        private const string GoogleSpreadsheetApiUrl = "http://spreadsheets.google.com/feeds/list/11024r_0u5Mu-dLFd-R9lt8VzOYXWgKX1I5JamHJd8S4/od6/public/values?hl=en_US&&alt=json";
+		private const string GoogleSpreadsheetApiUrl = "http://spreadsheets.google.com/feeds/list/11024r_0u5Mu-dLFd-R9lt8VzOYXWgKX1I5JamHJd8S4/od6/public/values?hl=en_US&&alt=json";
 		// ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
 		private static Timer _kiteDunkTimer;
 
         public KiteDunk()
         {
-	        //_cryptoRandom = new CryptoRandom();
-            _random = new Random();
+	        _random = new Random();
 	        UpdateKiteDunks().Wait();
 
 			_kiteDunkTimer = new Timer();
@@ -27,44 +28,36 @@ namespace KiteBot
 			_kiteDunkTimer.Interval = 86400000;//24 hours
 			_kiteDunkTimer.AutoReset = true;
 			_kiteDunkTimer.Enabled = true;
-
-            Console.WriteLine("Registering KiteDunk Command");
-                       
-            Program.Client.GetService<CommandService>().CreateCommand("KiteDunk")
-                    .Alias("dunk")
-                    .Description("Posts a hot Kite Dunk")
-                    .Do(async e =>
-                    {
-                        await e.Channel.SendMessage(GetUpdatedKiteDunk());                        
-                    });
-
-            Console.WriteLine("Registering KiteDunkAll Command");
-
-            Program.Client.GetService<CommandService>().CreateCommand("KiteDunkAll")
-                .Description("Posts hella KiteDunks, beware")
-                .AddCheck((c, u, ch) => u.Id == Program.Settings.OwnerId)
-                .Hide()
-                .Do(async e =>
-                {
-                    var stringBuilder = new System.Text.StringBuilder(2000);
-                    for (int i = 0; i < _updatedKiteDunks.GetLength(0);i++)
-                    {
-                        var entry = "\"" + _updatedKiteDunks[i, 1] + "\" - " + _updatedKiteDunks[i, 0] + Environment.NewLine;
-                        if (stringBuilder.Length + entry.Length > 2000)
-                        {
-                            await e.Channel.SendMessage(stringBuilder.ToString());
-                            stringBuilder.Clear();
-                        }
-                        else
-                        {
-                            stringBuilder.Append(entry);
-                        }                        
-                    }
-                    await e.Channel.SendMessage(stringBuilder.ToString());
-                });
         }
 
-		public string GetUpdatedKiteDunk()
+        // ~say hello -> hello
+        [Command("KiteDunk"), Summary("Posts a hot Kite Dunk"), Alias("dunk")]
+        public async Task KiteDunkCommand(IUserMessage msg)
+        {
+            await msg.Channel.SendMessageAsync(GetUpdatedKiteDunk());
+        }
+
+        [Command("KiteDunk"), Summary("Posts a hot Kite Dunk"), RequireOwner]
+        public async Task KiteDunkAllCommand(IUserMessage msg)
+        {
+            var stringBuilder = new System.Text.StringBuilder(2000);
+            for (int i = 0; i < _updatedKiteDunks.GetLength(0); i++)
+            {
+                var entry = "\"" + _updatedKiteDunks[i, 1] + "\" - " + _updatedKiteDunks[i, 0] + Environment.NewLine;
+                if (stringBuilder.Length + entry.Length > 2000)
+                {
+                    await msg.Channel.SendMessageAsync(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                }
+                else
+                {
+                    stringBuilder.Append(entry);
+                }
+            }
+            await msg.Channel.SendMessageAsync(stringBuilder.ToString());
+        }
+
+        public string GetUpdatedKiteDunk()
 		{
 			var i = _random.Next(_updatedKiteDunks.GetLength(0));
 			return "\"" + _updatedKiteDunks[i, 1] + "\" - " + _updatedKiteDunks[i, 0];

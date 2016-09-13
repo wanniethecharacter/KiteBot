@@ -4,6 +4,8 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Discord;
+using Discord.WebSocket;
 using Timer = System.Timers.Timer;
 
 namespace KiteBot
@@ -55,13 +57,14 @@ namespace KiteBot
             _chatTimer.Stop();
             try
             {
-                if (Program.Client.Servers.Any())
+                if (Program.Client.GetGuilds().Any())
                 {
                     try
                     {
                         _retry = 0;
                         _latestXElement = await GetXDocumentFromUrl(ApiCallUrl).ConfigureAwait(false);
                         var numberOfResults = _latestXElement.Element("number_of_page_results")?.Value;
+                        var channel = (ITextChannel) await Program.Client.GetChannelAsync(85842104034541568);
 
                         if (_wasStreamRunning == false && !numberOfResults.Equals("0"))
                         {
@@ -71,18 +74,14 @@ namespace KiteBot
                             var title = deGiantBombifyer(stream?.Element("title")?.Value);
                             var deck = deGiantBombifyer(stream?.Element("deck")?.Value);
 
-                            await
-                                Program.Client.GetChannel(85842104034541568)
-                                    .SendMessage(title + ": " + deck +
+                            await channel.SendMessageAsync(title + ": " + deck +
                                                  " is LIVE at http://www.giantbomb.com/chat/ NOW, check it out!");
                         }
                         else if (_wasStreamRunning && numberOfResults.Equals("0"))
                         {
                             _wasStreamRunning = false;
-                            await
-                                Program.Client.GetChannel(85842104034541568)
-                                    .SendMessage(
-                                        "Show is over folks, if you need more Giant Bomb videos, check this out: " +
+
+                            await channel.SendMessageAsync("Show is over folks, if you need more Giant Bomb videos, check this out: " +
                                         KiteChat.GetResponseUriFromRandomQlCrew());
                         }
 
@@ -96,10 +95,9 @@ namespace KiteBot
             catch (Exception ex)
             {
                 Console.WriteLine($"LivestreamChecker sucks: {ex} \n {ex.Message}");
-                var owner = Program.Client.Servers.FirstOrDefault()?
-                    .Users.FirstOrDefault(x => x.Id == 85817630560108544);
-                if (owner != null)
-                    await owner.SendMessage($"LivestreamChecker threw an {ex.GetType()}, check the logs").ConfigureAwait(false);
+                var ownerDMChannel = Program.Client.GetDMChannel(85817630560108544);
+                if (ownerDMChannel != null)
+                    await ownerDMChannel.SendMessageAsync($"LivestreamChecker threw an {ex.GetType()}, check the logs").ConfigureAwait(false);
             }
             finally
             {

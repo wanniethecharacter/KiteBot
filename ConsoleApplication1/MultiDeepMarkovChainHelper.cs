@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using Discord;
+using Discord.API;
+using Discord.API.Rest;
 using Newtonsoft.Json;
 using TextMarkovChains;
 
@@ -17,7 +19,7 @@ namespace KiteBot
         public static int Depth;
         private static Timer _timer;
         private static IMarkovChain _markovChain;
-        private static DiscordClient _client;
+        private static IDiscordClient _client;
         private static bool _isInitialized;
         private static List<JsonMessage> _jsonList = new List<JsonMessage>();
         private static JsonLastMessage _lastMessage = new JsonLastMessage();
@@ -31,7 +33,7 @@ namespace KiteBot
         {
         }
 
-        public MultiTextMarkovChainHelper(DiscordClient client,int depth)
+        public MultiTextMarkovChainHelper(IDiscordClient client,int depth)
         {
             Console.WriteLine("MultiTextMarkovChainHelper");
             _client = client;
@@ -57,7 +59,7 @@ namespace KiteBot
             }
 
             _timer = new Timer();
-            _timer.Elapsed += (s,e) => Save();
+            _timer.Elapsed += async (s,e) => await Save();
             _timer.Interval = 3600000;
             _timer.AutoReset = true;
         }
@@ -83,8 +85,7 @@ namespace KiteBot
                         {
                             string s = File.ReadAllText(JsonLastMessageLocation);
                             _lastMessage = JsonConvert.DeserializeObject<JsonLastMessage>(s);
-                            List<Message> list =
-                                await DownloadMessagesAfterId(_lastMessage.MessageId,_client.GetChannel(_lastMessage.ChannelId));
+                            List<Message> list = await DownloadMessagesAfterId(_lastMessage.MessageId, _lastMessage.ChannelId);
                             foreach (Message message in list)
                             {
                                 FeedMarkovChain(message);
@@ -98,15 +99,15 @@ namespace KiteBot
                 }
                 else
                 {
-                    List<Message> list = await GetMessagesFromChannel(_client.GetChannel(85842104034541568), 10000);
-                    list.AddRange(await GetMessagesFromChannel(_client.GetChannel(96786127238725632), 5000));
-                    list.AddRange(await GetMessagesFromChannel(_client.GetChannel(94122326802571264), 5000));
+                    List<Message> list = await GetMessagesFromChannel(85842104034541568, 10000);
+                    list.AddRange(await GetMessagesFromChannel(96786127238725632, 5000));
+                    list.AddRange(await GetMessagesFromChannel(94122326802571264, 5000));
                     foreach (Message message in list)
                     {
-                        if (message != null && !message.Text.Equals(""))
+                        if (message != null && !message.Content.Equals(""))
                         {
                             FeedMarkovChain(message);
-                            var json = new JsonMessage{M = message.Text};
+                            var json = new JsonMessage{M = message.Content.Value};
                             _jsonList.Add(json);
                         }
                     }
@@ -117,14 +118,14 @@ namespace KiteBot
             return _isInitialized;
         }
 
-        private async Task<List<Message>> DownloadMessagesAfterId(ulong id, Channel channel)
+        private async Task<List<Message>> DownloadMessagesAfterId(ulong id, ulong channelId)
         {
             Console.WriteLine("DownloadMessagesAfterId");
             List<Message> messages = new List<Message>();
-            var latestMessages = await channel.DownloadMessages(100, id,Relative.After);
+            var latestMessages = await _client.ApiClient.GetChannelMessagesAsync(channelId, new GetChannelMessagesParams { Limit = 100, RelativeDirection = Direction.After });
             messages.AddRange(latestMessages);
 
-            if (latestMessages.Length == 0) return messages;
+            if (latestMessages.Count == 0) return messages;
 
             ulong tmpMessageTracker = latestMessages.Last().Id;
             // ReSharper disable once TooWideLocalVariableScope
@@ -132,7 +133,7 @@ namespace KiteBot
 
             while (true)
             {
-                messages.AddRange(await channel.DownloadMessages(100, tmpMessageTracker,Relative.After));
+                messages.AddRange(await _client.ApiClient.GetChannelMessagesAsync(channelId, new GetChannelMessagesParams { Limit = 100, RelativeMessageId = tmpMessageTracker, RelativeDirection = Direction.After}));
 
                 newMessageTracker = messages[messages.Count - 1].Id;
                 if (tmpMessageTracker != newMessageTracker)     //Checks if there are any more messages in channel, and if not, returns the List
@@ -147,7 +148,7 @@ namespace KiteBot
             }
         }
 
-        public void Feed(Message message)
+        public void Feed(IMessage message)
         {
             FeedMarkovChain(message);
         }
@@ -169,35 +170,52 @@ namespace KiteBot
             return "I'm not ready yet Senpai!";
         }
 
-        private void FeedMarkovChain(Message message)
+        private void FeedMarkovChain(IMessage message)
         {
-            if (!message.User.IsBot)
+            if (!message.Author.IsBot)
             {
-                if(!message.Text.Equals("") && !message.Text.Contains("http") && !message.Text.ToLower().Contains("testmarkov") && !message.Text.ToLower().Contains("getdunked") && !message.IsMentioningMe())
+                if(!message.Content.Equals("") && !message.Content.Contains("http") && !message.Content.ToLower().Contains("testmarkov") && !message.Content.ToLower().Contains("getdunked"))//TODO: add back in is mentioning me check
                 {
-                    if (message.Text.Contains("."))
+                    if (message.Content.Contains("."))
                     {
                         if (GC.GetTotalMemory(false) < 512000000)
-                            _markovChain.feed(message.Text);
+                            _markovChain.feed(message.Content);
                     }
-                    _markovChain.feed(message.Text + ".");
-                    _jsonList.Add(new JsonMessage { M = message.Text });
+                    _markovChain.feed(message.Content + ".");
+                    _jsonList.Add(new JsonMessage { M = message.Content });
                 }
             }
         }
 
-        private async Task<List<Message>> GetMessagesFromChannel(Channel channel, int i)
+        private void FeedMarkovChain(Message message)
+        {
+            if (message.Author.IsSpecified && !message.Author.Value.Bot.Value)
+            {
+                if (!message.Content.Value.Equals("") && !message.Content.Value.Contains("http") && !message.Content.Value.ToLower().Contains("testmarkov") && !message.Content.Value.ToLower().Contains("getdunked") && message.Mentions.Value.First().Username.Value == "KiteBot")//TODO: add back in is mentioning me check
+                {
+                    if (message.Content.Value.Contains("."))
+                    {
+                        if (GC.GetTotalMemory(false) < 512000000)
+                            _markovChain.feed(message.Content.Value);
+                    }
+                    _markovChain.feed(message.Content + ".");
+                    _jsonList.Add(new JsonMessage { M = message.Content.Value });
+                }
+            }
+        }
+
+        private async Task<List<Message>> GetMessagesFromChannel(ulong channelId, int i)
         {
             Console.WriteLine("GetMessagesFromChannel");
             List<Message> messages = new List<Message>();
-            var latestMessage = await channel.DownloadMessages(i);
+            var latestMessage = await _client.ApiClient.GetChannelMessagesAsync(channelId, new GetChannelMessagesParams{Limit = 100});
             messages.AddRange(latestMessage);
 
             ulong tmpMessageTracker = latestMessage.Last().Id;
 
             while (messages.Count < i)
             {
-                messages.AddRange(await channel.DownloadMessages(100, tmpMessageTracker));
+                messages.AddRange(await _client.ApiClient.GetChannelMessagesAsync(channelId, new GetChannelMessagesParams { Limit = 100, RelativeMessageId = tmpMessageTracker, RelativeDirection = Direction.Before}));
 
                 ulong newMessageTracker = messages[messages.Count - 1].Id;
                 if (tmpMessageTracker != newMessageTracker)     //Checks if there are any more messages in channel, and if not, returns the List
@@ -213,7 +231,7 @@ namespace KiteBot
             return messages;
         }
 
-        public void Save()
+        public async Task Save()
         {
             Console.WriteLine("Save");
             if (_isInitialized)
@@ -226,11 +244,11 @@ namespace KiteBot
                         stream.Write(text, 0, text.Length);     // Write to the `stream` here and the result will be compressed
                     }
                 }
-                Message message = _client.GetChannel(85842104034541568).DownloadMessages(1).Result[0];
+                var message = await _client.ApiClient.GetChannelMessagesAsync(85842104034541568, new GetChannelMessagesParams {Limit = 1});
                 var x = new JsonLastMessage
                 {
-                    MessageId = message.Id,
-                    ChannelId = message.Channel.Id
+                    MessageId = message.First().Id,
+                    ChannelId = message.First().ChannelId
                 };
 
                 var lastmessageJson = JsonConvert.SerializeObject(x, Formatting.Indented);
