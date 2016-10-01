@@ -13,7 +13,6 @@ namespace KiteBot
 {
     class Program
     {
-        static bool _exitSystem = true;
 
 //#region Trap application termination
 //        [DllImport("Kernel32")]
