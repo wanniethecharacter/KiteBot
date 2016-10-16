@@ -7,6 +7,7 @@ using Discord.Commands;
 using Discord.Modules;
 using Newtonsoft.Json;
 using KiteBot.Commands;
+using Game = KiteBot.Commands.Game;
 
 
 namespace KiteBot
@@ -93,7 +94,8 @@ namespace KiteBot
                 Settings.MarkovChainDepth);            
 
             Eval.RegisterEvalCommand(Client);
-            Commands.Game.RegisterGameCommand(Client,Settings.GiantBombApiKey);
+            Game.RegisterGameCommand(Client,Settings.GiantBombApiKey);
+            Upcoming.RegisterUpcomingCommand(Client);
 
             //Event handlers
             Client.UserIsTyping += (s, e) => _kiteChat.IsRaeTyping(e);

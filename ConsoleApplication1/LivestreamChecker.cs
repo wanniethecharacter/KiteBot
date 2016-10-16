@@ -12,7 +12,7 @@ namespace KiteBot
 	{
 		public static string ApiCallUrl;
         public static int RefreshRate;
-		private static Timer _chatTimer;//Garbage collection doesnt like local variables that only fire a couple times per hour
+		private static Timer _chatTimer;//Garbage collection doesnt like local timers.
 		private XElement _latestXElement;
 		private static bool _wasStreamRunning;
         private int _retry;
@@ -52,7 +52,6 @@ namespace KiteBot
 
         private async Task RefreshChatsApi()
         {
-            _chatTimer.Stop();
             try
             {
                 if (Program.Client.Servers.Any())
@@ -101,10 +100,6 @@ namespace KiteBot
                 if (owner != null)
                     await owner.SendMessage($"LivestreamChecker threw an {ex.GetType()}, check the logs").ConfigureAwait(false);
             }
-            finally
-            {
-                _chatTimer.Start();
-            }
         }
 
         private string deGiantBombifyer(string s)
@@ -125,7 +120,7 @@ namespace KiteBot
             catch (Exception)
             {
                 _retry++;
-                if (_retry < 3)
+                if (_retry < 2)
                 {
                     await Task.Delay(10000);
                     return await GetXDocumentFromUrl(url).ConfigureAwait(false);

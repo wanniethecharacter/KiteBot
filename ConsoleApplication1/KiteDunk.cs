@@ -23,7 +23,7 @@ namespace KiteBot
 	        UpdateKiteDunks().Wait();
 
 			_kiteDunkTimer = new Timer();
-			_kiteDunkTimer.Elapsed += UpdateKiteDunks;
+            _kiteDunkTimer.Elapsed += async (s, e) => await UpdateKiteDunks();
 			_kiteDunkTimer.Interval = 86400000;//24 hours
 			_kiteDunkTimer.AutoReset = true;
 			_kiteDunkTimer.Enabled = true;
@@ -68,11 +68,6 @@ namespace KiteBot
 		{
 			var i = _random.Next(_updatedKiteDunks.GetLength(0));
 			return "\"" + _updatedKiteDunks[i, 1] + "\" - " + _updatedKiteDunks[i, 0];
-		}
-
-		private async void UpdateKiteDunks(object sender, ElapsedEventArgs elapsedEventArgs)
-		{
-		    await UpdateKiteDunks();
 		}
 
         public async Task UpdateKiteDunks()
