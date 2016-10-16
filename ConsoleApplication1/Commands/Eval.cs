@@ -10,11 +10,9 @@ using Newtonsoft.Json;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
-using RestSharp;
 
 namespace KiteBot.Commands
 {
-    [Module]
     class Eval
     {
         private static MetadataReference[] _references;

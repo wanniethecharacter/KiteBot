@@ -28,7 +28,6 @@ namespace KiteBot
         public static KiteSandwich KiteSandwich = new KiteSandwich();
 		public static KiteDunk KiteDunk = new KiteDunk();
 		public static DiceRoller DiceRoller = new DiceRoller();
-		//public static KitCoGame KiteGame = new KitCoGame();
         public static LivestreamChecker StreamChecker;
         public static GiantBombVideoChecker GbVideoChecker;
         public static MultiTextMarkovChainHelper MultiDeepMarkovChains;
@@ -74,7 +73,7 @@ namespace KiteBot
 
             //add all messages to the Markov Chain list
 
-            if (msg.Author != client.GetCurrentUserAsync().GetAwaiter().GetResult())
+            if (msg.Author.Id != client.CurrentUser.Id)
             {
                 MultiDeepMarkovChains.Feed(msg);
 
@@ -118,13 +117,12 @@ namespace KiteBot
 
                 else if (msg.Content.ToLower().StartsWith("!whois"))
                 {
-                    var userMentioned =
-                        msg.MentionedUsers.FirstOrDefault(x => x.Id != Program.Client.GetCurrentUser().Id);
-                    if (userMentioned != null)
+                    var userMentioned = msg.MentionedUserIds.FirstOrDefault();
+                    if (userMentioned != 0)
                     {
                         await
                             msg.Channel.SendMessageAsync(
-                                $"Former names for {userMentioned.Username} are: {EnumWhoIs(userMentioned.Id)}.".Replace(
+                                $"Former names for {await client.GetUserAsync(userMentioned)} are: {EnumWhoIs(userMentioned)}.".Replace(
                                     ",.", "."));
                     }
                 }
@@ -270,11 +268,6 @@ namespace KiteBot
                     }
                 }
             }
-        }
-
-        internal Task AsyncParseChat(IMessage msg, DiscordSocketClient client)
-        {
-            throw new NotImplementedException();
         }
 
         public static string GetResponseUriFromRandomQlCrew()

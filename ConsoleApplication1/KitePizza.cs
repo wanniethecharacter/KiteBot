@@ -15,14 +15,14 @@ namespace KiteBot
             if ( (userName.ToLower().Contains("ionic") && !message.ToLower().Contains("opt-out"))
                 || message.ToLower().Contains("japan"))
             {
-                pizzaToppings.AddRange(new string[] {"Mayonnaise", "Squid", "Raw Tuna", "Raw Salmon", "Avocado","Squid Ink",
+                pizzaToppings.AddRange(new [] {"Mayonnaise", "Squid", "Raw Tuna", "Raw Salmon", "Avocado","Squid Ink",
                                                       "Broccoli", "Shrimp", "Teriyaki Chicken", "Bonito Flakes", "Hot Sake",
                                                       "Soft Tofu", "Sushi Rice", "Nori", "Corn", "Snow Peas", "Bamboo Shoots",
                                                       "Potato", "Onion"});
             }
 
             else
-                pizzaToppings.AddRange(new string[] {"Extra Cheese", "Pepperoni", "Sausage", "Chicken", "Ham", "Canadian Bacon",
+                pizzaToppings.AddRange(new [] {"Extra Cheese", "Pepperoni", "Sausage", "Chicken", "Ham", "Canadian Bacon",
                                                          "Bacon", "Green Peppers", "Black Olives", "White Onion", "Diced Tomatoes",
                                                          "Spinach", "Roasted Red Peppers", "Sun Dried Tomato", "Pineapple", "Italian Sausage",
                                                          "Red Onion", "Green Chile", "Basil", "Mayonnaise", "Mushrooms", "Beef"});

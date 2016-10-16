@@ -9,8 +9,7 @@ using KiteBot.Commands;
 
 namespace KiteBot
 {
-    [Module]
-	public class KiteDunk
+    public class KiteDunk
 	{
 		private static string[,] _updatedKiteDunks;
 	    private static Random _random;

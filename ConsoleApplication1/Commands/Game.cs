@@ -6,11 +6,11 @@ using System.Xml.XPath;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using ScriptCs.Contracts;
 
 namespace KiteBot.Commands
 {
-    [Module]
-    class Game
+    class Game : ModuleBase
     {
         public static string ApiCallUrl;
         private static int _retry;
@@ -37,32 +37,7 @@ namespace KiteBot.Commands
                 await msg.Channel.SendMessageAsync($"Empty game name given, please specify a game title");
             }
         }
-
-        /*public static void RegisterGameCommand(IDiscordClient client, string gBapi)
-        {
-            Console.WriteLine("Registering Game Command");
-            ApiCallUrl =
-                $"http://www.giantbomb.com/api/games/?api_key={gBapi}&field_list=deck,image,name,original_release_date,platforms,site_detail_url&filter=name:";
-            client.GetService<CommandService>().CreateCommand("game")
-                    .Alias("games", "giantbomb", "videogame", "videogames")
-                    .Description("Gets the first game with the given name or alias from the GiantBomb games api endpoint")
-                    //.AddCheck((c, u, ch) => u.Id == 85817630560108544)
-                    .Parameter("GameTitle", ParameterType.Unparsed)
-                    .Do(async e =>
-                    {
-                        var args = e.GetArg("GameTitle");
-                        if (!string.IsNullOrWhiteSpace(args))
-                        {
-                            string s = await GetGamesEndpoint(args).ConfigureAwait(false);
-                            await e.Channel.SendMessageAsync(s);
-                        }
-                        else
-                        {
-                            await e.Channel.SendMessageAsync($"Empty game name given, please specify a game title");
-                        }
-                    });
-        }*/
-
+        
         private static async Task<string> GetGamesEndpoint(string gameTitle)
         {
             string output;

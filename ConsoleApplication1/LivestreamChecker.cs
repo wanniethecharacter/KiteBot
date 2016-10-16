@@ -57,14 +57,14 @@ namespace KiteBot
             _chatTimer.Stop();
             try
             {
-                if (Program.Client.GetGuilds().Any())
+                if (Program.Client.Guilds.Any())
                 {
                     try
                     {
                         _retry = 0;
                         _latestXElement = await GetXDocumentFromUrl(ApiCallUrl).ConfigureAwait(false);
                         var numberOfResults = _latestXElement.Element("number_of_page_results")?.Value;
-                        var channel = (ITextChannel) await Program.Client.GetChannelAsync(85842104034541568);
+                        var channel = (ITextChannel) Program.Client.GetChannel(85842104034541568);
 
                         if (_wasStreamRunning == false && !numberOfResults.Equals("0"))
                         {
@@ -95,7 +95,7 @@ namespace KiteBot
             catch (Exception ex)
             {
                 Console.WriteLine($"LivestreamChecker sucks: {ex} \n {ex.Message}");
-                var ownerDMChannel = Program.Client.GetDMChannel(85817630560108544);
+                var ownerDMChannel = await Program.Client.GetDMChannelAsync(85817630560108544);
                 if (ownerDMChannel != null)
                     await ownerDMChannel.SendMessageAsync($"LivestreamChecker threw an {ex.GetType()}, check the logs").ConfigureAwait(false);
             }

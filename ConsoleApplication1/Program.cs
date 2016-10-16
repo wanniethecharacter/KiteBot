@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using Discord.Commands;
+using KiteBot.Json;
 using Newtonsoft.Json;
 
 
@@ -15,7 +16,7 @@ namespace KiteBot
     {
         public static DiscordSocketClient Client;
         public static CommandService CommandService = new CommandService();
-        public static JsonSettings Settings;
+        public static BotSettings Settings;
         private static KiteChat _kiteChat;
         public static string ContentDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.FullName;
         private static string SettingsPath => ContentDirectory + "/Content/settings.json";
@@ -28,17 +29,22 @@ namespace KiteBot
             Client = new DiscordSocketClient(new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Info,
-                MessageCacheSize = 0                
+                MessageCacheSize = 0
             });
 
             Settings = File.Exists(SettingsPath) ? 
-                JsonConvert.DeserializeObject<JsonSettings>(File.ReadAllText(SettingsPath)) 
-                : new JsonSettings("email",
-                "password", 
-                "Token", 
-                "GBAPIKey", 
-                0,
-                true, 2, 60000, 60000);
+                JsonConvert.DeserializeObject<BotSettings>(File.ReadAllText(SettingsPath)) 
+                : new BotSettings()
+                {
+                    DiscordEmail = "email",
+                    DiscordPassword = "password",
+                    DiscordToken = "Token",
+                    GiantBombApiKey = "GBAPIKey",
+                    OwnerId = 0,
+                    MarkovChainStart = false,
+                    MarkovChainDepth = 2,
+                    GiantBombLiveStreamRefreshRate = 60000, GiantBombVideoRefreshRate = 60000
+                };
 
             _kiteChat = new KiteChat(Settings.MarkovChainStart,
                 Settings.GiantBombApiKey,
@@ -55,6 +61,7 @@ namespace KiteBot
 
             Client.MessageReceived += async msg =>
             {
+                Console.WriteLine(msg.ToString());
                 try
                 {
                     await _kiteChat.AsyncParseChat(msg, Client);
@@ -69,7 +76,7 @@ namespace KiteBot
 
             Client.GuildAvailable += async server =>
             {
-                if (Client.GetGuilds().Any())
+                if (Client.Guilds.Any())
                 {
                     Console.WriteLine(await _kiteChat.InitializeMarkovChain());
                 }
@@ -127,31 +134,10 @@ namespace KiteBot
             await Task.Delay(-1);
         }
 
-        public struct JsonSettings
+        private Task Log(LogMessage msg)
         {
-            public string DiscordEmail { get; set; }
-            public string DiscordPassword { get; set; }
-            public string DiscordToken { get; set; }
-            public string GiantBombApiKey { get; set; }
-            public ulong OwnerId { get; set; }
-
-            public bool MarkovChainStart { get; set; }
-            public int MarkovChainDepth { get; set; }
-            public int GiantBombVideoRefreshRate { get; set; }
-            public int GiantBombLiveStreamRefreshRate { get; set; }
-
-            public JsonSettings(string email, string password, string token, string gbApi, ulong ownerId, bool markovChainStart,int markovChainDepth, int videoRefresh, int livestreamRefresh)
-            {
-                DiscordEmail = email;
-                DiscordPassword = password;
-                DiscordToken = token;
-                GiantBombApiKey = gbApi;
-                MarkovChainStart = markovChainStart;
-                MarkovChainDepth = markovChainDepth;
-                GiantBombVideoRefreshRate = videoRefresh;
-                GiantBombLiveStreamRefreshRate = livestreamRefresh;
-                OwnerId = ownerId;
-            }
+            Console.WriteLine(msg.ToString());
+            return Task.CompletedTask;
         }
     }
 }

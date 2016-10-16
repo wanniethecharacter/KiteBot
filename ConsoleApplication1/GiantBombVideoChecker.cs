@@ -95,7 +95,7 @@ namespace KiteBot
                         var user = deGiantBombifyer(item?.Element("user")?.Value);
                         lastPublishTime = newPublishTime;
 
-                        ITextChannel channel = (ITextChannel) await Program.Client.GetChannelAsync(85842104034541568);
+                        ITextChannel channel = (ITextChannel) Program.Client.GetChannel(85842104034541568);
                         await channel.SendMessageAsync(title + ": " + deck + Environment.NewLine + "by: " + user +
                                              Environment.NewLine + link);
                     }

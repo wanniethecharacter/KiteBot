@@ -191,7 +191,7 @@ namespace KiteBot
         {
             if (message.Author.IsSpecified && !message.Author.Value.Bot.Value)
             {
-                if (!message.Content.Value.Equals("") && !message.Content.Value.Contains("http") && !message.Content.Value.ToLower().Contains("testmarkov") && !message.Content.Value.ToLower().Contains("getdunked") && message.Mentions.Value.First().Username.Value == "KiteBot")//TODO: add back in is mentioning me check
+                if (!message.Content.Value.Equals("") && !message.Content.Value.Contains("http") && !message.Content.Value.ToLower().Contains("testmarkov") && !message.Content.Value.ToLower().Contains("getdunked") && message.UserMentions.Value.First().Object.Username.Value == "KiteBot")//TODO: add back in is mentioning me check
                 {
                     if (message.Content.Value.Contains("."))
                     {
