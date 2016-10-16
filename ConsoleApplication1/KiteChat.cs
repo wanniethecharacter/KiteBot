@@ -7,6 +7,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
 using Newtonsoft.Json;
+using Discord.Commands;
+using Discord.WebSocket;
 
 namespace KiteBot
 {
@@ -26,7 +28,6 @@ namespace KiteBot
         public static KiteSandwich KiteSandwich = new KiteSandwich();
 		public static KiteDunk KiteDunk = new KiteDunk();
 		public static DiceRoller DiceRoller = new DiceRoller();
-		//public static KitCoGame KiteGame = new KitCoGame();
         public static LivestreamChecker StreamChecker;
         public static GiantBombVideoChecker GbVideoChecker;
         public static MultiTextMarkovChainHelper MultiDeepMarkovChains;
@@ -65,122 +66,122 @@ namespace KiteBot
             return await bek;
         }
 
-        public async Task AsyncParseChat(object s, MessageEventArgs e, DiscordClient client)
+        public async Task AsyncParseChat(IMessage msg, IDiscordClient client)
         {
-            Console.WriteLine("(" + e.User.Name + "/" + e.User.Id + ") - " + e.Message.Text);
-            IsRaeTyping(e);
+            Console.WriteLine("(" + msg.Author.Username + "/" + msg.Author.Id + ") - " + msg.Content);
+            IsRaeTyping(msg);
 
             //add all messages to the Markov Chain list
 
-            if (!e.Message.IsAuthor)
+            if (msg.Author.Id != client.CurrentUser.Id)
             {
-                MultiDeepMarkovChains.Feed(e.Message);
+                MultiDeepMarkovChains.Feed(msg);
 
-                if (e.Message.Text.StartsWith("/anime"))
+                if (msg.Content.StartsWith("/anime"))
                 {
                     try
                     {
-                        var result = await SearchHelper.GetAnimeData(e.Message.Text.Remove(0, 6));
-                        await e.Channel.SendMessage(result.ToString());
+                        var result = await SearchHelper.GetAnimeData(msg.Content.Remove(0, 6));
+                        await msg.Channel.SendMessageAsync(result.ToString());
                     }
                     catch (Exception)
                     {
-                        await e.Channel.SendMessage("Can't find any good anime named anything like that.");
+                        await msg.Channel.SendMessageAsync("Can't find any good anime named anything like that.");
                     }
                 }
-                else if (e.Message.Text.StartsWith("/manga"))
+                else if (msg.Content.StartsWith("/manga"))
                 {
                     try
                     {
-                        var result = await SearchHelper.GetMangaData(e.Message.Text.Remove(0, 6));
-                        await e.Channel.SendMessage(result.ToString());
+                        var result = await SearchHelper.GetMangaData(msg.Content.Remove(0, 6));
+                        await msg.Channel.SendMessageAsync(result.ToString());
                     }
                     catch (Exception)
                     {
-                        await e.Channel.SendMessage("Why are you even looking for manga when there is anime.");
+                        await msg.Channel.SendMessageAsync("Why are you even looking for manga when there is anime.");
                     }
                 }
-                else if (e.Message.Text.Contains("Mistake") && e.Channel.Id == 96786127238725632)
+                else if (msg.Content.Contains("Mistake") && msg.Channel.Id == 96786127238725632)
                 {
-                    await e.Channel.SendMessage("Anime is a mistake " + e.User.Mention +".");
+                    await msg.Channel.SendMessageAsync("Anime is a mistake " + msg.Author.Mention +".");
                 }
-                else if (e.Message.Text.StartsWith("/roll"))
+                else if (msg.Content.StartsWith("/roll"))
                 {
-                    await e.Channel.SendMessage(DiceRoller.ParseRoll(e.Message.Text));
-                }
-
-                else if (e.Message.Text.ToLower().StartsWith("!reminder"))
-                {
-                    await e.Channel.SendMessage(Reminder.AddNewEvent(e.Message));
+                    await msg.Channel.SendMessageAsync(DiceRoller.ParseRoll(msg.Content));
                 }
 
-                else if (e.Message.Text.ToLower().StartsWith("!whois"))
+                else if (msg.Content.ToLower().StartsWith("!reminder"))
                 {
-                    var userMentioned =
-                        e.Message.MentionedUsers.FirstOrDefault(x => x.Id != Program.Client.CurrentUser.Id);
-                    if (userMentioned != null)
+                    await msg.Channel.SendMessageAsync(Reminder.AddNewEvent(msg));
+                }
+
+                else if (msg.Content.ToLower().StartsWith("!whois"))
+                {
+                    var userMentioned = msg.MentionedUserIds.FirstOrDefault();
+                    if (userMentioned != 0)
                     {
                         await
-                            e.Channel.SendMessage(
-                                $"Former names for {userMentioned.Name} are: {EnumWhoIs(userMentioned.Id)}.".Replace(
+                            msg.Channel.SendMessageAsync(
+                                $"Former names for {await client.GetUserAsync(userMentioned)} are: {EnumWhoIs(userMentioned)}.".Replace(
                                     ",.", "."));
                     }
                 }
 
-                else if (e.Message.Text.Contains("GetDunked"))
+                else if (msg.Content.Contains("GetDunked"))
                 {
-                    await e.Channel.SendMessage("http://i.imgur.com/QhcNUWo.gif");
+                    await msg.Channel.SendMessageAsync("http://i.imgur.com/QhcNUWo.gif");
                 }
 
-                else if (e.Message.Text.Contains(@"/saveJSON") && e.User.Id == 85817630560108544 && StartMarkovChain)
+                else if (msg.Content.Contains(@"/saveJSON") && msg.Author.Id == 85817630560108544 && StartMarkovChain)
                 {
-                    MultiDeepMarkovChains.Save();
-                    await e.Channel.SendMessage("Done.");
+                    await MultiDeepMarkovChains.Save();
+                    await msg.Channel.SendMessageAsync("Done.");
                 }
-                else if (e.Message.Text.Contains(@"/saveExit") && e.User.Id == 85817630560108544 && StartMarkovChain)
+                else if (msg.Content.Contains(@"/saveExit") && msg.Author.Id == 85817630560108544 && StartMarkovChain)
                 {
-                    MultiDeepMarkovChains.Save();
-                    await e.Channel.SendMessage("Done.");
+                    await MultiDeepMarkovChains.Save();
+                    await msg.Channel.SendMessageAsync("Done.");
                     Environment.Exit(1);
                 }
-                else if (e.Message.Text.Contains(@"/restart") && e.User.Id == 85817630560108544)
+                else if (msg.Content.Contains(@"/restart") && msg.Author.Id == 85817630560108544)
                 {
                     StreamChecker.Restart();
                     GbVideoChecker.Restart();
                 }
-                else if ((e.Message.Text.Contains(@"/testMarkov") || e.Message.Text.StartsWith(@"@KiteBot /tm")) &&
+                else if ((msg.Content.Contains(@"/testMarkov") || msg.Content.StartsWith(@"@KiteBot /tm")) &&
                          StartMarkovChain)
                 {
                     try
                     {
-                        await e.Channel.SendMessage(MultiDeepMarkovChains.GetSequence());
+                        await msg.Channel.SendMessageAsync(MultiDeepMarkovChains.GetSequence());
                     }
                     catch (Exception)
                     {
-                        MultiDeepMarkovChains.Save();
+                        await MultiDeepMarkovChains.Save();
                         throw;
                     }
                     finally
                     {
-                        if (e.User.Id == 85817630560108544)
+                        if (msg.Author.Id == 85817630560108544)
                         {
-                            await e.Message.Delete();
+                            var userMessage = (IUserMessage) msg;
+                            await userMessage.DeleteAsync();
                         }
                     }
                 }
 
-                else if (e.Message.IsMentioningMe())
+                else if (msg.Content.Contains(@"@KiteBot"))
                 {
-                    if (e.Message.Text.StartsWith("@KiteBot #420") ||
-                        e.Message.Text.ToLower().StartsWith("@KiteBot #blaze") ||
-                        e.Message.Text.ToLower().Contains("waifu"))
+                    if (msg.Content.StartsWith("@KiteBot #420") ||
+                        msg.Content.ToLower().StartsWith("@KiteBot #blaze") ||
+                        msg.Content.ToLower().Contains("waifu"))
                     {
-                        await e.Channel.SendMessage("http://420.moe/");
+                        await msg.Channel.SendMessageAsync("http://420.moe/");
                     }
-                    else if (e.Message.Text.ToLower().Contains("help"))
+                    else if (msg.Content.ToLower().Contains("help"))
                     {
                         var nl = Environment.NewLine;
-                        await e.Channel.SendMessage("Current Commands are:" + nl + 
+                        await msg.Channel.SendMessageAsync("Current Commands are:" + nl + 
                                                     "#420"+ nl + 
                                                     "randomql" + nl + 
                                                     "google" + nl + 
@@ -194,35 +195,35 @@ namespace KiteBot
                                                     "RaeCounter"
                                                     + nl + "help");
                     }
-                    else if (e.Message.Text.ToLower().Contains("randomql"))
+                    else if (msg.Content.ToLower().Contains("randomql"))
                     {
                         await
-                            e.Channel.SendMessage(GetResponseUriFromRandomQlCrew());
+                            msg.Channel.SendMessageAsync(GetResponseUriFromRandomQlCrew());
                     }
-                    else if (e.Message.Text.ToLower().Contains("raecounter"))
+                    else if (msg.Content.ToLower().Contains("raecounter"))
                     {
-                        await e.Channel.SendMessage(@"Rae has ghost-typed " + RaeCounter);
+                        await msg.Channel.SendMessageAsync(@"Rae has ghost-typed " + RaeCounter);
                     }
-                    else if (e.Message.Text.ToLower().Contains("google"))
+                    else if (msg.Content.ToLower().Contains("google"))
                     {
                         await
-                            e.Channel.SendMessage("http://lmgtfy.com/?q=" +
-                                                  e.Message.Text.ToLower().Substring(16).Replace(' ', '+'));
+                            msg.Channel.SendMessageAsync("http://lmgtfy.com/?q=" +
+                                                  msg.Content.ToLower().Substring(16).Replace(' ', '+'));
                     }
-                    else if (e.Message.Text.ToLower().Contains("youtube"))
+                    else if (msg.Content.ToLower().Contains("youtube"))
                     {
-                        if (e.Message.Text.Length > 16)
+                        if (msg.Content.Length > 16)
                         {
-                            await e.Channel.SendMessage("https://www.youtube.com/results?search_query=" +
-                                                        e.Message.Text.ToLower().Substring(17).Replace(' ', '+'));
+                            await msg.Channel.SendMessageAsync("https://www.youtube.com/results?search_query=" +
+                                                        msg.Content.ToLower().Substring(17).Replace(' ', '+'));
                         }
                         else
                         {
-                            await e.Channel.SendMessage("Please add a query after youtube, starting with a space.");
+                            await msg.Channel.SendMessageAsync("Please add a query after youtube, starting with a space.");
                         }
                     }                    
-                    else if (e.Message.Text.ToLower().Contains("fuck you") ||
-                             e.Message.Text.ToLower().Contains("fuckyou"))
+                    else if (msg.Content.ToLower().Contains("fuck you") ||
+                             msg.Content.ToLower().Contains("fuckyou"))
                     {
                         List<string> possibleResponses = new List<string>
                         {
@@ -233,37 +234,37 @@ namespace KiteBot
                         };
 
                         await
-                            e.Channel.SendMessage(
+                            msg.Channel.SendMessageAsync(
                                 possibleResponses[RandomSeed.Next(0, possibleResponses.Count)].Replace("USER",
-                                    e.User.Name));
+                                    msg.Author.Username));
                     }
-                    else if (e.Message.Text.ToLower().Contains("/pizza"))
+                    else if (msg.Content.ToLower().Contains("/pizza"))
                     {
-                        await e.Channel.SendMessage(KitePizza.ParsePizza(e.User.Name, e.Message.Text));
+                        await msg.Channel.SendMessageAsync(KitePizza.ParsePizza(msg.Author.Username, msg.Content));
                     }
-                    else if (e.Message.Text.ToLower().Contains("sandwich"))
+                    else if (msg.Content.ToLower().Contains("sandwich"))
                     {
-                        await e.Channel.SendMessage(KiteSandwich.ParseSandwich(e.User.Name));
+                        await msg.Channel.SendMessageAsync(KiteSandwich.ParseSandwich(msg.Author.Username));
                     }
-                    else if (e.Message.Text.ToLower().Contains("hi") ||
-                             e.Message.Text.ToLower().Contains("hey") ||
-                             e.Message.Text.ToLower().Contains("hello"))
+                    else if (msg.Content.ToLower().Contains("hi") ||
+                             msg.Content.ToLower().Contains("hey") ||
+                             msg.Content.ToLower().Contains("hello"))
                     {
-                        await e.Channel.SendMessage(ParseGreeting(e.User.Name));
+                        await msg.Channel.SendMessageAsync(ParseGreeting(msg.Author.Username));
                     }
-                    else if (0 <= e.Message.Text.ToLower().IndexOf("/meal", 0, StringComparison.Ordinal) ||
-                             e.Message.Text.ToLower().Contains("dinner")
-                             || e.Message.Text.ToLower().Contains("lunch"))
+                    else if (0 <= msg.Content.ToLower().IndexOf("/meal", 0, StringComparison.Ordinal) ||
+                             msg.Content.ToLower().Contains("dinner")
+                             || msg.Content.ToLower().Contains("lunch"))
                     {
                         await
-                            e.Channel.SendMessage(
+                            msg.Channel.SendMessageAsync(
                                 _mealResponses[RandomSeed.Next(0, _mealResponses.Length)].Replace("USER",
-                                    e.User.Name));
+                                    msg.Author.Username));
                     }
                     else
                     {
                         await
-                            e.Channel.SendMessage("KiteBot ver. 1.1.3 \"Now with real dairy.\"");
+                            msg.Channel.SendMessageAsync("KiteBot ver. 1.1.3 \"Now with real dairy.\"");
                     }
                 }
             }
@@ -355,52 +356,52 @@ namespace KiteBot
             return true;
         }
 
-        public void IsRaeTyping(MessageEventArgs e)
+        public void IsRaeTyping(IMessage msg)
         {
-            if (e.User.Id == 85876755797139456)
+            if (msg.Author.Id == 85876755797139456)
             {
                 RaeCounter += -1;
             }
         }
 
-        public void IsRaeTyping(ChannelUserEventArgs channelUserEventArgs)
+        public void IsRaeTyping(IUser user)
         {
-            if (channelUserEventArgs.User.Id == 85876755797139456)
+            if (user.Id == 85876755797139456)
             {
                 RaeCounter += 1;
             }
         }
 
-        public void AddWhoIs(UserUpdatedEventArgs e)
+        public void AddWhoIs(IUser before, IUser after)
         {
-            if (WhoIsDictionary.ContainsKey(e.After.Id))
+            if (WhoIsDictionary.ContainsKey(after.Id))
             {
-                WhoIsDictionary[e.Before.Id].OldNames.Add(e.After.Name);
+                WhoIsDictionary[after.Id].OldNames.Add(after.Username);
             }
             else
             {
-                string[] names = {e.Before.Name,e.After.Name};
-                WhoIsDictionary.Add(e.Before.Id, new WhoIsPerson
+                string[] names = {before.Username, after.Username};
+                WhoIsDictionary.Add(after.Id, new WhoIsPerson
                 {
-                    UserId = e.Before.Id,
+                    UserId = after.Id,
                     OldNames = new List<string>(names)
                 });
             }
             File.WriteAllText(WhoIsLocation,JsonConvert.SerializeObject(WhoIsDictionary));
         }
 
-        public void AddWhoIs(UserUpdatedEventArgs e, string nicknameAfter)
+        public void AddWhoIs(IUser user, string nicknameAfter)
         {
-            if (WhoIsDictionary.ContainsKey(e.After.Id))
+            if (WhoIsDictionary.ContainsKey(user.Id))
             {
-                WhoIsDictionary[e.Before.Id].OldNames.Add(nicknameAfter);
+                WhoIsDictionary[user.Id].OldNames.Add(nicknameAfter);
             }
             else
             {
-                string[] names = { e.Before.Name, nicknameAfter };
-                WhoIsDictionary.Add(e.Before.Id, new WhoIsPerson
+                string[] names = { user.Username, nicknameAfter };
+                WhoIsDictionary.Add(user.Id, new WhoIsPerson
                 {
-                    UserId = e.Before.Id,
+                    UserId = user.Id,
                     OldNames = new List<string>(names)
                 });
             }

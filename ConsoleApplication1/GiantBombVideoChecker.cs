@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Discord;
 using Timer = System.Timers.Timer;
 
 namespace KiteBot
@@ -94,9 +95,8 @@ namespace KiteBot
                         var user = deGiantBombifyer(item?.Element("user")?.Value);
                         lastPublishTime = newPublishTime;
 
-                        await
-                            Program.Client.GetChannel(85842104034541568)
-                                .SendMessage(title + ": " + deck + Environment.NewLine + "by: " + user +
+                        ITextChannel channel = (ITextChannel) Program.Client.GetChannel(85842104034541568);
+                        await channel.SendMessageAsync(title + ": " + deck + Environment.NewLine + "by: " + user +
                                              Environment.NewLine + link);
                     }
                 }
