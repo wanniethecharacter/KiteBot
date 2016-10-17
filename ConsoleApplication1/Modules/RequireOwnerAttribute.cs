@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using Discord.Commands;
 
-namespace KiteBot.Commands
+namespace KiteBot.Modules
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     // Inherit from PreconditionAttribute
     public class RequireOwnerAttribute : PreconditionAttribute
     {

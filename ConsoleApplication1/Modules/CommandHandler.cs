@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Reflection;
-using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 
-namespace KiteBot
+namespace KiteBot.Modules
 {
     public class CommandHandler
     {
@@ -23,8 +20,11 @@ namespace KiteBot
             map.Add(_commands);
             _map = map;
 
-            await _commands.AddModules(Assembly.GetEntryAssembly(), _map);
-
+            await _commands.AddModules(Assembly.GetEntryAssembly());
+            foreach (var x in _commands.Commands)
+            {
+                Console.WriteLine(x.Name);
+            }
             _client.MessageReceived += HandleCommand;
         }
 
@@ -40,13 +40,21 @@ namespace KiteBot
             if (!(message.HasMentionPrefix(_client.CurrentUser, ref argPos) || message.HasCharPrefix('~', ref argPos))) return;
 
             // Create a Command Context
-            var context = new CommandContext(_client, message);
-            // Execute the Command, store the result
-            var result = await _commands.Execute(context, argPos, _map);
+            try
+            {
+                var context = new CommandContext(_client, message);
 
-            // If the command failed, notify the user
-            if (!result.IsSuccess)
-                await message.Channel.SendMessageAsync($"**Error:** {result.ErrorReason}");
+                // Execute the Command, store the result
+                var result = await _commands.Execute(context, argPos, _map);
+
+                // If the command failed, notify the user
+                if (!result.IsSuccess)
+                    await message.Channel.SendMessageAsync($"**Error:** {result.ErrorReason}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex + ": " + ex.Message);
+            }
         }
     }
 }

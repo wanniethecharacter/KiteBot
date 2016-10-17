@@ -7,14 +7,11 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
 using Newtonsoft.Json;
-using Discord.Commands;
-using Discord.WebSocket;
 
 namespace KiteBot
 {
     public class KiteChat
     {
-        //private static Timer _chatTimer;
         public static Random RandomSeed;
 
 		public static int RaeCounter;
@@ -24,19 +21,13 @@ namespace KiteBot
         private static string[] _mealResponses;
         private static string[] _bekGreetings;
 
-        public static KitePizza KitePizza = new KitePizza();
-        public static KiteSandwich KiteSandwich = new KiteSandwich();
-		public static KiteDunk KiteDunk = new KiteDunk();
-		public static DiceRoller DiceRoller = new DiceRoller();
         public static LivestreamChecker StreamChecker;
         public static GiantBombVideoChecker GbVideoChecker;
         public static MultiTextMarkovChainHelper MultiDeepMarkovChains;
-        public static Dictionary<ulong,WhoIsPerson> WhoIsDictionary; 
 
         public static string ChatDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.FullName;
         public static string GreetingFileLocation = ChatDirectory + "/Content/Greetings.txt";
         public static string MealFileLocation = ChatDirectory + "/Content/Meals.txt";
-        public static string WhoIsLocation = ChatDirectory + "/Content/Whois.json";
 
 
         public KiteChat(bool markovbool, string gBapi, int streamRefresh, int videoRefresh, int depth) : this(markovbool, depth,gBapi, streamRefresh, videoRefresh, File.ReadAllLines(GreetingFileLocation), File.ReadAllLines(MealFileLocation), new Random())
@@ -54,9 +45,6 @@ namespace KiteBot
             StreamChecker = new LivestreamChecker(gBapi, streamRefresh);
             GbVideoChecker = new GiantBombVideoChecker(gBapi, videoRefresh);
             MultiDeepMarkovChains = new MultiTextMarkovChainHelper(depth);
-            WhoIsDictionary = File.Exists(WhoIsLocation)
-                ? JsonConvert.DeserializeObject<Dictionary<ulong, WhoIsPerson>>(File.ReadAllText(WhoIsLocation))
-                : new Dictionary<ulong, WhoIsPerson>();
         }
 
         public async Task<bool> InitializeMarkovChain()
@@ -77,61 +65,14 @@ namespace KiteBot
             {
                 MultiDeepMarkovChains.Feed(msg);
 
-                if (msg.Content.StartsWith("/anime"))
-                {
-                    try
-                    {
-                        var result = await SearchHelper.GetAnimeData(msg.Content.Remove(0, 6));
-                        await msg.Channel.SendMessageAsync(result.ToString());
-                    }
-                    catch (Exception)
-                    {
-                        await msg.Channel.SendMessageAsync("Can't find any good anime named anything like that.");
-                    }
-                }
-                else if (msg.Content.StartsWith("/manga"))
-                {
-                    try
-                    {
-                        var result = await SearchHelper.GetMangaData(msg.Content.Remove(0, 6));
-                        await msg.Channel.SendMessageAsync(result.ToString());
-                    }
-                    catch (Exception)
-                    {
-                        await msg.Channel.SendMessageAsync("Why are you even looking for manga when there is anime.");
-                    }
-                }
-                else if (msg.Content.Contains("Mistake") && msg.Channel.Id == 96786127238725632)
+                if (msg.Content.Contains("Mistake") && msg.Channel.Id == 96786127238725632)
                 {
                     await msg.Channel.SendMessageAsync("Anime is a mistake " + msg.Author.Mention +".");
                 }
-                else if (msg.Content.StartsWith("/roll"))
-                {
-                    await msg.Channel.SendMessageAsync(DiceRoller.ParseRoll(msg.Content));
-                }
-
-                else if (msg.Content.ToLower().StartsWith("!reminder"))
-                {
-                    await msg.Channel.SendMessageAsync(Reminder.AddNewEvent(msg));
-                }
-
-                else if (msg.Content.ToLower().StartsWith("!whois"))
-                {
-                    var userMentioned = msg.MentionedUserIds.FirstOrDefault();
-                    if (userMentioned != 0)
-                    {
-                        await
-                            msg.Channel.SendMessageAsync(
-                                $"Former names for {await client.GetUserAsync(userMentioned)} are: {EnumWhoIs(userMentioned)}.".Replace(
-                                    ",.", "."));
-                    }
-                }
-
                 else if (msg.Content.Contains("GetDunked"))
                 {
                     await msg.Channel.SendMessageAsync("http://i.imgur.com/QhcNUWo.gif");
                 }
-
                 else if (msg.Content.Contains(@"/saveJSON") && msg.Author.Id == 85817630560108544 && StartMarkovChain)
                 {
                     await MultiDeepMarkovChains.Save();
@@ -210,18 +151,6 @@ namespace KiteBot
                             msg.Channel.SendMessageAsync("http://lmgtfy.com/?q=" +
                                                   msg.Content.ToLower().Substring(16).Replace(' ', '+'));
                     }
-                    else if (msg.Content.ToLower().Contains("youtube"))
-                    {
-                        if (msg.Content.Length > 16)
-                        {
-                            await msg.Channel.SendMessageAsync("https://www.youtube.com/results?search_query=" +
-                                                        msg.Content.ToLower().Substring(17).Replace(' ', '+'));
-                        }
-                        else
-                        {
-                            await msg.Channel.SendMessageAsync("Please add a query after youtube, starting with a space.");
-                        }
-                    }                    
                     else if (msg.Content.ToLower().Contains("fuck you") ||
                              msg.Content.ToLower().Contains("fuckyou"))
                     {
@@ -237,14 +166,6 @@ namespace KiteBot
                             msg.Channel.SendMessageAsync(
                                 possibleResponses[RandomSeed.Next(0, possibleResponses.Count)].Replace("USER",
                                     msg.Author.Username));
-                    }
-                    else if (msg.Content.ToLower().Contains("/pizza"))
-                    {
-                        await msg.Channel.SendMessageAsync(KitePizza.ParsePizza(msg.Author.Username, msg.Content));
-                    }
-                    else if (msg.Content.ToLower().Contains("sandwich"))
-                    {
-                        await msg.Channel.SendMessageAsync(KiteSandwich.ParseSandwich(msg.Author.Username));
                     }
                     else if (msg.Content.ToLower().Contains("hi") ||
                              msg.Content.ToLower().Contains("hey") ||
@@ -264,7 +185,7 @@ namespace KiteBot
                     else
                     {
                         await
-                            msg.Channel.SendMessageAsync("KiteBot ver. 1.1.3 \"Now with real dairy.\"");
+                            msg.Channel.SendMessageAsync("KiteBot ver. 2.0.3 \"Now with less...\"");
                     }
                 }
             }
@@ -370,64 +291,6 @@ namespace KiteBot
             {
                 RaeCounter += 1;
             }
-        }
-
-        public void AddWhoIs(IUser before, IUser after)
-        {
-            if (WhoIsDictionary.ContainsKey(after.Id))
-            {
-                WhoIsDictionary[after.Id].OldNames.Add(after.Username);
-            }
-            else
-            {
-                string[] names = {before.Username, after.Username};
-                WhoIsDictionary.Add(after.Id, new WhoIsPerson
-                {
-                    UserId = after.Id,
-                    OldNames = new List<string>(names)
-                });
-            }
-            File.WriteAllText(WhoIsLocation,JsonConvert.SerializeObject(WhoIsDictionary));
-        }
-
-        public void AddWhoIs(IUser user, string nicknameAfter)
-        {
-            if (WhoIsDictionary.ContainsKey(user.Id))
-            {
-                WhoIsDictionary[user.Id].OldNames.Add(nicknameAfter);
-            }
-            else
-            {
-                string[] names = { user.Username, nicknameAfter };
-                WhoIsDictionary.Add(user.Id, new WhoIsPerson
-                {
-                    UserId = user.Id,
-                    OldNames = new List<string>(names)
-                });
-            }
-            File.WriteAllText(WhoIsLocation, JsonConvert.SerializeObject(WhoIsDictionary));
-        }
-
-        public string EnumWhoIs(ulong id)
-        {
-            WhoIsPerson person;
-            if (WhoIsDictionary.TryGetValue(id, out person))
-            {
-                var output = "";
-                var list = person.OldNames;
-                foreach (var name in list)
-                {
-                    output += $"{name},";
-                }
-                return output;
-            }
-            return "No former names found,";
-        }
-
-        public class WhoIsPerson
-        {
-            public ulong UserId { get; set; }
-            public List<string> OldNames { get; set; }
         }
     }
 }

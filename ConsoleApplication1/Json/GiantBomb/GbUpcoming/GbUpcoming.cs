@@ -1,7 +1,17 @@
 ﻿using Newtonsoft.Json;
 
-namespace KiteBot.Json
+namespace KiteBot.Json.GiantBomb.GbUpcoming
 {
+
+    internal class GbUpcoming
+    {
+
+        [JsonProperty("liveNow")]
+        public LiveNow LiveNow { get; set; }
+
+        [JsonProperty("upcoming")]
+        public Upcoming[] Upcoming { get; set; }
+    }
 
     internal class LiveNow
     {
@@ -30,21 +40,6 @@ namespace KiteBot.Json
 
         [JsonProperty("premium")]
         public bool Premium { get; set; }
-    }
-
-}
-
-namespace KiteBot.Json
-{
-
-    internal class GbUpcoming
-    {
-
-        [JsonProperty("liveNow")]
-        public LiveNow LiveNow { get; set; }
-
-        [JsonProperty("upcoming")]
-        public Upcoming[] Upcoming { get; set; }
     }
 
 }

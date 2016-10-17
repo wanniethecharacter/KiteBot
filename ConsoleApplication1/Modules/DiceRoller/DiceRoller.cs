@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Discord.Commands;
 
-namespace KiteBot
+namespace KiteBot.Modules.DiceRoller
 {
-	public class DiceRoller
+	public class DiceRoller : ModuleBase
     {
-        public static CryptoRandom Random;
+        public CryptoRandom Random = new CryptoRandom();
 
-        public DiceRoller()
-        {
-            Random = new CryptoRandom();
-        }
-
-        public string ParseRoll(string text)
+        [Command("roll")]
+        [Alias("rolldice")]
+        [Summary("rolls some dice, or spesific dice")]
+        public async Task ParseRoll([Remainder]string text)
         {
             Regex diceroll = new Regex(@"(?<dice>[0-9]+)d(?<sides>[0-9]+)(\+(?<constant>[0-9]+))?|d?(?<single>[0-9]+)");//roll 2d20+20
             var matches = diceroll.Match(text);
@@ -27,7 +27,7 @@ namespace KiteBot
 
                     if (dice > 20)
                     {
-                        return "Why are you doing this, too many dice.";
+                        await ReplyAsync("Why are you doing this, too many dice.");
                     }
 
                     List<int> resultsHistory = new List<int>();
@@ -55,23 +55,23 @@ namespace KiteBot
                     if (matches.Groups["constant"].Success)
                     {
                         var constant = int.Parse(matches.Groups["constant"].Value);
-                        return resultsString + $" + {constant} = {result+constant}";
+                        await ReplyAsync(resultsString + $" + {constant} = {result+constant}");
                     }
-                    return resultsString;
+                    await ReplyAsync(resultsString);
                 }
                 else if (matches.Groups["single"].Success)
                 {
-                    return Random.Next(1, int.Parse(matches.Groups["single"].Value)).ToString();
+                    await ReplyAsync(Random.Next(1, int.Parse(matches.Groups["single"].Value)).ToString());
                 }
                 else
                 {
-                    return "use the format 5d6, d6 or simply spesify a positive integer";
+                    await ReplyAsync("use the format 5d6, d6 or simply spesify a positive integer");
                 }
 
             }
             catch (OverflowException)
             {
-                return "Why are you doing this? You're on my shitlist now.";
+                await ReplyAsync("Why are you doing this? You're on my shitlist now.");
             }
         }
     }

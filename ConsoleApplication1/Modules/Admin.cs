@@ -6,8 +6,9 @@ using Discord.Commands;
 using Discord.WebSocket;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using System.Globalization;
 
-namespace KiteBot.Commands
+namespace KiteBot.Modules
 {
     public class Admin : ModuleBase
     {
@@ -22,10 +23,10 @@ namespace KiteBot.Commands
 
         [Command("info")]
         [RequireOwner]
-        public async Task Info(IUserMessage msg)
+        public async Task Info()
         {
             var application = await Context.Client.GetApplicationInfoAsync();
-            await msg.Channel.SendMessageAsync(
+            await ReplyAsync(
                 $"{Format.Bold("Info")}\n" +
                 $"- Author: {application.Owner.Username} (ID {application.Owner.Id})\n" +
                 $"- Library: Discord.Net ({DiscordConfig.Version})\n" +
@@ -40,8 +41,7 @@ namespace KiteBot.Commands
             );
         }
 
-        private static string GetUptime()
-            => (DateTime.Now - Process.GetCurrentProcess().StartTime).ToString(@"dd\.hh\:mm\:ss");
-        private static string GetHeapSize() => Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString();
+        private static string GetUptime() => (DateTime.Now - Process.GetCurrentProcess().StartTime).ToString(@"dd\.hh\:mm\:ss");
+        private static string GetHeapSize() => Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString(CultureInfo.InvariantCulture);
     }
 }

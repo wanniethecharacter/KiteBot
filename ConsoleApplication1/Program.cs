@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using Discord.Commands;
 using KiteBot.Json;
+using KiteBot.Modules;
 using Newtonsoft.Json;
 
 
@@ -17,8 +17,9 @@ namespace KiteBot
         public static DiscordSocketClient Client;
         public static CommandService CommandService = new CommandService();
         public static BotSettings Settings;
-        private static KiteChat _kiteChat;
         public static string ContentDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.FullName;
+
+        private static KiteChat _kiteChat;
         private static string SettingsPath => ContentDirectory + "/Content/settings.json";
         private static CommandHandler _handler;
 
@@ -34,7 +35,7 @@ namespace KiteBot
 
             Settings = File.Exists(SettingsPath) ? 
                 JsonConvert.DeserializeObject<BotSettings>(File.ReadAllText(SettingsPath)) 
-                : new BotSettings()
+                : new BotSettings
                 {
                     DiscordEmail = "email",
                     DiscordPassword = "password",
@@ -43,7 +44,8 @@ namespace KiteBot
                     OwnerId = 0,
                     MarkovChainStart = false,
                     MarkovChainDepth = 2,
-                    GiantBombLiveStreamRefreshRate = 60000, GiantBombVideoRefreshRate = 60000
+                    GiantBombLiveStreamRefreshRate = 60000,
+                    GiantBombVideoRefreshRate = 60000
                 };
 
             _kiteChat = new KiteChat(Settings.MarkovChainStart,
@@ -61,7 +63,6 @@ namespace KiteBot
 
             Client.MessageReceived += async msg =>
             {
-                Console.WriteLine(msg.ToString());
                 try
                 {
                     await _kiteChat.AsyncParseChat(msg, Client);
@@ -70,7 +71,7 @@ namespace KiteBot
                 {
                     Console.WriteLine(ex.Message);
                     Console.WriteLine(ex);
-                    Environment.Exit(-1);
+                    //Environment.Exit(-1);
                 }
             }; 
 
@@ -94,7 +95,7 @@ namespace KiteBot
                 if (!before.Username.Equals(after.Username))
                 {                    
                     await channel.SendMessageAsync($"{before.Username} changed his name to {after.Username}.");
-                    _kiteChat.AddWhoIs(before, after);
+                    WhoIsService.AddWhoIs(before, after);
                 }
                 try
                 {
@@ -103,12 +104,12 @@ namespace KiteBot
                         if (before.Nickname != null && after.Nickname != null)
                         {
                             await channel.SendMessageAsync($"{before.Nickname} changed his nickname to {after.Nickname}.");
-                            _kiteChat.AddWhoIs(before, after.Nickname);
+                            WhoIsService.AddWhoIs(before, after.Nickname);
                         }
                         else if (before.Nickname == null && after.Nickname != null)
                         {
                             await channel.SendMessageAsync($"{before.Username} set his nickname to {after.Nickname}.");
-                            _kiteChat.AddWhoIs(before, after.Nickname);
+                            WhoIsService.AddWhoIs(before, after.Nickname);
                         }
                         else
                         {
@@ -130,14 +131,8 @@ namespace KiteBot
 
             _handler = new CommandHandler();
             await _handler.Install(map);
-
+            
             await Task.Delay(-1);
-        }
-
-        private Task Log(LogMessage msg)
-        {
-            Console.WriteLine(msg.ToString());
-            return Task.CompletedTask;
         }
     }
 }

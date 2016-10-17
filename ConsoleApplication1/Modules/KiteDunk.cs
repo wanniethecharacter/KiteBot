@@ -4,12 +4,10 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Timers;
-using Discord;
-using KiteBot.Commands;
 
-namespace KiteBot
+namespace KiteBot.Modules
 {
-    public class KiteDunk
+    public class KiteDunk : ModuleBase
 	{
 		private static string[,] _updatedKiteDunks;
 	    private static Random _random;
@@ -31,13 +29,13 @@ namespace KiteBot
 
         // ~say hello -> hello
         [Command("KiteDunk"), Summary("Posts a hot Kite Dunk"), Alias("dunk")]
-        public async Task KiteDunkCommand(IUserMessage msg)
+        public async Task KiteDunkCommand()
         {
-            await msg.Channel.SendMessageAsync(GetUpdatedKiteDunk());
+            await ReplyAsync(GetUpdatedKiteDunk());
         }
 
-        [Command("KiteDunk"), Summary("Posts a hot Kite Dunk"), RequireOwner]
-        public async Task KiteDunkAllCommand(IUserMessage msg)
+        [Command("KiteDunkAll"), Summary("Posts a hot Kite Dunk"), RequireOwner]
+        public async Task KiteDunkAllCommand()
         {
             var stringBuilder = new System.Text.StringBuilder(2000);
             for (int i = 0; i < _updatedKiteDunks.GetLength(0); i++)
@@ -45,7 +43,7 @@ namespace KiteBot
                 var entry = "\"" + _updatedKiteDunks[i, 1] + "\" - " + _updatedKiteDunks[i, 0] + Environment.NewLine;
                 if (stringBuilder.Length + entry.Length > 2000)
                 {
-                    await msg.Channel.SendMessageAsync(stringBuilder.ToString());
+                    await ReplyAsync(stringBuilder.ToString());
                     stringBuilder.Clear();
                 }
                 else
@@ -53,7 +51,7 @@ namespace KiteBot
                     stringBuilder.Append(entry);
                 }
             }
-            await msg.Channel.SendMessageAsync(stringBuilder.ToString());
+            await ReplyAsync(stringBuilder.ToString());
         }
 
         public string GetUpdatedKiteDunk()
