@@ -20,7 +20,6 @@ namespace KiteBot
 		//private XElement _latestXElement; Dont Need this anymore I think.
         private DateTime lastPublishTime;
         private bool firstTime = true;
-        private int _retry;
 
         public GiantBombVideoChecker(string GBapi,int videoRefresh)
         {
@@ -71,7 +70,7 @@ namespace KiteBot
 
 		private async Task RefreshVideosApi()
 		{
-            var latestXElement = await GetXDocumentFromUrl(ApiCallUrl);
+            var latestXElement = await GetXDocumentFromUrl(ApiCallUrl,0);
             IEnumerable<XElement> promos = latestXElement?.Element("results")?.Elements("promo");
 
             IOrderedEnumerable<XElement> sortedXElements = promos.OrderBy(e => GetGiantBombFormatDateTime(e.Element("date_added")?.Value));
@@ -114,7 +113,7 @@ namespace KiteBot
 			return s.Replace("<![CDATA[ ", "").Replace(" ]]>", "");
 		}
 
-        private async Task<XElement> GetXDocumentFromUrl(string url)
+        private async Task<XElement> GetXDocumentFromUrl(string url, int retry)
         {
             try
             {
@@ -126,11 +125,10 @@ namespace KiteBot
             }
             catch (Exception)
             {
-                _retry++;
-                if (_retry < 3)
+                if (++retry < 3)
                 {
                     await Task.Delay(10000);
-                    return await GetXDocumentFromUrl(url).ConfigureAwait(false);
+                    return await GetXDocumentFromUrl(url,retry).ConfigureAwait(false);
                 }
                 throw new TimeoutException();
             }

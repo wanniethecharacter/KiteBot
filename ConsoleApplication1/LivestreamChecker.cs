@@ -17,7 +17,6 @@ namespace KiteBot
 		private static Timer _chatTimer;//Garbage collection doesnt like local timers.
 		private XElement _latestXElement;
 		private static bool _wasStreamRunning;
-        private int _retry;
 
         public LivestreamChecker(string gBapi,int streamRefresh)
         {
@@ -60,8 +59,7 @@ namespace KiteBot
                 {
                     try
                     {
-                        _retry = 0;
-                        _latestXElement = await GetXDocumentFromUrl(ApiCallUrl).ConfigureAwait(false);
+                        _latestXElement = await GetXDocumentFromUrl(ApiCallUrl,0).ConfigureAwait(false);
                         var numberOfResults = _latestXElement.Element("number_of_page_results")?.Value;
                         var channel = (ITextChannel) Program.Client.GetChannel(85842104034541568);
 
@@ -105,7 +103,7 @@ namespace KiteBot
 			return s.Replace("<![CDATA[ ", "").Replace(" ]]>", "");
 		}
 
-        private async Task<XElement> GetXDocumentFromUrl(string url)
+        private async Task<XElement> GetXDocumentFromUrl(string url, int retry)
         {
             try
             {
@@ -117,11 +115,10 @@ namespace KiteBot
             }
             catch (Exception)
             {
-                _retry++;
-                if (_retry < 2)
+                if (++retry < 2)
                 {
                     await Task.Delay(10000);
-                    return await GetXDocumentFromUrl(url).ConfigureAwait(false);
+                    return await GetXDocumentFromUrl(url,retry).ConfigureAwait(false);
                 }
                 throw new TimeoutException();
             }
